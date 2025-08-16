@@ -284,6 +284,166 @@ export function SectionEditor({
           <div className="border rounded-lg p-4 space-y-4 bg-muted/50">
             <h4 className="font-semibold text-sm">Carousel Settings</h4>
             
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="portfolio-slides-xs">Mobile (XS)</Label>
+                <Select
+                  value={String((section.data as any).carousel?.slidesPerView?.xs || 1)}
+                  onValueChange={(value) => updateSectionData({ 
+                    carousel: { 
+                      ...(section.data as any).carousel, 
+                      slidesPerView: { 
+                        ...(section.data as any).carousel?.slidesPerView, 
+                        xs: parseInt(value) 
+                      } 
+                    } 
+                  })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[1, 2, 3].map((num) => (
+                      <SelectItem key={num} value={String(num)}>{num}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="portfolio-slides-sm">Small (SM)</Label>
+                <Select
+                  value={String((section.data as any).carousel?.slidesPerView?.sm || 1)}
+                  onValueChange={(value) => updateSectionData({ 
+                    carousel: { 
+                      ...(section.data as any).carousel, 
+                      slidesPerView: { 
+                        ...(section.data as any).carousel?.slidesPerView, 
+                        sm: parseInt(value) 
+                      } 
+                    } 
+                  })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[1, 2, 3].map((num) => (
+                      <SelectItem key={num} value={String(num)}>{num}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="portfolio-slides-md">Medium (MD)</Label>
+                <Select
+                  value={String((section.data as any).carousel?.slidesPerView?.md || 2)}
+                  onValueChange={(value) => updateSectionData({ 
+                    carousel: { 
+                      ...(section.data as any).carousel, 
+                      slidesPerView: { 
+                        ...(section.data as any).carousel?.slidesPerView, 
+                        md: parseInt(value) 
+                      } 
+                    } 
+                  })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[1, 2, 3, 4].map((num) => (
+                      <SelectItem key={num} value={String(num)}>{num}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="portfolio-slides-lg">Large (LG)</Label>
+                <Select
+                  value={String((section.data as any).carousel?.slidesPerView?.lg || 3)}
+                  onValueChange={(value) => updateSectionData({ 
+                    carousel: { 
+                      ...(section.data as any).carousel, 
+                      slidesPerView: { 
+                        ...(section.data as any).carousel?.slidesPerView, 
+                        lg: parseInt(value) 
+                      } 
+                    } 
+                  })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[1, 2, 3, 4, 5, 6].map((num) => (
+                      <SelectItem key={num} value={String(num)}>{num}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="portfolio-autoplay"
+                  checked={(section.data as any).carousel?.autoplay || false}
+                  onCheckedChange={(checked) => updateSectionData({ 
+                    carousel: { 
+                      ...(section.data as any).carousel, 
+                      autoplay: checked 
+                    } 
+                  })}
+                />
+                <Label htmlFor="portfolio-autoplay">Autoplay</Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="portfolio-loop"
+                  checked={(section.data as any).carousel?.loop !== false}
+                  onCheckedChange={(checked) => updateSectionData({ 
+                    carousel: { 
+                      ...(section.data as any).carousel, 
+                      loop: checked 
+                    } 
+                  })}
+                />
+                <Label htmlFor="portfolio-loop">Loop</Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="portfolio-arrows"
+                  checked={(section.data as any).carousel?.showArrows !== false}
+                  onCheckedChange={(checked) => updateSectionData({ 
+                    carousel: { 
+                      ...(section.data as any).carousel, 
+                      showArrows: checked 
+                    } 
+                  })}
+                />
+                <Label htmlFor="portfolio-arrows">Arrows</Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="portfolio-dots"
+                  checked={(section.data as any).carousel?.showDots !== false}
+                  onCheckedChange={(checked) => updateSectionData({ 
+                    carousel: { 
+                      ...(section.data as any).carousel, 
+                      showDots: checked 
+                    } 
+                  })}
+                />
+                <Label htmlFor="portfolio-dots">Dots</Label>
+              </div>
+            </div>
+            
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Aspect Ratio</Label>

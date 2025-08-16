@@ -3,6 +3,20 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
+// Motion animation variants for staggered entrance
+const slideVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: (index: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.15,
+      delay: index * 0.06,
+      ease: [0.4, 0, 0.2, 1], // Standard ease-out
+    },
+  }),
+};
+
 interface CarouselBaseProps {
   children: React.ReactNode[];
   title: string;
@@ -36,6 +50,7 @@ export function CarouselBase({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [hasAnimated, setHasAnimated] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<NodeJS.Timeout>();
   const touchStartX = useRef<number>(0);
@@ -53,6 +68,18 @@ export function CarouselBase({
       
       mediaQuery.addEventListener('change', handleChange);
       return () => mediaQuery.removeEventListener('change', handleChange);
+    }
+  }, []);
+
+  // Trigger animation on mount
+  useEffect(() => {
+    if (!prefersReducedMotion && !hasAnimated) {
+      const timer = setTimeout(() => {
+        setHasAnimated(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    } else if (prefersReducedMotion) {
+      setHasAnimated(true);
     }
   }, []);
 
@@ -197,28 +224,45 @@ export function CarouselBase({
         onTouchEnd={handleTouchEnd}
       >
         <div
-          className="flex transition-transform duration-300 ease-out"
+          className="flex transition-transform ease-out"
           style={{
             transform: `translateX(${translateX}%)`,
             gap: `${gap}px`,
-            transition: prefersReducedMotion ? 'none' : undefined,
+            transitionDuration: prefersReducedMotion ? '0ms' : '300ms',
           }}
           aria-live="off"
         >
-          {children.map((child, index) => (
-            <div
-              key={index}
-              className="flex-shrink-0"
-              style={{ width: `calc(${slideWidth}% - ${gap * (currentSlidesPerView - 1) / currentSlidesPerView}px)` }}
-              aria-hidden={
-                loop 
-                  ? false 
-                  : index < currentIndex || index >= currentIndex + currentSlidesPerView
-              }
-            >
-              {child}
-            </div>
-          ))}
+          {children.map((child, index) => {
+            const isVisible = loop 
+              ? true 
+              : index >= currentIndex && index < currentIndex + currentSlidesPerView;
+            
+            return (
+              <div
+                key={index}
+                className={cn(
+                  "flex-shrink-0 transition-opacity ease-out",
+                  hasAnimated && !prefersReducedMotion && isVisible 
+                    ? "opacity-100 animate-fade-in" 
+                    : hasAnimated 
+                    ? "opacity-100" 
+                    : "opacity-0"
+                )}
+                style={{ 
+                  width: `calc(${slideWidth}% - ${gap * (currentSlidesPerView - 1) / currentSlidesPerView}px)`,
+                  animationDelay: !prefersReducedMotion && hasAnimated ? `${index * 60}ms` : '0ms',
+                  transitionDuration: prefersReducedMotion ? '0ms' : '150ms',
+                }}
+                aria-hidden={
+                  loop 
+                    ? false 
+                    : index < currentIndex || index >= currentIndex + currentSlidesPerView
+                }
+              >
+                {child}
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -231,10 +275,11 @@ export function CarouselBase({
             className={cn(
               "absolute left-2 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full",
               "bg-background/80 backdrop-blur-sm border-2",
-              "hover:bg-background hover:scale-110 transition-all duration-200",
+              "hover:bg-background hover:scale-110 transition-all ease-out",
               "focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
               (!loop && currentIndex === 0) && "opacity-50 cursor-not-allowed"
             )}
+            style={{ transitionDuration: prefersReducedMotion ? '0ms' : '120ms' }}
             onClick={goToPrev}
             disabled={!loop && currentIndex === 0}
             aria-label="Previous slide"
@@ -248,10 +293,11 @@ export function CarouselBase({
             className={cn(
               "absolute right-2 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full",
               "bg-background/80 backdrop-blur-sm border-2",
-              "hover:bg-background hover:scale-110 transition-all duration-200",
+              "hover:bg-background hover:scale-110 transition-all ease-out",
               "focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
               (!loop && currentIndex >= maxIndex) && "opacity-50 cursor-not-allowed"
             )}
+            style={{ transitionDuration: prefersReducedMotion ? '0ms' : '120ms' }}
             onClick={goToNext}
             disabled={!loop && currentIndex >= maxIndex}
             aria-label="Next slide"
@@ -273,12 +319,13 @@ export function CarouselBase({
               <button
                 key={index}
                 className={cn(
-                  "w-3 h-3 rounded-full transition-all duration-200",
+                  "w-3 h-3 rounded-full transition-all ease-out",
                   "focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
                   isActive 
                     ? "bg-primary scale-110" 
                     : "bg-muted hover:bg-muted-foreground/30"
                 )}
+                style={{ transitionDuration: prefersReducedMotion ? '0ms' : '120ms' }}
                 onClick={() => goToSlide(loop ? index : index * currentSlidesPerView)}
                 aria-label={`Go to slide ${index + 1}`}
                 aria-current={isActive ? 'true' : undefined}

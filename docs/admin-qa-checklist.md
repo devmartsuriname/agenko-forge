@@ -131,6 +131,26 @@
 - [ ] Edge (latest)
 - [ ] Mobile responsive on all screen sizes
 
+## Carousel QA Tests
+
+### Keyboard Navigation
+- [ ] Tab order: carousel region → slides → arrows → dots
+- [ ] Left/Right arrow keys navigate slides when focused
+- [ ] Each dot has proper aria-label and aria-current
+- [ ] Visible focus indicators on all interactive elements
+- [ ] Focus doesn't get trapped in hidden slides
+
+### Reduced Motion Support
+- [ ] `prefers-reduced-motion: reduce` disables autoplay
+- [ ] Transitions are minimal/disabled with reduced motion
+- [ ] No motion sickness triggers (parallax, rapid movement)
+
+### Touch/Mobile Navigation
+- [ ] Left/right swipe changes slides
+- [ ] Swipe threshold appropriate (not too sensitive)
+- [ ] Touch targets meet 44px minimum size
+- [ ] No horizontal scroll conflicts
+
 ## Performance Benchmarks
 
 ### Lighthouse Scores (Desktop)
@@ -144,6 +164,12 @@
 - [ ] Dashboard: <3s with data
 - [ ] List pages: <2s for 100 items
 - [ ] Editors: <1s to interactive
+
+### Carousel Performance
+- [ ] 60fps swipe on mid-range Android devices
+- [ ] No CLS from carousel loading/initialization
+- [ ] Smooth transitions without janky animations
+- [ ] Images lazy load properly with aspect ratio preservation
 
 ## Security Verification
 

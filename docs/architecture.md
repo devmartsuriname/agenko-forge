@@ -117,5 +117,36 @@ This is a modern agency website with secure admin CMS, built with React, TypeScr
 - Performance optimization and caching
 - SEO enhancements and sitemap generation
 
+## Carousel System
+
+### Design Principles
+- **Homepage Only**: Carousels are exclusive to homepage sections; /blog and /portfolio routes maintain grid/list layouts
+- **Accessibility First**: Full keyboard navigation, proper ARIA labels, screen reader support
+- **Performance Optimized**: Transform/opacity animations only, 60fps target, <30KB JS budget
+- **Reduced Motion**: Honors `prefers-reduced-motion: reduce` with disabled autoplay and minimal transitions
+
+### Technical Implementation
+- **CarouselBase Component**: Headless carousel with touch/keyboard/mouse support
+- **Motion System**: 120-180ms durations, 60-80ms stagger delays, standard ease-out curves
+- **Responsive**: Configurable slides per viewport (xs/sm/md/lg breakpoints)
+- **Focus Management**: Proper focus order, visible focus indicators, aria-current for active slides
+- **Image Optimization**: Lazy loading, proper aspect ratios, sizes/srcset attributes
+
+### Carousel Configuration
+```typescript
+carousel: {
+  slidesPerView: { xs: 1, sm: 1, md: 2, lg: 3 },
+  gap: 16,                  // Tailwind gap equivalent
+  autoplay: false,          // Disabled by default
+  intervalMs: 6000,         // Autoplay interval
+  loop: true,               // Infinite loop
+  showArrows: true,         // Navigation arrows
+  showDots: true,           // Dot indicators
+  // Portfolio-specific
+  aspectRatio: '16/9',      // '16/9' | '4/3' | '1/1'
+  imageFit: 'cover'         // 'cover' | 'contain'
+}
+```
+
 ## Style Isolation
 Admin styles use semantic tokens and can be scoped with `.admin-root` class to prevent conflicts with public frontend.
