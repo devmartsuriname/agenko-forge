@@ -1,3 +1,4 @@
+import { useLocation } from 'react-router-dom';
 import { HeroSectionComponent } from './HeroSection';
 import { AboutSectionComponent } from './AboutSection';
 import { ServicesPreviewSectionComponent } from './ServicesPreviewSection';
@@ -12,26 +13,41 @@ interface SectionRendererProps {
 }
 
 export function SectionRenderer({ sections }: SectionRendererProps) {
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+
   return (
     <div className="section-renderer">
       {sections.map((section) => {
-        switch (section.type) {
+        // Force grid layout for portfolio and blog sections on non-homepage routes
+        let sectionToRender = section;
+        if (!isHomePage && (section.type === 'portfolioPreview' || section.type === 'blogPreview')) {
+          sectionToRender = {
+            ...section,
+            data: {
+              ...section.data,
+              layout: 'grid' as const
+            }
+          };
+        }
+
+        switch (sectionToRender.type) {
           case 'hero':
-            return <HeroSectionComponent key={section.id} section={section} />;
+            return <HeroSectionComponent key={sectionToRender.id} section={sectionToRender} />;
           case 'about':
-            return <AboutSectionComponent key={section.id} section={section} />;
+            return <AboutSectionComponent key={sectionToRender.id} section={sectionToRender} />;
           case 'servicesPreview':
-            return <ServicesPreviewSectionComponent key={section.id} section={section} />;
+            return <ServicesPreviewSectionComponent key={sectionToRender.id} section={sectionToRender} />;
           case 'portfolioPreview':
-            return <PortfolioPreviewSectionComponent key={section.id} section={section} />;
+            return <PortfolioPreviewSectionComponent key={sectionToRender.id} section={sectionToRender} />;
           case 'testimonials':
-            return <TestimonialsSectionComponent key={section.id} section={section} />;
+            return <TestimonialsSectionComponent key={sectionToRender.id} section={sectionToRender} />;
           case 'blogPreview':
-            return <BlogPreviewSectionComponent key={section.id} section={section} />;
+            return <BlogPreviewSectionComponent key={sectionToRender.id} section={sectionToRender} />;
           case 'cta':
-            return <CtaSectionComponent key={section.id} section={section} />;
+            return <CtaSectionComponent key={sectionToRender.id} section={sectionToRender} />;
           default:
-            console.warn(`Unknown section type: ${(section as any).type}`);
+            console.warn(`Unknown section type: ${(sectionToRender as any).type}`);
             return null;
         }
       })}
