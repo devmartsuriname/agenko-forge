@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
+import { BlogPreviewCarousel } from './BlogPreviewCarousel';
 import type { BlogPreviewSection } from '@/lib/sections/schema';
 
 interface BlogPreviewSectionProps {
@@ -14,6 +15,11 @@ interface BlogPreviewSectionProps {
 
 export function BlogPreviewSectionComponent({ section }: BlogPreviewSectionProps) {
   const { data } = section;
+
+  // Render carousel layout if specified
+  if (data.layout === 'carousel') {
+    return <BlogPreviewCarousel section={section} />;
+  }
 
   const { data: blogPosts = [], isLoading } = useQuery({
     queryKey: ['published-blog-posts', data.limit],

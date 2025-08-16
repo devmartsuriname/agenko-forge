@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { PortfolioPreviewCarousel } from './PortfolioPreviewCarousel';
 import type { PortfolioPreviewSection } from '@/lib/sections/schema';
 
 interface PortfolioPreviewSectionProps {
@@ -12,6 +13,11 @@ interface PortfolioPreviewSectionProps {
 
 export function PortfolioPreviewSectionComponent({ section }: PortfolioPreviewSectionProps) {
   const { data } = section;
+
+  // Render carousel layout if specified
+  if (data.layout === 'carousel') {
+    return <PortfolioPreviewCarousel section={section} />;
+  }
 
   const { data: projects = [], isLoading } = useQuery({
     queryKey: ['published-projects', data.limit],

@@ -57,6 +57,23 @@ export const PortfolioPreviewSectionSchema = BaseSectionSchema.extend({
     description: z.string().optional(),
     limit: z.number().min(1).max(12).default(6),
     showAll: z.boolean().default(true),
+    layout: z.enum(['grid', 'carousel']).default('grid'),
+    carousel: z.object({
+      slidesPerView: z.object({
+        xs: z.number().min(1).max(6).default(1),
+        sm: z.number().min(1).max(6).default(1),
+        md: z.number().min(1).max(6).default(2),
+        lg: z.number().min(1).max(6).default(3),
+      }).default({ xs: 1, sm: 1, md: 2, lg: 3 }),
+      gap: z.number().min(0).max(64).default(16),
+      autoplay: z.boolean().default(false),
+      intervalMs: z.number().min(1000).max(10000).default(6000),
+      loop: z.boolean().default(true),
+      showArrows: z.boolean().default(true),
+      showDots: z.boolean().default(true),
+      aspectRatio: z.enum(['16/9', '4/3', '1/1']).default('16/9'),
+      imageFit: z.enum(['cover', 'contain']).default('cover'),
+    }).optional(),
   }),
 });
 
@@ -85,6 +102,21 @@ export const BlogPreviewSectionSchema = BaseSectionSchema.extend({
     description: z.string().optional(),
     limit: z.number().min(1).max(12).default(3),
     showAll: z.boolean().default(true),
+    layout: z.enum(['grid', 'carousel']).default('grid'),
+    carousel: z.object({
+      slidesPerView: z.object({
+        xs: z.number().min(1).max(6).default(1),
+        sm: z.number().min(1).max(6).default(1),
+        md: z.number().min(1).max(6).default(2),
+        lg: z.number().min(1).max(6).default(3),
+      }).default({ xs: 1, sm: 1, md: 2, lg: 3 }),
+      gap: z.number().min(0).max(64).default(16),
+      autoplay: z.boolean().default(false),
+      intervalMs: z.number().min(1000).max(10000).default(6000),
+      loop: z.boolean().default(true),
+      showArrows: z.boolean().default(true),
+      showDots: z.boolean().default(true),
+    }).optional(),
   }),
 });
 
@@ -194,6 +226,7 @@ export function createDefaultSection(type: Section['type']): Section {
           description: 'Explore our portfolio of successful projects.',
           limit: 6,
           showAll: true,
+          layout: 'grid' as const,
         },
       } as PortfolioPreviewSection;
       
@@ -225,6 +258,7 @@ export function createDefaultSection(type: Section['type']): Section {
           description: 'Stay updated with our latest thoughts and industry trends.',
           limit: 3,
           showAll: true,
+          layout: 'grid' as const,
         },
       } as BlogPreviewSection;
       
