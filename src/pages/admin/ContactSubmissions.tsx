@@ -5,10 +5,14 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { SEOHead } from '@/lib/seo';
-import { adminCms, exportToCSV } from '@/lib/admin-cms';
+import { adminCms } from '@/lib/admin-cms';
 import { ContactSubmission } from '@/types/content';
 import { useAuth } from '@/lib/auth';
-import { Download, Search, Calendar } from 'lucide-react';
+import { adminToast } from '@/lib/toast-utils';
+import { adminExports } from '@/lib/csv-export';
+import { EmptyState } from '@/components/admin/EmptyState';
+import { LoadingListSkeleton } from '@/components/admin/LoadingSkeleton';
+import { Download, Search, Calendar, FileText, Mail } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function ContactSubmissions() {
@@ -45,22 +49,30 @@ export default function ContactSubmissions() {
       setFilteredSubmissions(data);
     } catch (error) {
       console.error('Error fetching contact submissions:', error);
+      if (error instanceof Error && error.message.includes('permission')) {
+        adminToast.permissionDenied('view contact submissions');
+      } else {
+        adminToast.networkError();
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const handleExportCSV = () => {
-    const exportData = filteredSubmissions.map(submission => ({
-      name: submission.name,
-      email: submission.email,
-      subject: submission.subject || '',
-      message: submission.message,
-      created_at: submission.created_at,
-      ip: submission.ip || ''
-    }));
-    
-    exportToCSV(exportData, `contact_submissions_${format(new Date(), 'yyyy-MM-dd')}.csv`);
+  const handleExportCSV = async () => {
+    try {
+      if (filteredSubmissions.length === 0) {
+        adminToast.warning('No Data', 'No contact submissions to export.');
+        return;
+      }
+      
+      adminToast.generateProgress('CSV export');
+      const filename = adminExports.contactSubmissions(filteredSubmissions);
+      adminToast.exported('Contact Submissions', filename);
+    } catch (error) {
+      console.error('Error exporting submissions:', error);
+      adminToast.error('Export Failed', 'Unable to generate CSV file. Please try again.');
+    }
   };
 
   if (!isAdmin) {
@@ -74,9 +86,26 @@ export default function ContactSubmissions() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
+      <>
+        <SEOHead 
+          title="Contact Submissions - Admin Panel"
+          description="Manage contact form submissions"
+        />
+        <meta name="robots" content="noindex,nofollow" />
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Contact Submissions</h1>
+              <p className="text-muted-foreground">View and manage contact form submissions</p>
+            </div>
+            <Button disabled>
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
+            </Button>
+          </div>
+          <LoadingListSkeleton />
+        </div>
+      </>
     );
   }
 
@@ -86,6 +115,7 @@ export default function ContactSubmissions() {
         title="Contact Submissions - Admin Panel"
         description="Manage contact form submissions"
       />
+      <meta name="robots" content="noindex,nofollow" />
       
       <div className="space-y-6">
         <div className="flex justify-between items-center">
@@ -127,9 +157,23 @@ export default function ContactSubmissions() {
           </CardHeader>
           <CardContent>
             {filteredSubmissions.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">
-                {searchTerm ? 'No submissions found matching your search.' : 'No submissions found.'}
-              </p>
+              submissions.length === 0 ? (
+                <EmptyState
+                  icon={Mail}
+                  title="No contact submissions yet"
+                  description="When visitors use your contact form, their messages will appear here for you to review and respond to."
+                  actionLabel="View Contact Form"
+                  actionTo="/contact"
+                />
+              ) : (
+                <EmptyState
+                  icon={Search}
+                  title="No submissions found"
+                  description="Try adjusting your search terms to find what you're looking for."
+                  actionLabel="Clear Search"
+                  actionTo="/admin/contact"
+                />
+              )
             ) : (
               <div className="space-y-4">
                 {filteredSubmissions.map((submission) => (
@@ -167,43 +211,47 @@ export default function ContactSubmissions() {
                               View Details
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="max-w-2xl">
+                          <DialogContent 
+                            className="max-w-2xl"
+                            aria-labelledby="submission-title"
+                            aria-describedby="submission-description"
+                          >
                             <DialogHeader>
-                              <DialogTitle>Contact Submission Details</DialogTitle>
-                              <DialogDescription>
+                              <DialogTitle id="submission-title">Contact Submission Details</DialogTitle>
+                              <DialogDescription id="submission-description">
                                 Submitted on {format(new Date(submission.created_at), 'MMMM d, yyyy')} at {format(new Date(submission.created_at), 'h:mm a')}
                               </DialogDescription>
                             </DialogHeader>
                             <div className="space-y-4">
                               <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                  <label className="text-sm font-medium">Name</label>
-                                  <p className="text-sm text-muted-foreground">{submission.name}</p>
+                                  <label className="text-sm font-medium" htmlFor={`name-${submission.id}`}>Name</label>
+                                  <p className="text-sm text-muted-foreground" id={`name-${submission.id}`}>{submission.name}</p>
                                 </div>
                                 <div>
-                                  <label className="text-sm font-medium">Email</label>
-                                  <p className="text-sm text-muted-foreground">{submission.email}</p>
+                                  <label className="text-sm font-medium" htmlFor={`email-${submission.id}`}>Email</label>
+                                  <p className="text-sm text-muted-foreground" id={`email-${submission.id}`}>{submission.email}</p>
                                 </div>
                               </div>
                               
                               {submission.subject && (
                                 <div>
-                                  <label className="text-sm font-medium">Subject</label>
-                                  <p className="text-sm text-muted-foreground">{submission.subject}</p>
+                                  <label className="text-sm font-medium" htmlFor={`subject-${submission.id}`}>Subject</label>
+                                  <p className="text-sm text-muted-foreground" id={`subject-${submission.id}`}>{submission.subject}</p>
                                 </div>
                               )}
                               
                               <div>
-                                <label className="text-sm font-medium">Message</label>
+                                <label className="text-sm font-medium" htmlFor={`message-${submission.id}`}>Message</label>
                                 <div className="mt-1 p-3 bg-muted rounded-md">
-                                  <p className="text-sm whitespace-pre-wrap">{submission.message}</p>
+                                  <p className="text-sm whitespace-pre-wrap" id={`message-${submission.id}`}>{submission.message}</p>
                                 </div>
                               </div>
                               
                               {submission.ip && (
                                 <div>
-                                  <label className="text-sm font-medium">IP Address</label>
-                                  <p className="text-sm text-muted-foreground">{submission.ip}</p>
+                                  <label className="text-sm font-medium" htmlFor={`ip-${submission.id}`}>IP Address</label>
+                                  <p className="text-sm text-muted-foreground" id={`ip-${submission.id}`}>{submission.ip}</p>
                                 </div>
                               )}
                             </div>

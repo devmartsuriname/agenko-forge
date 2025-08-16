@@ -12,7 +12,11 @@ import { adminCms } from '@/lib/admin-cms';
 import { Page } from '@/types/content';
 import { useAuth } from '@/lib/auth';
 import { formatDate, getStatusBadgeVariant } from '@/lib/admin-utils';
-import { Plus, Search, Edit, Trash2, Eye } from 'lucide-react';
+import { adminToast } from '@/lib/toast-utils';
+import { EmptyState } from '@/components/admin/EmptyState';
+import { LoadingListSkeleton } from '@/components/admin/LoadingSkeleton';
+import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
+import { Plus, Search, Edit, Trash2, Eye, FileText } from 'lucide-react';
 
 function AdminPages() {
   const { isAdmin, isEditor } = useAuth();
@@ -39,11 +43,11 @@ function AdminPages() {
       setPages(data);
     } catch (error) {
       console.error('Error fetching pages:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch pages',
-        variant: 'destructive',
-      });
+      if (error instanceof Error && error.message.includes('permission')) {
+        adminToast.permissionDenied('view pages');
+      } else {
+        adminToast.networkError();
+      }
     } finally {
       setLoading(false);
     }
@@ -71,17 +75,14 @@ function AdminPages() {
     try {
       await adminCms.deletePage(page.id);
       setPages(prev => prev.filter(p => p.id !== page.id));
-      toast({
-        title: 'Success',
-        description: 'Page deleted successfully',
-      });
+      adminToast.deleted('Page', page.title);
     } catch (error) {
       console.error('Error deleting page:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete page',
-        variant: 'destructive',
-      });
+      if (error instanceof Error && error.message.includes('permission')) {
+        adminToast.permissionDenied('delete pages');
+      } else {
+        adminToast.error('Failed to Delete', 'Unable to delete page. Please try again.');
+      }
     } finally {
       setDeleting(false);
       setDeleteConfirm(null);
@@ -99,9 +100,26 @@ function AdminPages() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
+      <>
+        <SEOHead 
+          title="Pages - Admin Panel"
+          description="Manage website pages"
+        />
+        <meta name="robots" content="noindex,nofollow" />
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Pages</h1>
+              <p className="text-muted-foreground">Manage your website pages</p>
+            </div>
+            <Button disabled>
+              <Plus className="h-4 w-4 mr-2" />
+              New Page
+            </Button>
+          </div>
+          <LoadingListSkeleton />
+        </div>
+      </>
     );
   }
 
@@ -111,6 +129,7 @@ function AdminPages() {
         title="Pages - Admin Panel"
         description="Manage website pages"
       />
+      <meta name="robots" content="noindex,nofollow" />
       
       <div className="space-y-6">
         <div className="flex justify-between items-center">
@@ -166,9 +185,23 @@ function AdminPages() {
           </CardHeader>
           <CardContent>
             {filteredPages.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">
-                {searchTerm || statusFilter !== 'all' ? 'No pages found matching your filters.' : 'No pages found.'}
-              </p>
+              pages.length === 0 ? (
+                <EmptyState
+                  icon={FileText}
+                  title="No pages yet"
+                  description="Create your first page to add custom content like About, Privacy Policy, or other static pages to your website."
+                  actionLabel="Create First Page"
+                  actionTo="/admin/pages/new"
+                />
+              ) : (
+                <EmptyState
+                  icon={Search}
+                  title="No pages found"
+                  description="Try adjusting your search terms or filters to find what you're looking for."
+                  actionLabel="Clear Filters"
+                  actionTo="/admin/pages"
+                />
+              )
             ) : (
               <div className="space-y-4">
                 {filteredPages.map((page) => (
@@ -207,41 +240,36 @@ function AdminPages() {
                         </Button>
                         
                         {isAdmin && (
-                          <Dialog open={deleteConfirm?.id === page.id} onOpenChange={() => setDeleteConfirm(null)}>
-                            <DialogTrigger asChild>
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => setDeleteConfirm(page)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>Delete Page</DialogTitle>
-                                <DialogDescription>
-                                  Are you sure you want to delete "{page.title}"? This action cannot be undone.
-                                </DialogDescription>
-                              </DialogHeader>
-                              <div className="flex justify-end space-x-2">
-                                <Button
-                                  variant="outline"
-                                  onClick={() => setDeleteConfirm(null)}
-                                  disabled={deleting}
-                                >
-                                  Cancel
-                                </Button>
-                                <Button
-                                  variant="destructive"
-                                  onClick={() => handleDelete(page)}
-                                  disabled={deleting}
-                                >
-                                  {deleting ? 'Deleting...' : 'Delete'}
-                                </Button>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
+                          <>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => setDeleteConfirm(page)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                            <ConfirmDialog
+                              open={deleteConfirm?.id === page.id}
+                              onOpenChange={() => setDeleteConfirm(null)}
+                              title="Delete Page"
+                              description={
+                                <>
+                                  Are you sure you want to delete <strong>"{page.title}"</strong>?
+                                  <br /><br />
+                                  This action cannot be undone.
+                                  {page.status === 'published' && (
+                                    <div className="mt-2 p-2 bg-destructive/10 border border-destructive/20 rounded">
+                                      <strong>Warning:</strong> This page is currently published and visible to visitors.
+                                    </div>
+                                  )}
+                                </>
+                              }
+                              confirmLabel="Delete Page"
+                              variant="destructive"
+                              onConfirm={() => handleDelete(page)}
+                              loading={deleting}
+                            />
+                          </>
                         )}
                       </div>
                     </div>

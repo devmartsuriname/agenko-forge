@@ -12,7 +12,11 @@ import { adminCms } from '@/lib/admin-cms';
 import { BlogPost } from '@/types/content';
 import { useAuth } from '@/lib/auth';
 import { formatDate, getStatusBadgeVariant } from '@/lib/admin-utils';
-import { Plus, Search, Edit, Trash2, Eye, Tag } from 'lucide-react';
+import { adminToast } from '@/lib/toast-utils';
+import { EmptyState } from '@/components/admin/EmptyState';
+import { LoadingListSkeleton } from '@/components/admin/LoadingSkeleton';
+import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
+import { Plus, Search, Edit, Trash2, Eye, Tag, FileText } from 'lucide-react';
 
 function AdminBlog() {
   const { isAdmin, isEditor } = useAuth();
@@ -43,11 +47,11 @@ function AdminBlog() {
       setPosts(data);
     } catch (error) {
       console.error('Error fetching blog posts:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch blog posts',
-        variant: 'destructive',
-      });
+      if (error instanceof Error && error.message.includes('permission')) {
+        adminToast.permissionDenied('view blog posts');
+      } else {
+        adminToast.networkError();
+      }
     } finally {
       setLoading(false);
     }
@@ -87,17 +91,14 @@ function AdminBlog() {
     try {
       await adminCms.deleteBlogPost(post.id);
       setPosts(prev => prev.filter(p => p.id !== post.id));
-      toast({
-        title: 'Success',
-        description: 'Blog post deleted successfully',
-      });
+      adminToast.deleted('Blog Post', post.title);
     } catch (error) {
       console.error('Error deleting blog post:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete blog post',
-        variant: 'destructive',
-      });
+      if (error instanceof Error && error.message.includes('permission')) {
+        adminToast.permissionDenied('delete blog posts');
+      } else {
+        adminToast.error('Failed to Delete', 'Unable to delete blog post. Please try again.');
+      }
     } finally {
       setDeleting(false);
       setDeleteConfirm(null);
@@ -115,9 +116,26 @@ function AdminBlog() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
+      <>
+        <SEOHead 
+          title="Blog - Admin Panel"
+          description="Manage blog posts"
+        />
+        <meta name="robots" content="noindex,nofollow" />
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Blog Posts</h1>
+              <p className="text-muted-foreground">Manage your blog content</p>
+            </div>
+            <Button disabled>
+              <Plus className="h-4 w-4 mr-2" />
+              New Post
+            </Button>
+          </div>
+          <LoadingListSkeleton />
+        </div>
+      </>
     );
   }
 
@@ -127,6 +145,7 @@ function AdminBlog() {
         title="Blog - Admin Panel"
         description="Manage blog posts"
       />
+      <meta name="robots" content="noindex,nofollow" />
       
       <div className="space-y-6">
         <div className="flex justify-between items-center">
@@ -198,11 +217,23 @@ function AdminBlog() {
           </CardHeader>
           <CardContent>
             {filteredPosts.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">
-                {searchTerm || statusFilter !== 'all' || tagFilter !== 'all' 
-                  ? 'No posts found matching your filters.' 
-                  : 'No blog posts found.'}
-              </p>
+              posts.length === 0 ? (
+                <EmptyState
+                  icon={FileText}
+                  title="No blog posts yet"
+                  description="Create your first blog post to start sharing insights, updates, and valuable content with your audience."
+                  actionLabel="Create First Post"
+                  actionTo="/admin/blog/new"
+                />
+              ) : (
+                <EmptyState
+                  icon={Search}
+                  title="No posts found"
+                  description="Try adjusting your search terms or filters to find what you're looking for."
+                  actionLabel="Clear Filters"
+                  actionTo="/admin/blog"
+                />
+              )
             ) : (
               <div className="space-y-4">
                 {filteredPosts.map((post) => (
@@ -253,41 +284,36 @@ function AdminBlog() {
                         </Button>
                         
                         {isAdmin && (
-                          <Dialog open={deleteConfirm?.id === post.id} onOpenChange={() => setDeleteConfirm(null)}>
-                            <DialogTrigger asChild>
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => setDeleteConfirm(post)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>Delete Blog Post</DialogTitle>
-                                <DialogDescription>
-                                  Are you sure you want to delete "{post.title}"? This action cannot be undone.
-                                </DialogDescription>
-                              </DialogHeader>
-                              <div className="flex justify-end space-x-2">
-                                <Button
-                                  variant="outline"
-                                  onClick={() => setDeleteConfirm(null)}
-                                  disabled={deleting}
-                                >
-                                  Cancel
-                                </Button>
-                                <Button
-                                  variant="destructive"
-                                  onClick={() => handleDelete(post)}
-                                  disabled={deleting}
-                                >
-                                  {deleting ? 'Deleting...' : 'Delete'}
-                                </Button>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
+                          <>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => setDeleteConfirm(post)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                            <ConfirmDialog
+                              open={deleteConfirm?.id === post.id}
+                              onOpenChange={() => setDeleteConfirm(null)}
+                              title="Delete Blog Post"
+                              description={
+                                <>
+                                  Are you sure you want to delete <strong>"{post.title}"</strong>?
+                                  <br /><br />
+                                  This action cannot be undone.
+                                  {post.status === 'published' && (
+                                    <div className="mt-2 p-2 bg-destructive/10 border border-destructive/20 rounded">
+                                      <strong>Warning:</strong> This blog post is currently published and visible to visitors.
+                                    </div>
+                                  )}
+                                </>
+                              }
+                              confirmLabel="Delete Post"
+                              variant="destructive"
+                              onConfirm={() => handleDelete(post)}
+                              loading={deleting}
+                            />
+                          </>
                         )}
                       </div>
                     </div>

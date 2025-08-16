@@ -12,7 +12,11 @@ import { adminCms } from '@/lib/admin-cms';
 import { Service } from '@/types/content';
 import { useAuth } from '@/lib/auth';
 import { formatDate, getStatusBadgeVariant } from '@/lib/admin-utils';
-import { Plus, Search, Edit, Trash2, Eye } from 'lucide-react';
+import { adminToast } from '@/lib/toast-utils';
+import { EmptyState } from '@/components/admin/EmptyState';
+import { LoadingListSkeleton } from '@/components/admin/LoadingSkeleton';
+import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
+import { Plus, Search, Edit, Trash2, Eye, Settings } from 'lucide-react';
 
 function AdminServices() {
   const { isAdmin, isEditor } = useAuth();
@@ -39,11 +43,11 @@ function AdminServices() {
       setServices(data);
     } catch (error) {
       console.error('Error fetching services:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch services',
-        variant: 'destructive',
-      });
+      if (error instanceof Error && error.message.includes('permission')) {
+        adminToast.permissionDenied('view services');
+      } else {
+        adminToast.networkError();
+      }
     } finally {
       setLoading(false);
     }
@@ -72,17 +76,14 @@ function AdminServices() {
     try {
       await adminCms.deleteService(service.id);
       setServices(prev => prev.filter(s => s.id !== service.id));
-      toast({
-        title: 'Success',
-        description: 'Service deleted successfully',
-      });
+      adminToast.deleted('Service', service.title);
     } catch (error) {
       console.error('Error deleting service:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete service',
-        variant: 'destructive',
-      });
+      if (error instanceof Error && error.message.includes('permission')) {
+        adminToast.permissionDenied('delete services');
+      } else {
+        adminToast.error('Failed to Delete', 'Unable to delete service. Please try again.');
+      }
     } finally {
       setDeleting(false);
       setDeleteConfirm(null);
@@ -100,9 +101,26 @@ function AdminServices() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
+      <>
+        <SEOHead 
+          title="Services - Admin Panel"
+          description="Manage service offerings"
+        />
+        <meta name="robots" content="noindex,nofollow" />
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Services</h1>
+              <p className="text-muted-foreground">Manage your service offerings</p>
+            </div>
+            <Button disabled>
+              <Plus className="h-4 w-4 mr-2" />
+              New Service
+            </Button>
+          </div>
+          <LoadingListSkeleton />
+        </div>
+      </>
     );
   }
 
@@ -110,8 +128,9 @@ function AdminServices() {
     <>
       <SEOHead 
         title="Services - Admin Panel"
-        description="Manage website services"
+        description="Manage service offerings"
       />
+      <meta name="robots" content="noindex,nofollow" />
       
       <div className="space-y-6">
         <div className="flex justify-between items-center">
@@ -167,9 +186,23 @@ function AdminServices() {
           </CardHeader>
           <CardContent>
             {filteredServices.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">
-                {searchTerm || statusFilter !== 'all' ? 'No services found matching your filters.' : 'No services found.'}
-              </p>
+              services.length === 0 ? (
+                <EmptyState
+                  icon={Settings}
+                  title="No services yet"
+                  description="Create your first service offering to showcase what you provide to clients and how you can help them achieve their goals."
+                  actionLabel="Create First Service"
+                  actionTo="/admin/services/new"
+                />
+              ) : (
+                <EmptyState
+                  icon={Search}
+                  title="No services found"
+                  description="Try adjusting your search terms or filters to find what you're looking for."
+                  actionLabel="Clear Filters"
+                  actionTo="/admin/services"
+                />
+              )
             ) : (
               <div className="space-y-4">
                 {filteredServices.map((service) => (
@@ -211,41 +244,36 @@ function AdminServices() {
                         </Button>
                         
                         {isAdmin && (
-                          <Dialog open={deleteConfirm?.id === service.id} onOpenChange={() => setDeleteConfirm(null)}>
-                            <DialogTrigger asChild>
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => setDeleteConfirm(service)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>Delete Service</DialogTitle>
-                                <DialogDescription>
-                                  Are you sure you want to delete "{service.title}"? This action cannot be undone.
-                                </DialogDescription>
-                              </DialogHeader>
-                              <div className="flex justify-end space-x-2">
-                                <Button
-                                  variant="outline"
-                                  onClick={() => setDeleteConfirm(null)}
-                                  disabled={deleting}
-                                >
-                                  Cancel
-                                </Button>
-                                <Button
-                                  variant="destructive"
-                                  onClick={() => handleDelete(service)}
-                                  disabled={deleting}
-                                >
-                                  {deleting ? 'Deleting...' : 'Delete'}
-                                </Button>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
+                          <>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => setDeleteConfirm(service)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                            <ConfirmDialog
+                              open={deleteConfirm?.id === service.id}
+                              onOpenChange={() => setDeleteConfirm(null)}
+                              title="Delete Service"
+                              description={
+                                <>
+                                  Are you sure you want to delete <strong>"{service.title}"</strong>?
+                                  <br /><br />
+                                  This action cannot be undone.
+                                  {service.status === 'published' && (
+                                    <div className="mt-2 p-2 bg-destructive/10 border border-destructive/20 rounded">
+                                      <strong>Warning:</strong> This service is currently published and visible to visitors.
+                                    </div>
+                                  )}
+                                </>
+                              }
+                              confirmLabel="Delete Service"
+                              variant="destructive"
+                              onConfirm={() => handleDelete(service)}
+                              loading={deleting}
+                            />
+                          </>
                         )}
                       </div>
                     </div>
