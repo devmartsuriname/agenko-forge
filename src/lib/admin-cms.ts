@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Service, Project, BlogPost, Page, ContactSubmission, Settings } from './cms';
+import { Service, Project, BlogPost, Page, ContactSubmission, Settings, ProjectImage } from './cms';
 
 // Admin CMS functions with full CRUD capabilities
 export const adminCms = {
@@ -92,27 +92,15 @@ export const adminCms = {
     if (error) throw error;
   },
 
-  // Project Images
-  async addProjectImage(projectId: string, url: string, alt?: string, sortOrder?: number): Promise<void> {
-    const { error } = await supabase
-      .from('project_images')
-      .insert({
-        project_id: projectId,
-        url,
-        alt,
-        sort_order: sortOrder || 0
-      });
+  async getProject(id: string): Promise<Project> {
+    const { data, error } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('id', id)
+      .single();
 
     if (error) throw error;
-  },
-
-  async deleteProjectImage(imageId: string): Promise<void> {
-    const { error } = await supabase
-      .from('project_images')
-      .delete()
-      .eq('id', imageId);
-
-    if (error) throw error;
+    return data as Project;
   },
 
   // Blog Posts
@@ -143,6 +131,17 @@ export const adminCms = {
       .update(updates)
       .eq('id', id)
       .select()
+      .single();
+
+    if (error) throw error;
+    return data as BlogPost;
+  },
+
+  async getBlogPost(id: string): Promise<BlogPost> {
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select('*')
+      .eq('id', id)
       .single();
 
     if (error) throw error;
@@ -253,6 +252,59 @@ export const adminCms = {
       .from('profiles')
       .update({ role })
       .eq('id', userId);
+
+    if (error) throw error;
+  },
+
+  // Project Images Management
+  async getAllProjectImages(): Promise<ProjectImage[]> {
+    const { data, error } = await supabase
+      .from('project_images')
+      .select('*')
+      .order('sort_order', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getProjectImages(projectId: string): Promise<ProjectImage[]> {
+    const { data, error } = await supabase
+      .from('project_images')
+      .select('*')
+      .eq('project_id', projectId)
+      .order('sort_order', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async addProjectImage(projectId: string, url: string, alt?: string, sortOrder?: number): Promise<void> {
+    const { error } = await supabase
+      .from('project_images')
+      .insert({
+        project_id: projectId,
+        url,
+        alt,
+        sort_order: sortOrder || 0,
+      });
+
+    if (error) throw error;
+  },
+
+  async updateProjectImageOrder(imageId: string, sortOrder: number): Promise<void> {
+    const { error } = await supabase
+      .from('project_images')
+      .update({ sort_order: sortOrder })
+      .eq('id', imageId);
+
+    if (error) throw error;
+  },
+
+  async deleteProjectImage(imageId: string): Promise<void> {
+    const { error } = await supabase
+      .from('project_images')
+      .delete()
+      .eq('id', imageId);
 
     if (error) throw error;
   },

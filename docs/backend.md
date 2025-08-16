@@ -46,8 +46,9 @@
 ### Content Management
 - **Pages**: Create/edit static pages with rich content
 - **Services**: Manage service offerings with descriptions
-- **Projects**: Portfolio management with image galleries (in progress)
-- **Blog**: Full blog management with tags and publishing (in progress)
+- **Projects**: Complete portfolio management with image galleries and reordering
+- **Blog**: Full blog management with tags, filtering, and publishing workflow
+- **Media**: Read-only media library showing project images (upload pipeline planned)
 - **Contact Submissions**: View, search, and export form submissions
 - **Settings**: Site configuration and social media links
 - **Users**: User role management (admin only)
@@ -60,9 +61,11 @@
 ### CRUD Operations
 - All content types support create/read/update operations
 - Delete operations restricted to admin role only
-- Slug auto-generation with uniqueness checking
-- Status workflow (draft/published) with publish timestamp
-- Optimistic UI updates with proper error handling
+- Slug auto-generation with uniqueness checking using kebab-case, diacritic removal
+- Status workflow (draft/published) with automatic published_at timestamp setting
+- Gallery management for projects with image reordering (up/down controls)
+- Tag management for blog posts with validation (max 10 tags, 50 chars each)
+- Optimistic UI updates with proper error handling and toast notifications
 
 ### Export Features
 - CSV export for contact submissions
