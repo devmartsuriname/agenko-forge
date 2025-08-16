@@ -64,9 +64,15 @@ This is a modern agency website with secure admin CMS, built with React, TypeScr
 - **Route Protection**: Supabase authentication with role-based access
 - **Style Isolation**: Admin uses `.admin-root` scope with semantic tokens
 - **CRUD Operations**: Full create, read, update, delete for all content types
-- **Gallery Management**: Project images with drag-and-drop reordering
-- **Tag System**: Blog posts support tag filtering and management
+- **Gallery Management**: Project images with accessibility-enhanced reordering
+- **Tag System**: Blog posts support tag filtering with keyboard-accessible chips
 - **Status Workflow**: Draft/published states with automatic timestamp management
+- **Error Boundaries**: Global error handling with friendly fallbacks
+- **Loading States**: Consistent skeleton components across all interfaces
+- **Toast System**: Standardized notifications with contextual icons
+- **Accessibility**: WCAG AA compliant with focus management and ARIA labels
+- **Empty States**: Clear CTAs when no content exists
+- **Confirmation Dialogs**: Destructive actions require explicit confirmation
 
 ## Route Structure
 ### Public Routes
@@ -80,17 +86,25 @@ This is a modern agency website with secure admin CMS, built with React, TypeScr
 - `/blog/:slug` - Blog post
 - `/contact` - Contact form
 
-### Admin Routes (Lazy Loaded)
+### Admin Routes (Lazy Loaded with ErrorBoundary)
 - `/admin/login` - Authentication
-- `/admin` - Dashboard
-- `/admin/pages` - Page management
-- `/admin/services` - Service management
-- `/admin/projects` - Project management
-- `/admin/blog` - Blog management
-- `/admin/media` - Media management
-- `/admin/contact` - Contact submissions
-- `/admin/settings` - Site settings
-- `/admin/users` - User management
+- `/admin` - Dashboard (wrapped in ErrorBoundary)
+- `/admin/pages` - Page management (wrapped in ErrorBoundary)
+- `/admin/pages/new` - Page editor (includes ErrorBoundary)
+- `/admin/pages/:id/edit` - Page editor (includes ErrorBoundary)
+- `/admin/services` - Service management (wrapped in ErrorBoundary)
+- `/admin/services/new` - Service editor (includes ErrorBoundary)
+- `/admin/services/:id/edit` - Service editor (includes ErrorBoundary)
+- `/admin/projects` - Project management (wrapped in ErrorBoundary)
+- `/admin/projects/new` - Project editor (includes ErrorBoundary)
+- `/admin/projects/:id/edit` - Project editor (includes ErrorBoundary)
+- `/admin/blog` - Blog management (wrapped in ErrorBoundary)
+- `/admin/blog/new` - Blog editor (includes ErrorBoundary)
+- `/admin/blog/:id/edit` - Blog editor (includes ErrorBoundary)
+- `/admin/media` - Media management (wrapped in ErrorBoundary)
+- `/admin/contact` - Contact submissions (wrapped in ErrorBoundary)
+- `/admin/settings` - Site settings (wrapped in ErrorBoundary)
+- `/admin/users` - User management (wrapped in ErrorBoundary)
 
 ## Next Steps
 - Complete public pages implementation

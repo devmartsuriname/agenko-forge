@@ -6,19 +6,20 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
-import { SEOHead } from '@/lib/seo';
+import { Helmet } from 'react-helmet-async';
 import { adminCms } from '@/lib/admin-cms';
 import { Page } from '@/types/content';
 import { useAuth } from '@/lib/auth';
 import { generateSlug, ensureUniqueSlug } from '@/lib/admin-utils';
 import { Save, ArrowLeft } from 'lucide-react';
+import { AdminErrorBoundary } from '@/components/admin/ErrorBoundary';
+import { LoadingCardSkeleton } from '@/components/admin/LoadingSkeleton';
+import { adminToast } from '@/lib/toast-utils';
 
-function AdminPageEditor() {
+function AdminPageEditorContent() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isEditor } = useAuth();
-  const { toast } = useToast();
   const isEditing = id !== 'new';
   
   const [page, setPage] = useState<Partial<Page>>({
@@ -46,20 +47,12 @@ function AdminPageEditor() {
         setPage(foundPage);
         setContent(foundPage.body?.content || '');
       } else {
-        toast({
-          title: 'Error',
-          description: 'Page not found',
-          variant: 'destructive',
-        });
+        adminToast.error('Page not found');
         navigate('/admin/pages');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching page:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch page',
-        variant: 'destructive',
-      });
+      adminToast.error('Failed to fetch page', error.message);
     } finally {
       setLoading(false);
     }
@@ -89,28 +82,18 @@ function AdminPageEditor() {
 
       if (isEditing && id) {
         await adminCms.updatePage(id, pageData);
-        toast({
-          title: 'Success',
-          description: 'Page updated successfully',
-        });
+        adminToast.updated('Page');
       } else {
         // Ensure unique slug before creating
         const uniqueSlug = await ensureUniqueSlug('pages', page.slug || generateSlug(page.title || ''));
         await adminCms.createPage({ ...pageData, slug: uniqueSlug } as Omit<Page, 'id' | 'created_at' | 'updated_at'>);
-        toast({
-          title: 'Success',
-          description: 'Page created successfully',
-        });
+        adminToast.created('Page');
       }
       
       navigate('/admin/pages');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving page:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to save page',
-        variant: 'destructive',
-      });
+      adminToast.error('Failed to save page', error.message);
     } finally {
       setSaving(false);
     }
@@ -126,19 +109,15 @@ function AdminPageEditor() {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <LoadingCardSkeleton />;
   }
 
   return (
     <>
-      <SEOHead 
-        title={`${isEditing ? 'Edit' : 'New'} Page - Admin Panel`}
-        description={`${isEditing ? 'Edit' : 'Create'} page content`}
-      />
+      <Helmet>
+        <title>{isEditing ? 'Edit' : 'New'} Page - Admin Panel</title>
+        <meta name="robots" content="noindex,nofollow" />
+      </Helmet>
       
       <div className="space-y-6">
         <div className="flex items-center space-x-4">
@@ -246,6 +225,14 @@ function AdminPageEditor() {
         </form>
       </div>
     </>
+  );
+}
+
+export function AdminPageEditor() {
+  return (
+    <AdminErrorBoundary>
+      <AdminPageEditorContent />
+    </AdminErrorBoundary>
   );
 }
 

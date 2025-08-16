@@ -37,6 +37,17 @@ export const adminCms = {
     return data as Service;
   },
 
+  async getService(id: string): Promise<Service | null> {
+    const { data, error } = await supabase
+      .from('services')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) return null;
+    return data as Service;
+  },
+
   async deleteService(id: string): Promise<void> {
     const { error } = await supabase
       .from('services')

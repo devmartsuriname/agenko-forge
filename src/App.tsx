@@ -33,6 +33,7 @@ const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminPages = lazy(() => import("./pages/admin/AdminPages"));
 const AdminPageEditor = lazy(() => import("./pages/admin/AdminPageEditor"));
 const AdminServices = lazy(() => import("./pages/admin/AdminServices"));
+const AdminServiceEditor = lazy(() => import("./pages/admin/AdminServiceEditor"));
 const AdminProjects = lazy(() => import("./pages/admin/AdminProjects"));
 const AdminProjectEditor = lazy(() => import("./pages/admin/AdminProjectEditor"));
 const AdminBlog = lazy(() => import("./pages/admin/AdminBlog"));
@@ -101,6 +102,16 @@ const App = () => (
                 <Route path="services" element={
                   <Suspense fallback={<Spinner />}>
                     <AdminServices />
+                  </Suspense>
+                } />
+                <Route path="services/new" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminServiceEditor />
+                  </Suspense>
+                } />
+                <Route path="services/:id/edit" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminServiceEditor />
                   </Suspense>
                 } />
                 <Route path="projects" element={

@@ -47,31 +47,42 @@
 ### Content Management ✅
 
 #### Pages
-- [ ] Create/edit/delete functionality
+- [ ] Create/edit/delete functionality with LoadingSkeleton and ErrorBoundary
 - [ ] Slug auto-generation with uniqueness validation
 - [ ] Draft/published status toggle
-- [ ] Rich content editing
-- [ ] SEO meta tags support
+- [ ] Rich content editing with proper validation
+- [ ] SEO meta tags support with noindex for admin
+- [ ] Standardized toast notifications (✓ ✗ ℹ ⚠)
+- [ ] ConfirmDialog for delete operations (admin-only)
 
 #### Services
 - [ ] Full CRUD with excerpt and content fields
 - [ ] Status workflow (draft → published)
 - [ ] Search and filter by status
-- [ ] Bulk operations where applicable
+- [ ] EmptyState when no services exist
+- [ ] LoadingSkeleton during data fetch
+- [ ] ErrorBoundary wrapping all service routes
+- [ ] Service editor with proper validation and accessibility
+- [ ] ConfirmDialog for delete (admin-only)
 
 #### Projects
 - [ ] Project CRUD with gallery management
-- [ ] Image upload/reorder/delete in gallery
-- [ ] Up/down controls for image ordering
-- [ ] Project tags support
+- [ ] GalleryManager with accessibility features
+- [ ] Image upload/reorder/delete with keyboard support
+- [ ] Up/down controls for image ordering + aria-live feedback
+- [ ] Project tags support with TagInput component
 - [ ] Portfolio visibility controls
+- [ ] EmptyState for gallery when no images
+- [ ] ErrorBoundary around project editor
 
 #### Blog
 - [ ] Article CRUD with tag support
-- [ ] Tag input with chips interface
+- [ ] TagInput with chips interface and keyboard navigation
 - [ ] Filter by tags and status
-- [ ] Publication workflow
-- [ ] Previous/next navigation preparation
+- [ ] Publication workflow with proper status management
+- [ ] EmptyState when no posts exist
+- [ ] LoadingSkeleton during editor load
+- [ ] ErrorBoundary around blog routes
 
 #### Media
 - [ ] List view of all referenced images

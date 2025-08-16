@@ -120,8 +120,20 @@
 - Optimistic UI updates with proper error handling and toast notifications
 
 ### Export Features
-- CSV export for contact submissions
-- Formatted data with proper encoding
+- CSV export for contact submissions with UTF-8 BOM encoding
+- Formatted data with proper comma/quote escaping
+- Timestamped filenames and progress indicators
+- Standardized toast notifications for export status
+
+### Production Polish
+- ErrorBoundary components for resilient error handling
+- EmptyState components with clear CTAs across all lists
+- LoadingSkeleton components for consistent loading states
+- ConfirmDialog components for destructive actions
+- Standardized toast system with contextual icons (✓ ✗ ℹ ⚠)
+- SEO protection with noindex meta tags on admin routes
+- Global accessibility improvements (focus management, ARIA labels, keyboard navigation)
+- Role-based access control with clear permission messaging
 
 ## Security
 - RLS policies ensure data isolation
