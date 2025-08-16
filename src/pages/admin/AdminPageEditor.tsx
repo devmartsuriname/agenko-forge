@@ -228,21 +228,20 @@ function AdminPageEditorContent() {
           </TabsContent>
         </Tabs>
 
-          <div className="flex justify-end space-x-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate('/admin/pages')}
-              disabled={saving}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={saving}>
-              <Save className="h-4 w-4 mr-2" />
-              {saving ? 'Saving...' : 'Save Page'}
-            </Button>
-          </div>
-        </form>
+        <div className="flex justify-end space-x-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => navigate('/admin/pages')}
+            disabled={saving}
+          >
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} disabled={saving}>
+            <Save className="h-4 w-4 mr-2" />
+            {saving ? 'Saving...' : 'Save Page'}
+          </Button>
+        </div>
       </div>
     </>
   );
