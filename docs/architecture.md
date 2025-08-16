@@ -73,6 +73,9 @@ This is a modern agency website with secure admin CMS, built with React, TypeScr
 - **Accessibility**: WCAG AA compliant with focus management and ARIA labels
 - **Empty States**: Clear CTAs when no content exists
 - **Confirmation Dialogs**: Destructive actions require explicit confirmation
+- **Section-Based Editing**: Dynamic page composition with visual editor
+- **Schema Validation**: Zod schemas ensure data integrity
+- **Live Preview**: Sections render dynamically with real published content
 
 ## Route Structure
 ### Public Routes
