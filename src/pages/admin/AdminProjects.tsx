@@ -9,12 +9,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/lib/seo';
 import { adminCms } from '@/lib/admin-cms';
-import { Project } from '@/lib/cms';
+import { Project } from '@/types/content';
 import { useAuth } from '@/lib/auth';
 import { formatDate, getStatusBadgeVariant } from '@/lib/admin-utils';
 import { Plus, Search, Edit, Trash2, Eye, Image } from 'lucide-react';
 
-export default function AdminProjects() {
+function AdminProjects() {
   const { isAdmin, isEditor } = useAuth();
   const { toast } = useToast();
   const [projects, setProjects] = useState<Project[]>([]);
@@ -259,3 +259,5 @@ export default function AdminProjects() {
     </>
   );
 }
+
+export default AdminProjects;

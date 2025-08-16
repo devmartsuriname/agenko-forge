@@ -11,12 +11,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/lib/seo';
 import { adminCms } from '@/lib/admin-cms';
-import { Project, ProjectImage } from '@/lib/cms';
+import { Project, ProjectImage } from '@/types/content';
 import { useAuth } from '@/lib/auth';
 import { generateSlug, ensureUniqueSlug } from '@/lib/admin-utils';
 import { ArrowLeft, Save, Eye, Image, Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 
-export default function AdminProjectEditor() {
+function AdminProjectEditor() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isEditor } = useAuth();
@@ -476,3 +476,5 @@ export default function AdminProjectEditor() {
     </>
   );
 }
+
+export default AdminProjectEditor;

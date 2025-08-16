@@ -48,6 +48,58 @@
 - **Services**: Manage service offerings with descriptions
 - **Projects**: Complete portfolio management with image galleries and reordering
 - **Blog**: Full blog management with tags, filtering, and publishing workflow
+- **Media**: Placeholder interface for future file upload integration
+- **Contact**: Read-only submissions with CSV export functionality
+- **Users**: Role management for admin/editor permissions
+
+### Lazy Loading Implementation
+- All admin routes use `React.lazy()` for code splitting
+- Suspense boundaries with loading spinners
+- Bundle optimization prevents admin code in public build
+- Clean default exports for all admin components
+
+### Type System
+- Centralized content types in `/types/content.ts`
+- Consistent interfaces across admin and public APIs
+- Optional vs required field distinctions
+- Proper TypeScript inference throughout
+
+### Gallery Management
+- Project images stored in `project_images` table
+- Reorderable with `sort_order` field
+- Up/down controls for manual ordering
+- Automatic sort persistence on reorder
+
+### Tag System (Blog)
+- String array storage for flexible tagging
+- Chip-based input with add/remove
+- Server-side validation for tag limits
+- Filter by tag in admin interface
+
+### Status Workflow
+- All content supports draft/published states
+- Published content sets `published_at` timestamp
+- Public routes only show published content
+- Admin routes show all content with status indicators
+
+### Slug Generation
+- Automatic slug creation from titles
+- Kebab-case formatting with diacritic removal
+- Uniqueness validation with `-2`, `-3` suffixes
+- Manual override capability in editors
+
+### CSV Export
+- UTF-8 encoding for international characters
+- Proper header row generation
+- Comma and quote escaping
+- Filename with date stamp pattern
+
+### Access Control Matrix
+| Role | View All | Create | Edit | Delete | Manage Users |
+|------|----------|--------|------|--------|--------------|
+| Viewer | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Editor | ✅ | ✅ | ✅ | ❌ | ❌ |
+| Admin | ✅ | ✅ | ✅ | ✅ | ✅ |
 - **Media**: Read-only media library showing project images (upload pipeline planned)
 - **Contact Submissions**: View, search, and export form submissions
 - **Settings**: Site configuration and social media links

@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Badge } from '@/components/ui/badge';
 import { SEOHead } from '@/lib/seo';
 import { adminCms, exportToCSV } from '@/lib/admin-cms';
-import { ContactSubmission } from '@/lib/cms';
+import { ContactSubmission } from '@/types/content';
 import { useAuth } from '@/lib/auth';
 import { Download, Search, Calendar } from 'lucide-react';
 import { format } from 'date-fns';

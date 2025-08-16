@@ -9,12 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/lib/seo';
 import { adminCms } from '@/lib/admin-cms';
-import { Page } from '@/lib/cms';
+import { Page } from '@/types/content';
 import { useAuth } from '@/lib/auth';
 import { generateSlug, ensureUniqueSlug } from '@/lib/admin-utils';
 import { Save, ArrowLeft } from 'lucide-react';
 
-export default function AdminPageEditor() {
+function AdminPageEditor() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isEditor } = useAuth();
@@ -248,3 +248,5 @@ export default function AdminPageEditor() {
     </>
   );
 }
+
+export default AdminPageEditor;

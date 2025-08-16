@@ -9,12 +9,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/lib/seo';
 import { adminCms } from '@/lib/admin-cms';
-import { BlogPost } from '@/lib/cms';
+import { BlogPost } from '@/types/content';
 import { useAuth } from '@/lib/auth';
 import { formatDate, getStatusBadgeVariant } from '@/lib/admin-utils';
 import { Plus, Search, Edit, Trash2, Eye, Tag } from 'lucide-react';
 
-export default function AdminBlog() {
+function AdminBlog() {
   const { isAdmin, isEditor } = useAuth();
   const { toast } = useToast();
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -301,3 +301,5 @@ export default function AdminBlog() {
     </>
   );
 }
+
+export default AdminBlog;

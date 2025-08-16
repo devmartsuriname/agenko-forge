@@ -5,6 +5,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from '@/lib/auth';
+import { Suspense, lazy } from 'react';
+import { Spinner } from "@/components/ui/spinner";
+
+// Public pages
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Services from "./pages/Services";
@@ -18,15 +22,24 @@ import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import NotFound from "./pages/NotFound";
+
+// Admin layout
 import { AdminLayout } from "./components/admin/AdminLayout";
-import AdminLogin from "./pages/admin/Login";
-import AdminDashboard from "./pages/admin/Dashboard";
-import AdminPages from "./pages/admin/AdminPages";
-import AdminPageEditor from "./pages/admin/AdminPageEditor";
-import AdminServices from "./pages/admin/AdminServices";
-import ContactSubmissions from "./pages/admin/ContactSubmissions";
-import Settings from "./pages/admin/Settings";
-import Users from "./pages/admin/Users";
+
+// Admin pages - lazy loaded
+const AdminLogin = lazy(() => import("./pages/admin/Login"));
+const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
+const AdminPages = lazy(() => import("./pages/admin/AdminPages"));
+const AdminPageEditor = lazy(() => import("./pages/admin/AdminPageEditor"));
+const AdminServices = lazy(() => import("./pages/admin/AdminServices"));
+const AdminProjects = lazy(() => import("./pages/admin/AdminProjects"));
+const AdminProjectEditor = lazy(() => import("./pages/admin/AdminProjectEditor"));
+const AdminBlog = lazy(() => import("./pages/admin/AdminBlog"));
+const AdminBlogEditor = lazy(() => import("./pages/admin/AdminBlogEditor"));
+const AdminMedia = lazy(() => import("./pages/admin/AdminMedia"));
+const ContactSubmissions = lazy(() => import("./pages/admin/ContactSubmissions"));
+const Settings = lazy(() => import("./pages/admin/Settings"));
+const Users = lazy(() => import("./pages/admin/Users"));
 
 const queryClient = new QueryClient();
 
@@ -54,23 +67,87 @@ const App = () => (
               <Route path="/terms-conditions" element={<TermsConditions />} />
               
               {/* Admin Routes */}
-              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin/login" element={
+                <Suspense fallback={<Spinner />}>
+                  <AdminLogin />
+                </Suspense>
+              } />
               <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<AdminDashboard />} />
-                <Route path="pages" element={<AdminPages />} />
-                <Route path="pages/new" element={<AdminPageEditor />} />
-                <Route path="pages/:id/edit" element={<AdminPageEditor />} />
-                <Route path="services" element={<AdminServices />} />
-                <Route path="projects" element={<AdminProjects />} />
-                <Route path="projects/new" element={<AdminProjectEditor />} />
-                <Route path="projects/:id/edit" element={<AdminProjectEditor />} />
-                <Route path="blog" element={<AdminBlog />} />
-                <Route path="blog/new" element={<AdminBlogEditor />} />
-                <Route path="blog/:id/edit" element={<AdminBlogEditor />} />
-                <Route path="media" element={<AdminMedia />} />
-                <Route path="contact" element={<ContactSubmissions />} />
-                <Route path="settings" element={<Settings />} />
-                <Route path="users" element={<Users />} />
+                <Route index element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminDashboard />
+                  </Suspense>
+                } />
+                <Route path="pages" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminPages />
+                  </Suspense>
+                } />
+                <Route path="pages/new" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminPageEditor />
+                  </Suspense>
+                } />
+                <Route path="pages/:id/edit" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminPageEditor />
+                  </Suspense>
+                } />
+                <Route path="services" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminServices />
+                  </Suspense>
+                } />
+                <Route path="projects" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminProjects />
+                  </Suspense>
+                } />
+                <Route path="projects/new" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminProjectEditor />
+                  </Suspense>
+                } />
+                <Route path="projects/:id/edit" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminProjectEditor />
+                  </Suspense>
+                } />
+                <Route path="blog" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminBlog />
+                  </Suspense>
+                } />
+                <Route path="blog/new" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminBlogEditor />
+                  </Suspense>
+                } />
+                <Route path="blog/:id/edit" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminBlogEditor />
+                  </Suspense>
+                } />
+                <Route path="media" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminMedia />
+                  </Suspense>
+                } />
+                <Route path="contact" element={
+                  <Suspense fallback={<Spinner />}>
+                    <ContactSubmissions />
+                  </Suspense>
+                } />
+                <Route path="settings" element={
+                  <Suspense fallback={<Spinner />}>
+                    <Settings />
+                  </Suspense>
+                } />
+                <Route path="users" element={
+                  <Suspense fallback={<Spinner />}>
+                    <Users />
+                  </Suspense>
+                } />
               </Route>
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

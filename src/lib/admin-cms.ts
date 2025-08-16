@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Service, Project, BlogPost, Page, ContactSubmission, Settings, ProjectImage } from './cms';
+import { ProjectImage, Service, Project, BlogPost, Page, ContactSubmission } from '@/types/content';
 
 // Admin CMS functions with full CRUD capabilities
 export const adminCms = {

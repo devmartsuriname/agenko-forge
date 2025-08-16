@@ -10,12 +10,12 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/lib/seo';
 import { adminCms } from '@/lib/admin-cms';
-import { BlogPost } from '@/lib/cms';
+import { BlogPost } from '@/types/content';
 import { useAuth } from '@/lib/auth';
 import { generateSlug, ensureUniqueSlug } from '@/lib/admin-utils';
 import { ArrowLeft, Save, Eye, X, Plus } from 'lucide-react';
 
-export default function AdminBlogEditor() {
+function AdminBlogEditor() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isEditor } = useAuth();
@@ -370,3 +370,5 @@ export default function AdminBlogEditor() {
     </>
   );
 }
+
+export default AdminBlogEditor;

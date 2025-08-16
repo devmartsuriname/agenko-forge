@@ -7,11 +7,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/lib/seo';
 import { adminCms } from '@/lib/admin-cms';
-import { ProjectImage } from '@/lib/cms';
+import { ProjectImage } from '@/types/content';
 import { useAuth } from '@/lib/auth';
 import { Plus, Image, ExternalLink } from 'lucide-react';
 
-export default function AdminMedia() {
+function AdminMedia() {
   const { isEditor } = useAuth();
   const { toast } = useToast();
   const [mediaItems, setMediaItems] = useState<ProjectImage[]>([]);
@@ -243,3 +243,5 @@ export default function AdminMedia() {
     </>
   );
 }
+
+export default AdminMedia;
