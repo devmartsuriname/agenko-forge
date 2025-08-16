@@ -7,19 +7,20 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/lib/seo';
 import { adminCms } from '@/lib/admin-cms';
 import { BlogPost } from '@/types/content';
 import { useAuth } from '@/lib/auth';
 import { generateSlug, ensureUniqueSlug } from '@/lib/admin-utils';
-import { ArrowLeft, Save, Eye, X, Plus } from 'lucide-react';
+import { adminToast } from '@/lib/toast-utils';
+import { LoadingCardSkeleton } from '@/components/admin/LoadingSkeleton';
+import { TagInput } from '@/components/admin/TagInput';
+import { ArrowLeft, Save, Eye } from 'lucide-react';
 
 function AdminBlogEditor() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isEditor } = useAuth();
-  const { toast } = useToast();
   const isEditing = Boolean(id);
 
   const [post, setPost] = useState<Partial<BlogPost>>({
@@ -32,7 +33,6 @@ function AdminBlogEditor() {
   });
   const [loading, setLoading] = useState(isEditing);
   const [saving, setSaving] = useState(false);
-  const [newTag, setNewTag] = useState('');
 
   useEffect(() => {
     if (isEditing && id) {
@@ -46,11 +46,11 @@ function AdminBlogEditor() {
       setPost(data);
     } catch (error) {
       console.error('Error fetching blog post:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch blog post',
-        variant: 'destructive',
-      });
+      if (error instanceof Error && error.message.includes('permission')) {
+        adminToast.permissionDenied('view blog posts');
+      } else {
+        adminToast.error('Failed to Load', 'Unable to load blog post');
+      }
       navigate('/admin/blog');
     } finally {
       setLoading(false);
@@ -67,97 +67,40 @@ function AdminBlogEditor() {
     }
   };
 
-  const handleAddTag = () => {
-    if (!newTag.trim()) return;
-    
-    const tag = newTag.trim().toLowerCase();
-    const currentTags = post.tags || [];
-    
-    if (currentTags.includes(tag)) {
-      toast({
-        title: 'Error',
-        description: 'Tag already exists',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (currentTags.length >= 10) {
-      toast({
-        title: 'Error',
-        description: 'Maximum 10 tags allowed',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (tag.length > 50) {
-      toast({
-        title: 'Error',
-        description: 'Tag must be 50 characters or less',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    setPost(prev => ({
-      ...prev,
-      tags: [...currentTags, tag]
-    }));
-    setNewTag('');
-  };
-
-  const handleRemoveTag = (tagToRemove: string) => {
-    setPost(prev => ({
-      ...prev,
-      tags: (prev.tags || []).filter(tag => tag !== tagToRemove)
-    }));
-  };
-
   const handleSave = async () => {
     if (!post.title?.trim()) {
-      toast({
-        title: 'Error',
-        description: 'Blog post title is required',
-        variant: 'destructive',
-      });
+      adminToast.validationError('Title is required');
       return;
     }
 
     setSaving(true);
     try {
-      const now = new Date().toISOString();
-      const publishedAt = post.status === 'published' && !post.published_at ? now : post.published_at;
+      const slug = await ensureUniqueSlug('blog_posts', generateSlug(post.title), isEditing ? post.id : undefined);
+      const postData = {
+        title: post.title!,
+        slug,
+        excerpt: post.excerpt || '',
+        body: post.body || {},
+        tags: post.tags || [],
+        status: post.status!,
+        published_at: post.status === 'published' && !post.published_at ? new Date().toISOString() : post.published_at,
+      };
 
-      if (isEditing && id) {
-        await adminCms.updateBlogPost(id, {
-          ...post,
-          published_at: publishedAt,
-        });
+      if (isEditing) {
+        await adminCms.updateBlogPost(post.id!, postData);
+        adminToast.updated('Blog Post', post.title);
       } else {
-        const created = await adminCms.createBlogPost({
-          title: post.title!,
-          slug: post.slug!,
-          excerpt: post.excerpt || null,
-          body: post.body || {},
-          tags: post.tags || [],
-          status: post.status!,
-          published_at: publishedAt,
-        });
-        navigate(`/admin/blog/${created.id}/edit`);
+        const newPost = await adminCms.createBlogPost(postData);
+        adminToast.created('Blog Post', post.title);
+        navigate(`/admin/blog/${newPost.id}/edit`);
       }
-
-      toast({
-        title: 'Success',
-        description: `Blog post ${isEditing ? 'updated' : 'created'} successfully`,
-      });
     } catch (error) {
       console.error('Error saving blog post:', error);
-      toast({
-        title: 'Error',
-        description: `Failed to ${isEditing ? 'update' : 'create'} blog post`,
-        variant: 'destructive',
-      });
+      if (error instanceof Error && error.message.includes('permission')) {
+        adminToast.permissionDenied('save blog posts');
+      } else {
+        adminToast.error('Failed to Save', 'Unable to save blog post. Please try again.');
+      }
     } finally {
       setSaving(false);
     }
@@ -174,18 +117,36 @@ function AdminBlogEditor() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
+      <>
+        <SEOHead 
+          title={`${isEditing ? 'Edit' : 'Create'} Blog Post - Admin Panel`}
+          description="Blog post editor"
+        />
+        <meta name="robots" content="noindex,nofollow" />
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <Button variant="ghost" onClick={() => navigate('/admin/blog')} disabled>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Blog
+            </Button>
+            <Button disabled>
+              <Save className="h-4 w-4 mr-2" />
+              Save
+            </Button>
+          </div>
+          <LoadingCardSkeleton />
+        </div>
+      </>
     );
   }
 
   return (
     <>
       <SEOHead 
-        title={`${isEditing ? 'Edit' : 'New'} Blog Post - Admin Panel`}
-        description="Edit blog post content"
+        title={`${isEditing ? 'Edit' : 'Create'} Blog Post - Admin Panel`}
+        description="Blog post editor"
       />
+      <meta name="robots" content="noindex,nofollow" />
       
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -228,42 +189,58 @@ function AdminBlogEditor() {
                 <CardTitle>Post Details</CardTitle>
                 <CardDescription>Basic information about your blog post</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 <div>
-                  <Label htmlFor="title">Title *</Label>
+                  <Label htmlFor="blog-title">Title *</Label>
                   <Input
-                    id="title"
+                    id="blog-title"
+                    placeholder="Enter blog post title"
                     value={post.title || ''}
                     onChange={(e) => handleTitleChange(e.target.value)}
-                    placeholder="Enter blog post title"
+                    disabled={saving}
+                    aria-describedby="title-help"
+                    required
                   />
+                  <p id="title-help" className="text-sm text-muted-foreground mt-1">
+                    A clear, descriptive title for your blog post
+                  </p>
                 </div>
 
                 <div>
-                  <Label htmlFor="slug">Slug</Label>
+                  <Label htmlFor="blog-slug">URL Slug</Label>
                   <Input
-                    id="slug"
+                    id="blog-slug"
+                    placeholder="url-friendly-slug"
                     value={post.slug || ''}
                     onChange={(e) => setPost(prev => ({ ...prev, slug: e.target.value }))}
-                    placeholder="blog-post-slug"
+                    disabled={saving}
+                    aria-describedby="slug-help"
                   />
+                  <p id="slug-help" className="text-sm text-muted-foreground mt-1">
+                    Auto-generated from title, or customize manually
+                  </p>
                 </div>
 
                 <div>
-                  <Label htmlFor="excerpt">Excerpt</Label>
+                  <Label htmlFor="blog-excerpt">Excerpt</Label>
                   <Textarea
-                    id="excerpt"
+                    id="blog-excerpt"
+                    placeholder="Brief description of the blog post"
                     value={post.excerpt || ''}
                     onChange={(e) => setPost(prev => ({ ...prev, excerpt: e.target.value }))}
-                    placeholder="Brief description of the blog post"
+                    disabled={saving}
                     rows={3}
+                    aria-describedby="excerpt-help"
                   />
+                  <p id="excerpt-help" className="text-sm text-muted-foreground mt-1">
+                    A short summary that appears in blog listings and search results
+                  </p>
                 </div>
 
                 <div>
-                  <Label htmlFor="body">Content</Label>
+                  <Label htmlFor="blog-content">Content</Label>
                   <Textarea
-                    id="body"
+                    id="blog-content"
                     value={typeof post.body === 'object' ? JSON.stringify(post.body, null, 2) : ''}
                     onChange={(e) => {
                       try {
@@ -276,7 +253,12 @@ function AdminBlogEditor() {
                     placeholder="Blog post content (JSON format)"
                     rows={15}
                     className="font-mono text-sm"
+                    disabled={saving}
+                    aria-describedby="content-help"
                   />
+                  <p id="content-help" className="text-sm text-muted-foreground mt-1">
+                    Rich content in JSON format (future rich text editor)
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -291,9 +273,9 @@ function AdminBlogEditor() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="status">Status</Label>
+                  <Label htmlFor="blog-status">Status</Label>
                   <Select value={post.status} onValueChange={(value) => setPost(prev => ({ ...prev, status: value as 'draft' | 'published' }))}>
-                    <SelectTrigger>
+                    <SelectTrigger id="blog-status">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -305,7 +287,7 @@ function AdminBlogEditor() {
 
                 <div className="pt-4 border-t">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Status</span>
+                    <span className="text-sm font-medium">Current Status</span>
                     <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
                       {post.status}
                     </Badge>
@@ -324,43 +306,19 @@ function AdminBlogEditor() {
                 <CardTitle>Tags</CardTitle>
                 <CardDescription>Add tags to categorize your post</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex gap-2">
-                  <Input
-                    value={newTag}
-                    onChange={(e) => setNewTag(e.target.value)}
-                    placeholder="Add a tag"
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleAddTag();
-                      }
-                    }}
-                  />
-                  <Button type="button" onClick={handleAddTag} size="sm">
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                {post.tags && post.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {post.tags.map(tag => (
-                      <Badge key={tag} variant="secondary" className="flex items-center gap-1">
-                        {tag}
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveTag(tag)}
-                          className="ml-1 hover:text-destructive"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-
-                <p className="text-xs text-muted-foreground">
-                  Maximum 10 tags, 50 characters each
+              <CardContent>
+                <TagInput
+                  tags={post.tags || []}
+                  onTagsChange={(tags) => setPost(prev => ({ ...prev, tags }))}
+                  placeholder="Add tags (press Enter, comma, or space)"
+                  maxTags={10}
+                  maxTagLength={30}
+                  disabled={saving}
+                  aria-label="Blog post tags"
+                  aria-describedby="tags-help"
+                />
+                <p id="tags-help" className="text-sm text-muted-foreground mt-2">
+                  Add relevant tags to help readers find your content
                 </p>
               </CardContent>
             </Card>

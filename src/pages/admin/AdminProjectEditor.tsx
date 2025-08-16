@@ -7,20 +7,20 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/lib/seo';
 import { adminCms } from '@/lib/admin-cms';
 import { Project, ProjectImage } from '@/types/content';
 import { useAuth } from '@/lib/auth';
 import { generateSlug, ensureUniqueSlug } from '@/lib/admin-utils';
-import { ArrowLeft, Save, Eye, Image, Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
+import { adminToast } from '@/lib/toast-utils';
+import { LoadingCardSkeleton } from '@/components/admin/LoadingSkeleton';
+import { GalleryManager } from '@/components/admin/GalleryManager';
+import { ArrowLeft, Save, Eye } from 'lucide-react';
 
 function AdminProjectEditor() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isEditor } = useAuth();
-  const { toast } = useToast();
   const isEditing = Boolean(id);
 
   const [project, setProject] = useState<Partial<Project>>({
@@ -33,13 +33,10 @@ function AdminProjectEditor() {
   const [images, setImages] = useState<ProjectImage[]>([]);
   const [loading, setLoading] = useState(isEditing);
   const [saving, setSaving] = useState(false);
-  const [showImageDialog, setShowImageDialog] = useState(false);
-  const [newImage, setNewImage] = useState({ url: '', alt: '' });
 
   useEffect(() => {
     if (isEditing && id) {
       fetchProject(id);
-      fetchImages(id);
     }
   }, [id]);
 
@@ -47,25 +44,19 @@ function AdminProjectEditor() {
     try {
       const data = await adminCms.getProject(projectId);
       setProject(data);
+      
+      const imageData = await adminCms.getProjectImages(projectId);
+      setImages(imageData);
     } catch (error) {
       console.error('Error fetching project:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch project',
-        variant: 'destructive',
-      });
+      if (error instanceof Error && error.message.includes('permission')) {
+        adminToast.permissionDenied('view projects');
+      } else {
+        adminToast.error('Failed to Load', 'Unable to load project');
+      }
       navigate('/admin/projects');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchImages = async (projectId: string) => {
-    try {
-      const data = await adminCms.getProjectImages(projectId);
-      setImages(data);
-    } catch (error) {
-      console.error('Error fetching project images:', error);
     }
   };
 
@@ -81,128 +72,39 @@ function AdminProjectEditor() {
 
   const handleSave = async () => {
     if (!project.title?.trim()) {
-      toast({
-        title: 'Error',
-        description: 'Project title is required',
-        variant: 'destructive',
-      });
+      adminToast.validationError('Project title is required');
       return;
     }
 
     setSaving(true);
     try {
-      const now = new Date().toISOString();
-      const publishedAt = project.status === 'published' && !project.published_at ? now : project.published_at;
+      const slug = await ensureUniqueSlug('projects', generateSlug(project.title), isEditing ? project.id : undefined);
+      const projectData = {
+        title: project.title!,
+        slug,
+        excerpt: project.excerpt || '',
+        body: project.body || {},
+        status: project.status!,
+        published_at: project.status === 'published' && !project.published_at ? new Date().toISOString() : project.published_at,
+      };
 
-      if (isEditing && id) {
-        await adminCms.updateProject(id, {
-          ...project,
-          published_at: publishedAt,
-        });
+      if (isEditing) {
+        await adminCms.updateProject(project.id!, projectData);
+        adminToast.updated('Project', project.title);
       } else {
-        const created = await adminCms.createProject({
-          title: project.title!,
-          slug: project.slug!,
-          excerpt: project.excerpt || null,
-          body: project.body || {},
-          status: project.status!,
-          published_at: publishedAt,
-        });
-        navigate(`/admin/projects/${created.id}/edit`);
+        const newProject = await adminCms.createProject(projectData);
+        adminToast.created('Project', project.title);
+        navigate(`/admin/projects/${newProject.id}/edit`);
       }
-
-      toast({
-        title: 'Success',
-        description: `Project ${isEditing ? 'updated' : 'created'} successfully`,
-      });
     } catch (error) {
       console.error('Error saving project:', error);
-      toast({
-        title: 'Error',
-        description: `Failed to ${isEditing ? 'update' : 'create'} project`,
-        variant: 'destructive',
-      });
+      if (error instanceof Error && error.message.includes('permission')) {
+        adminToast.permissionDenied('save projects');
+      } else {
+        adminToast.error('Failed to Save', 'Unable to save project. Please try again.');
+      }
     } finally {
       setSaving(false);
-    }
-  };
-
-  const handleAddImage = async () => {
-    if (!newImage.url.trim() || !id) return;
-
-    try {
-      const nextSortOrder = Math.max(0, ...images.map(img => img.sort_order || 0)) + 1;
-      await adminCms.addProjectImage(id, newImage.url, newImage.alt, nextSortOrder);
-      await fetchImages(id);
-      setNewImage({ url: '', alt: '' });
-      setShowImageDialog(false);
-      
-      toast({
-        title: 'Success',
-        description: 'Image added successfully',
-      });
-    } catch (error) {
-      console.error('Error adding image:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to add image',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const handleDeleteImage = async (imageId: string) => {
-    try {
-      await adminCms.deleteProjectImage(imageId);
-      setImages(prev => prev.filter(img => img.id !== imageId));
-      
-      toast({
-        title: 'Success',
-        description: 'Image deleted successfully',
-      });
-    } catch (error) {
-      console.error('Error deleting image:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete image',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const handleReorderImage = async (imageId: string, direction: 'up' | 'down') => {
-    const currentIndex = images.findIndex(img => img.id === imageId);
-    if (currentIndex === -1) return;
-
-    const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
-    if (newIndex < 0 || newIndex >= images.length) return;
-
-    try {
-      const newImages = [...images];
-      [newImages[currentIndex], newImages[newIndex]] = [newImages[newIndex], newImages[currentIndex]];
-      
-      // Update sort orders
-      newImages.forEach((img, index) => {
-        img.sort_order = index + 1;
-      });
-
-      setImages(newImages);
-
-      // Save to database
-      await Promise.all(
-        newImages.map(img => 
-          adminCms.updateProjectImageOrder(img.id, img.sort_order!)
-        )
-      );
-    } catch (error) {
-      console.error('Error reordering images:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to reorder images',
-        variant: 'destructive',
-      });
-      // Revert on error
-      await fetchImages(id!);
     }
   };
 
@@ -217,18 +119,36 @@ function AdminProjectEditor() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
+      <>
+        <SEOHead 
+          title={`${isEditing ? 'Edit' : 'Create'} Project - Admin Panel`}
+          description="Project editor"
+        />
+        <meta name="robots" content="noindex,nofollow" />
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <Button variant="ghost" onClick={() => navigate('/admin/projects')} disabled>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Projects
+            </Button>
+            <Button disabled>
+              <Save className="h-4 w-4 mr-2" />
+              Save
+            </Button>
+          </div>
+          <LoadingCardSkeleton />
+        </div>
+      </>
     );
   }
 
   return (
     <>
       <SEOHead 
-        title={`${isEditing ? 'Edit' : 'New'} Project - Admin Panel`}
-        description="Edit project details"
+        title={`${isEditing ? 'Edit' : 'Create'} Project - Admin Panel`}
+        description="Project editor"
       />
+      <meta name="robots" content="noindex,nofollow" />
       
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -271,42 +191,58 @@ function AdminProjectEditor() {
                 <CardTitle>Project Details</CardTitle>
                 <CardDescription>Basic information about your project</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 <div>
-                  <Label htmlFor="title">Title *</Label>
+                  <Label htmlFor="project-title">Title *</Label>
                   <Input
-                    id="title"
+                    id="project-title"
+                    placeholder="Enter project title"
                     value={project.title || ''}
                     onChange={(e) => handleTitleChange(e.target.value)}
-                    placeholder="Enter project title"
+                    disabled={saving}
+                    aria-describedby="title-help"
+                    required
                   />
+                  <p id="title-help" className="text-sm text-muted-foreground mt-1">
+                    A clear, descriptive title for your project
+                  </p>
                 </div>
 
                 <div>
-                  <Label htmlFor="slug">Slug</Label>
+                  <Label htmlFor="project-slug">URL Slug</Label>
                   <Input
-                    id="slug"
+                    id="project-slug"
+                    placeholder="project-slug"
                     value={project.slug || ''}
                     onChange={(e) => setProject(prev => ({ ...prev, slug: e.target.value }))}
-                    placeholder="project-slug"
+                    disabled={saving}
+                    aria-describedby="slug-help"
                   />
+                  <p id="slug-help" className="text-sm text-muted-foreground mt-1">
+                    Auto-generated from title, or customize manually
+                  </p>
                 </div>
 
                 <div>
-                  <Label htmlFor="excerpt">Excerpt</Label>
+                  <Label htmlFor="project-excerpt">Excerpt</Label>
                   <Textarea
-                    id="excerpt"
+                    id="project-excerpt"
+                    placeholder="Brief description of the project"
                     value={project.excerpt || ''}
                     onChange={(e) => setProject(prev => ({ ...prev, excerpt: e.target.value }))}
-                    placeholder="Brief description of the project"
+                    disabled={saving}
                     rows={3}
+                    aria-describedby="excerpt-help"
                   />
+                  <p id="excerpt-help" className="text-sm text-muted-foreground mt-1">
+                    A short summary for project listings
+                  </p>
                 </div>
 
                 <div>
-                  <Label htmlFor="body">Content</Label>
+                  <Label htmlFor="project-content">Content</Label>
                   <Textarea
-                    id="body"
+                    id="project-content"
                     value={typeof project.body === 'object' ? JSON.stringify(project.body, null, 2) : ''}
                     onChange={(e) => {
                       try {
@@ -317,120 +253,26 @@ function AdminProjectEditor() {
                       }
                     }}
                     placeholder="Project content (JSON format)"
-                    rows={10}
+                    rows={15}
                     className="font-mono text-sm"
+                    disabled={saving}
+                    aria-describedby="content-help"
                   />
+                  <p id="content-help" className="text-sm text-muted-foreground mt-1">
+                    Rich content in JSON format (future rich text editor)
+                  </p>
                 </div>
               </CardContent>
             </Card>
 
             {/* Gallery Management */}
-            {isEditing && (
-              <Card>
-                <CardHeader>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <CardTitle>Project Gallery</CardTitle>
-                      <CardDescription>Manage project images and their order</CardDescription>
-                    </div>
-                    <Dialog open={showImageDialog} onOpenChange={setShowImageDialog}>
-                      <DialogTrigger asChild>
-                        <Button>
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add Image
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Add New Image</DialogTitle>
-                          <DialogDescription>
-                            Add a new image to the project gallery
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                          <div>
-                            <Label htmlFor="imageUrl">Image URL *</Label>
-                            <Input
-                              id="imageUrl"
-                              value={newImage.url}
-                              onChange={(e) => setNewImage(prev => ({ ...prev, url: e.target.value }))}
-                              placeholder="https://example.com/image.jpg"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="imageAlt">Alt Text</Label>
-                            <Input
-                              id="imageAlt"
-                              value={newImage.alt}
-                              onChange={(e) => setNewImage(prev => ({ ...prev, alt: e.target.value }))}
-                              placeholder="Description of the image"
-                            />
-                          </div>
-                          <div className="flex justify-end space-x-2">
-                            <Button variant="outline" onClick={() => setShowImageDialog(false)}>
-                              Cancel
-                            </Button>
-                            <Button onClick={handleAddImage} disabled={!newImage.url.trim()}>
-                              Add Image
-                            </Button>
-                          </div>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  {images.length === 0 ? (
-                    <p className="text-muted-foreground text-center py-8">
-                      No images added yet. Click "Add Image" to get started.
-                    </p>
-                  ) : (
-                    <div className="space-y-3">
-                      {images.map((image, index) => (
-                        <div key={image.id} className="flex items-center space-x-3 p-3 border rounded-lg">
-                          <img
-                            src={image.url}
-                            alt={image.alt || 'Project image'}
-                            className="w-16 h-16 object-cover rounded"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = '/placeholder.svg';
-                            }}
-                          />
-                          <div className="flex-1">
-                            <p className="font-medium truncate">{image.alt || 'Untitled'}</p>
-                            <p className="text-sm text-muted-foreground truncate">{image.url}</p>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleReorderImage(image.id, 'up')}
-                              disabled={index === 0}
-                            >
-                              <ChevronUp className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleReorderImage(image.id, 'down')}
-                              disabled={index === images.length - 1}
-                            >
-                              <ChevronDown className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => handleDeleteImage(image.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+            {isEditing && id && (
+              <GalleryManager
+                projectId={id}
+                images={images}
+                onImagesChange={setImages}
+                disabled={saving}
+              />
             )}
           </div>
 
@@ -443,9 +285,9 @@ function AdminProjectEditor() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="status">Status</Label>
+                  <Label htmlFor="project-status">Status</Label>
                   <Select value={project.status} onValueChange={(value) => setProject(prev => ({ ...prev, status: value as 'draft' | 'published' }))}>
-                    <SelectTrigger>
+                    <SelectTrigger id="project-status">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -457,7 +299,7 @@ function AdminProjectEditor() {
 
                 <div className="pt-4 border-t">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Status</span>
+                    <span className="text-sm font-medium">Current Status</span>
                     <Badge variant={project.status === 'published' ? 'default' : 'secondary'}>
                       {project.status}
                     </Badge>
