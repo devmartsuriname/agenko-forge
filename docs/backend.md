@@ -42,7 +42,18 @@
 - CSV export for contact submissions
 - File upload for media management
 
+## Edge Functions
+
+### submit-contact
+- **Purpose**: Handles contact form submissions with validation and rate limiting
+- **Rate Limiting**: 5 requests per minute per IP address
+- **Validation**: Email format, field lengths, required fields
+- **CAPTCHA**: Stub implementation ready for hCaptcha/reCAPTCHA integration
+- **Security**: Server-side validation, IP tracking, error handling
+
 ## Environment Variables Required
 - `ADMIN_EMAIL`: Initial admin user email
 - `RESEND_API_KEY`: For email notifications (future)
 - `CAPTCHA_SECRET`: For form protection (future)
+- `SUPABASE_URL`: Automatically provided
+- `SUPABASE_SERVICE_ROLE_KEY`: Automatically provided for edge functions
