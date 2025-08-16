@@ -27,9 +27,10 @@ This is a modern agency website with secure admin CMS, built with React, TypeScr
 - **Responsive**: Mobile-first approach
 
 ## Authentication
-- Supabase Auth with email/password
-- Invite-only signup (no public registration)
-- Role-based permissions (admin/editor/viewer)
+- Supabase Auth with secure admin bootstrap process (`npm run seed:admin`)
+- Role-based permissions enforced at database level (admin/editor/viewer)
+- Public signup disabled; invite-only user management with service role seeding
+- Session management with auto-refresh and persistence
 
 ## Frontend Structure
 - **Public Routes**: /, /about, /services, /portfolio, /blog, /contact

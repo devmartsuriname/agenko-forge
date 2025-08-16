@@ -143,11 +143,12 @@
 - Homepage sections stored in pages.body JSONB field
 - Content preview sections automatically fetch published data
 
-### Content Seeding
-- Comprehensive Devmart v1.0 seed data including services, projects, blog posts
-- Homepage configured with dynamic sections
-- Settings table for company info, pricing plans, and SEO defaults
-- All seeded content published and ready for production
+### Admin Bootstrap & Recovery
+- Secure admin seeding using Supabase Admin API
+- Environment-based credentials (ADMIN_EMAIL, ADMIN_PASSWORD)
+- Recovery procedures for lost admin access
+- Public signup disabled; admin-controlled user promotion
+- Service role key for bypassing RLS during seeding
 
 ## Security
 - RLS policies ensure data isolation
