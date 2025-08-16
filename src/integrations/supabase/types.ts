@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_config: {
+        Row: {
+          created_at: string | null
+          key: string
+          updated_at: string | null
+          value: string
+        }
+        Insert: {
+          created_at?: string | null
+          key: string
+          updated_at?: string | null
+          value: string
+        }
+        Update: {
+          created_at?: string | null
+          key?: string
+          updated_at?: string | null
+          value?: string
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           body: Json | null
@@ -270,9 +291,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      bootstrap_promote_admin: {
+        Args: { p_code: string }
+        Returns: Json
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      is_registration_enabled: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      set_bootstrap_hash: {
+        Args: { p_code: string }
+        Returns: boolean
       }
     }
     Enums: {
