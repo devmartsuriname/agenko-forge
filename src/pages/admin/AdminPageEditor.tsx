@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Helmet } from 'react-helmet-async';
 import { adminCms } from '@/lib/admin-cms';
 import { Page } from '@/types/content';
@@ -15,6 +16,7 @@ import { Save, ArrowLeft } from 'lucide-react';
 import { AdminErrorBoundary } from '@/components/admin/ErrorBoundary';
 import { LoadingCardSkeleton } from '@/components/admin/LoadingSkeleton';
 import { adminToast } from '@/lib/toast-utils';
+import { SectionsTab } from '@/components/admin/sections/SectionsTab';
 
 function AdminPageEditorContent() {
   const { id } = useParams();
@@ -135,78 +137,96 @@ function AdminPageEditorContent() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Page Details</CardTitle>
-              <CardDescription>Basic information about the page</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Title</Label>
-                <Input
-                  id="title"
-                  value={page.title || ''}
-                  onChange={(e) => handleTitleChange(e.target.value)}
-                  placeholder="Enter page title"
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="slug">Slug</Label>
-                <Input
-                  id="slug"
-                  value={page.slug || ''}
-                  onChange={(e) => setPage(prev => ({ ...prev, slug: e.target.value }))}
-                  placeholder="page-url-slug"
-                  required
-                />
-                <p className="text-sm text-muted-foreground">
-                  This will be the URL: /{page.slug || 'page-url-slug'}
-                </p>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
-                <Select
-                  value={page.status || 'draft'}
-                  onValueChange={(value) => setPage(prev => ({ ...prev, status: value as 'draft' | 'published' }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="draft">Draft</SelectItem>
-                    <SelectItem value="published">Published</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
+        <Tabs defaultValue="details" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="details">Page Details</TabsTrigger>
+            <TabsTrigger value="sections">Sections</TabsTrigger>
+            <TabsTrigger value="content">Raw Content</TabsTrigger>
+          </TabsList>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Content</CardTitle>
-              <CardDescription>Page content and body text</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <Label htmlFor="content">Content</Label>
-                <Textarea
-                  id="content"
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder="Enter page content..."
-                  rows={15}
-                  className="font-mono"
-                />
-                <p className="text-sm text-muted-foreground">
-                  You can use Markdown syntax for formatting.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <TabsContent value="details">
+            <Card>
+              <CardHeader>
+                <CardTitle>Page Details</CardTitle>
+                <CardDescription>Basic information about the page</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Title</Label>
+                  <Input
+                    id="title"
+                    value={page.title || ''}
+                    onChange={(e) => handleTitleChange(e.target.value)}
+                    placeholder="Enter page title"
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="slug">Slug</Label>
+                  <Input
+                    id="slug"
+                    value={page.slug || ''}
+                    onChange={(e) => setPage(prev => ({ ...prev, slug: e.target.value }))}
+                    placeholder="page-url-slug"
+                    required
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    This will be the URL: /{page.slug || 'page-url-slug'}
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="status">Status</Label>
+                  <Select
+                    value={page.status || 'draft'}
+                    onValueChange={(value) => setPage(prev => ({ ...prev, status: value as 'draft' | 'published' }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="draft">Draft</SelectItem>
+                      <SelectItem value="published">Published</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="sections">
+            <SectionsTab 
+              pageBody={page.body}
+              onUpdate={(body) => setPage(prev => ({ ...prev, body }))}
+            />
+          </TabsContent>
+
+          <TabsContent value="content">
+            <Card>
+              <CardHeader>
+                <CardTitle>Raw Content</CardTitle>
+                <CardDescription>Direct JSON content editing (advanced)</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <Label htmlFor="content">Content</Label>
+                  <Textarea
+                    id="content"
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    placeholder="Enter page content..."
+                    rows={15}
+                    className="font-mono"
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    You can use Markdown syntax for formatting.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
 
           <div className="flex justify-end space-x-2">
             <Button
