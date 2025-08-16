@@ -49,37 +49,7 @@ export default function AdminRegister() {
 
   // Show disabled state if registration is not enabled
   if (registrationEnabled === false) {
-    return (
-      <>
-        <SEOHead 
-          title="Admin Registration - Devmart"
-          description="Admin registration for Devmart CMS"
-        />
-        
-        <div className="min-h-screen flex items-center justify-center bg-background p-4">
-          <Card className="w-full max-w-md">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl font-bold">Registration Disabled</CardTitle>
-              <CardDescription>
-                Admin registration is currently disabled
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center space-y-4">
-              <Alert>
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>
-                  Registration has been disabled. Please contact your administrator or use the existing admin login.
-                </AlertDescription>
-              </Alert>
-              
-              <Button asChild className="w-full">
-                <a href="/admin/login">Go to Login</a>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </>
-    );
+    return <Navigate to="/admin/login" replace />;
   }
 
   const validateForm = () => {
