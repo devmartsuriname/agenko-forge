@@ -200,6 +200,17 @@ export const cms = {
   },
 
   // Contact Submissions
+  async getPublishedPages(): Promise<Page[]> {
+    const { data, error } = await supabase
+      .from('pages')
+      .select('*')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false });
+
+    if (error) throw error;
+    return (data || []) as Page[];
+  },
+
   async submitContact(submission: {
     name: string;
     email: string;
