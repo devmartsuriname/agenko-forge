@@ -10,7 +10,7 @@ Devmart uses Supabase Auth with a role-based access control system. The applicat
 
 ## Bootstrap Process
 
-### Initial Admin Setup
+### Method 1: Admin Seeding Script (Recommended)
 
 1. **Set Environment Variables**
    ```bash
@@ -29,6 +29,20 @@ Devmart uses Supabase Auth with a role-based access control system. The applicat
    - Create the first admin user with email verification bypassed
    - Set up the admin profile with proper role assignment
    - Skip creation if admin already exists
+
+### Method 2: Bootstrap Registration (UI Alternative)
+
+1. **Set Bootstrap Code**
+   ```bash
+   # Add to Supabase Edge Functions secrets
+   BOOTSTRAP_CODE=your_one_time_secret_code
+   ```
+
+2. **Access Registration Page**
+   - Visit `/admin/register` (only available when no admin exists)
+   - Use @devmart.sr email address
+   - Enter the bootstrap code
+   - Registration automatically disabled after first successful admin creation
 
 3. **Configure Supabase Auth Settings**
    - Navigate to Supabase Dashboard → Authentication → Settings
@@ -177,6 +191,75 @@ npx supabase sql --query "SELECT u.email, u.email_confirmed_at, p.role FROM auth
 
 # Reset admin password (requires service role)
 npx supabase sql --query "UPDATE auth.users SET encrypted_password = crypt('new_password', gen_salt('bf')) WHERE email = 'info@devmart.sr';"
+```
+
+## Bootstrap Registration API
+
+### Endpoint: `/api/auth/register`
+
+**Method:** `POST`
+
+**Request Body:**
+```json
+{
+  "email": "admin@devmart.sr",
+  "password": "secure_password",
+  "bootstrapCode": "your_bootstrap_code"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Admin account created successfully",
+  "user": {
+    "id": "uuid",
+    "email": "admin@devmart.sr"
+  }
+}
+```
+
+**Error Response:**
+```json
+{
+  "error": "Error message"
+}
+```
+
+### Security Features
+
+- **Rate Limiting:** 5 requests per minute per IP
+- **Domain Validation:** Only @devmart.sr emails allowed
+- **One-time Use:** Registration disabled after first successful admin creation
+- **Bootstrap Code:** Server-side validation with hashed storage
+- **RLS Compliance:** Uses security definer functions for safe privilege escalation
+
+### Managing Bootstrap Registration
+
+#### Set Bootstrap Code (Admin Required)
+```sql
+SELECT set_bootstrap_hash('your_new_bootstrap_code');
+```
+
+#### Check Registration Status
+```sql
+SELECT is_registration_enabled();
+```
+
+#### Manually Enable/Disable Registration
+```sql
+-- Enable
+UPDATE app_config SET value = 'true' WHERE key = 'registration_enabled';
+
+-- Disable
+UPDATE app_config SET value = 'false' WHERE key = 'registration_enabled';
+```
+
+#### Rotate Bootstrap Code
+```sql
+-- Only admins can call this
+SELECT set_bootstrap_hash('new_bootstrap_code_here');
 ```
 
 ## Future Considerations

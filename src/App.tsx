@@ -29,6 +29,7 @@ import { AdminErrorBoundary } from "./components/admin/ErrorBoundary";
 
 // Admin pages - lazy loaded
 const AdminLogin = lazy(() => import("./pages/admin/Login"));
+const AdminRegister = lazy(() => import("./pages/admin/AdminRegister"));
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminPages = lazy(() => import("./pages/admin/AdminPages"));
 const AdminPageEditor = lazy(() => import("./pages/admin/AdminPageEditor"));
@@ -72,6 +73,11 @@ const App = () => (
               <Route path="/admin/login" element={
                 <Suspense fallback={<Spinner />}>
                   <AdminLogin />
+                </Suspense>
+              } />
+              <Route path="/admin/register" element={
+                <Suspense fallback={<Spinner />}>
+                  <AdminRegister />
                 </Suspense>
               } />
               <Route path="/admin" element={
