@@ -23,8 +23,9 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import NotFound from "./pages/NotFound";
 
-// Admin layout
+// Admin layout and error boundary
 import { AdminLayout } from "./components/admin/AdminLayout";
+import { AdminErrorBoundary } from "./components/admin/ErrorBoundary";
 
 // Admin pages - lazy loaded
 const AdminLogin = lazy(() => import("./pages/admin/Login"));
@@ -72,7 +73,11 @@ const App = () => (
                   <AdminLogin />
                 </Suspense>
               } />
-              <Route path="/admin" element={<AdminLayout />}>
+              <Route path="/admin" element={
+                <AdminErrorBoundary>
+                  <AdminLayout />
+                </AdminErrorBoundary>
+              }>
                 <Route index element={
                   <Suspense fallback={<Spinner />}>
                     <AdminDashboard />

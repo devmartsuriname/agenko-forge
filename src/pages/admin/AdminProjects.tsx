@@ -12,7 +12,11 @@ import { adminCms } from '@/lib/admin-cms';
 import { Project } from '@/types/content';
 import { useAuth } from '@/lib/auth';
 import { formatDate, getStatusBadgeVariant } from '@/lib/admin-utils';
-import { Plus, Search, Edit, Trash2, Eye, Image } from 'lucide-react';
+import { adminToast } from '@/lib/toast-utils';
+import { EmptyState } from '@/components/admin/EmptyState';
+import { LoadingListSkeleton } from '@/components/admin/LoadingSkeleton';
+import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
+import { Plus, Search, Edit, Trash2, Eye, FolderOpen } from 'lucide-react';
 
 function AdminProjects() {
   const { isAdmin, isEditor } = useAuth();
@@ -39,11 +43,11 @@ function AdminProjects() {
       setProjects(data);
     } catch (error) {
       console.error('Error fetching projects:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch projects',
-        variant: 'destructive',
-      });
+      if (error instanceof Error && error.message.includes('permission')) {
+        adminToast.permissionDenied('view projects');
+      } else {
+        adminToast.networkError();
+      }
     } finally {
       setLoading(false);
     }
@@ -72,17 +76,14 @@ function AdminProjects() {
     try {
       await adminCms.deleteProject(project.id);
       setProjects(prev => prev.filter(p => p.id !== project.id));
-      toast({
-        title: 'Success',
-        description: 'Project deleted successfully',
-      });
+      adminToast.deleted('Project', project.title);
     } catch (error) {
       console.error('Error deleting project:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete project',
-        variant: 'destructive',
-      });
+      if (error instanceof Error && error.message.includes('permission')) {
+        adminToast.permissionDenied('delete projects');
+      } else {
+        adminToast.error('Failed to Delete', 'Unable to delete project. Please try again.');
+      }
     } finally {
       setDeleting(false);
       setDeleteConfirm(null);
@@ -100,9 +101,25 @@ function AdminProjects() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
+      <>
+        <SEOHead 
+          title="Projects - Admin Panel"
+          description="Manage portfolio projects"
+        />
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Projects</h1>
+              <p className="text-muted-foreground">Manage your portfolio projects</p>
+            </div>
+            <Button disabled>
+              <Plus className="h-4 w-4 mr-2" />
+              New Project
+            </Button>
+          </div>
+          <LoadingListSkeleton />
+        </div>
+      </>
     );
   }
 
@@ -167,9 +184,23 @@ function AdminProjects() {
           </CardHeader>
           <CardContent>
             {filteredProjects.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">
-                {searchTerm || statusFilter !== 'all' ? 'No projects found matching your filters.' : 'No projects found.'}
-              </p>
+              projects.length === 0 ? (
+                <EmptyState
+                  icon={FolderOpen}
+                  title="No projects yet"
+                  description="Create your first portfolio project to showcase your work to potential clients."
+                  actionLabel="Create First Project"
+                  actionTo="/admin/projects/new"
+                />
+              ) : (
+                <EmptyState
+                  icon={Search}
+                  title="No projects found"
+                  description="Try adjusting your search terms or filters to find what you're looking for."
+                  actionLabel="Clear Filters"
+                  actionTo="/admin/projects"
+                />
+              )
             ) : (
               <div className="space-y-4">
                 {filteredProjects.map((project) => (
@@ -211,41 +242,36 @@ function AdminProjects() {
                         </Button>
                         
                         {isAdmin && (
-                          <Dialog open={deleteConfirm?.id === project.id} onOpenChange={() => setDeleteConfirm(null)}>
-                            <DialogTrigger asChild>
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => setDeleteConfirm(project)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>Delete Project</DialogTitle>
-                                <DialogDescription>
-                                  Are you sure you want to delete "{project.title}"? This action cannot be undone and will also delete all associated images.
-                                </DialogDescription>
-                              </DialogHeader>
-                              <div className="flex justify-end space-x-2">
-                                <Button
-                                  variant="outline"
-                                  onClick={() => setDeleteConfirm(null)}
-                                  disabled={deleting}
-                                >
-                                  Cancel
-                                </Button>
-                                <Button
-                                  variant="destructive"
-                                  onClick={() => handleDelete(project)}
-                                  disabled={deleting}
-                                >
-                                  {deleting ? 'Deleting...' : 'Delete'}
-                                </Button>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
+                          <>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => setDeleteConfirm(project)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                            <ConfirmDialog
+                              open={deleteConfirm?.id === project.id}
+                              onOpenChange={() => setDeleteConfirm(null)}
+                              title="Delete Project"
+                              description={
+                                <>
+                                  Are you sure you want to delete <strong>"{project.title}"</strong>?
+                                  <br /><br />
+                                  This action cannot be undone and will also delete all associated images.
+                                  {project.status === 'published' && (
+                                    <div className="mt-2 p-2 bg-destructive/10 border border-destructive/20 rounded">
+                                      <strong>Warning:</strong> This project is currently published and visible to visitors.
+                                    </div>
+                                  )}
+                                </>
+                              }
+                              confirmLabel="Delete Project"
+                              variant="destructive"
+                              onConfirm={() => handleDelete(project)}
+                              loading={deleting}
+                            />
+                          </>
                         )}
                       </div>
                     </div>
