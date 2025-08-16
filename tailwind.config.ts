@@ -61,7 +61,33 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// Agenko brand colors
+				'agenko-green': 'hsl(var(--agenko-green))',
+				'agenko-green-hover': 'hsl(var(--agenko-green-hover))',
+				'agenko-dark': 'hsl(var(--agenko-dark))',
+				'agenko-dark-lighter': 'hsl(var(--agenko-dark-lighter))',
+				'agenko-gray': 'hsl(var(--agenko-gray))',
+				'agenko-gray-light': 'hsl(var(--agenko-gray-light))',
+				'agenko-white': 'hsl(var(--agenko-white))'
+			},
+			fontFamily: {
+				'heading': 'var(--font-heading)',
+				'body': 'var(--font-body)'
+			},
+			boxShadow: {
+				'soft': 'var(--shadow-soft)',
+				'glow': 'var(--shadow-glow)',
+				'card': 'var(--shadow-card)'
+			},
+			backgroundImage: {
+				'gradient-hero': 'var(--gradient-hero)',
+				'gradient-dark': 'var(--gradient-dark)',
+				'gradient-card': 'var(--gradient-card)'
+			},
+			transitionTimingFunction: {
+				'smooth': 'var(--transition-smooth)',
+				'bounce': 'var(--transition-bounce)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

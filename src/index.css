@@ -2,41 +2,67 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Agenko Design System - Based on the Agenko Home 3 design */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Agenko Brand Colors */
+    --agenko-green: 90 100% 63%; /* #A1FF4C */
+    --agenko-green-hover: 88 100% 58%; /* #94F83D */
+    --agenko-dark: 220 13% 9%; /* #161A1E */
+    --agenko-dark-lighter: 215 15% 12%; /* #1B2127 */
+    --agenko-gray: 220 9% 46%; /* #6B7280 */
+    --agenko-gray-light: 220 13% 69%; /* #9CA3AF */
+    --agenko-white: 0 0% 100%; /* #FFFFFF */
+    
+    /* Primary Theme */
+    --background: var(--agenko-dark);
+    --foreground: var(--agenko-white);
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: var(--agenko-dark-lighter);
+    --card-foreground: var(--agenko-white);
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: var(--agenko-dark-lighter);
+    --popover-foreground: var(--agenko-white);
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: var(--agenko-green);
+    --primary-foreground: var(--agenko-dark);
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: var(--agenko-dark-lighter);
+    --secondary-foreground: var(--agenko-white);
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: var(--agenko-dark-lighter);
+    --muted-foreground: var(--agenko-gray-light);
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: var(--agenko-green);
+    --accent-foreground: var(--agenko-dark);
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: var(--agenko-white);
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 217 32% 17%;
+    --input: 217 32% 17%;
+    --ring: var(--agenko-green);
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(var(--agenko-green)) 0%, hsl(88 100% 58%) 100%);
+    --gradient-dark: linear-gradient(180deg, hsl(var(--agenko-dark)) 0%, hsl(var(--agenko-dark-lighter)) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(var(--agenko-dark-lighter)) 0%, hsl(217 25% 15%) 100%);
+
+    /* Shadows */
+    --shadow-soft: 0 4px 20px -4px hsl(var(--agenko-dark) / 0.3);
+    --shadow-glow: 0 0 40px hsl(var(--agenko-green) / 0.2);
+    --shadow-card: 0 8px 32px -8px hsl(0 0% 0% / 0.3);
+
+    /* Typography */
+    --font-heading: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
     --sidebar-background: 0 0% 98%;
 
@@ -92,6 +118,15 @@ All colors MUST be HSL.
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
+  /* Admin Theme Override */
+  .admin-root {
+    --background: var(--agenko-dark);
+    --foreground: var(--agenko-white);
+    --card: var(--agenko-dark-lighter);
+    --border: 217 32% 20%;
+    --input: 217 32% 20%;
+  }
 }
 
 @layer base {
@@ -100,6 +135,37 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+}
+
+@layer components {
+  /* Hero Button Variant */
+  .btn-hero {
+    @apply bg-gradient-to-r from-agenko-green to-agenko-green-hover text-agenko-dark font-semibold px-8 py-4 rounded-full hover:shadow-glow transition-all duration-300 transform hover:scale-105;
+  }
+
+  /* Gradient Text */
+  .text-gradient {
+    background: var(--gradient-hero);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Card Styles */
+  .card-gradient {
+    background: var(--gradient-card);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Glow Effects */
+  .glow-green {
+    box-shadow: var(--shadow-glow);
   }
 }

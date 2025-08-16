@@ -18,6 +18,9 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        hero: "bg-agenko-green text-agenko-dark hover:bg-agenko-green-hover font-semibold rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-glow",
+        cta: "bg-gradient-to-r from-agenko-green to-agenko-green-hover text-agenko-dark font-semibold border-0 hover:shadow-glow transition-all duration-300",
+        "outline-green": "border-2 border-agenko-green text-agenko-green bg-transparent hover:bg-agenko-green hover:text-agenko-dark transition-all duration-300",
       },
       size: {
         default: "h-10 px-4 py-2",
