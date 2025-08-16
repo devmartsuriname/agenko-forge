@@ -21,6 +21,9 @@ import NotFound from "./pages/NotFound";
 import { AdminLayout } from "./components/admin/AdminLayout";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
+import AdminPages from "./pages/admin/AdminPages";
+import AdminPageEditor from "./pages/admin/AdminPageEditor";
+import AdminServices from "./pages/admin/AdminServices";
 import ContactSubmissions from "./pages/admin/ContactSubmissions";
 import Settings from "./pages/admin/Settings";
 import Users from "./pages/admin/Users";
@@ -54,10 +57,13 @@ const App = () => (
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<AdminDashboard />} />
+                <Route path="pages" element={<AdminPages />} />
+                <Route path="pages/new" element={<AdminPageEditor />} />
+                <Route path="pages/:id/edit" element={<AdminPageEditor />} />
+                <Route path="services" element={<AdminServices />} />
                 <Route path="contact" element={<ContactSubmissions />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="users" element={<Users />} />
-                {/* TODO: Add remaining CRUD pages */}
               </Route>
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -36,24 +36,49 @@
 - Default site settings
 - Admin user creation (via ADMIN_EMAIL env var)
 
-## API Endpoints (Future)
-- Contact form submission with rate limiting
-- CAPTCHA verification
+## Admin CMS Features
+
+### Dashboard
+- KPI display (content counts)
+- Recent activity tracking
+- Role-aware content access
+
+### Content Management
+- **Pages**: Create/edit static pages with rich content
+- **Services**: Manage service offerings with descriptions
+- **Projects**: Portfolio management with image galleries (in progress)
+- **Blog**: Full blog management with tags and publishing (in progress)
+- **Contact Submissions**: View, search, and export form submissions
+- **Settings**: Site configuration and social media links
+- **Users**: User role management (admin only)
+
+### Access Control
+- **Admin**: Full access to all features including user management and deletion
+- **Editor**: Content creation and editing, view submissions
+- **Viewer**: Read-only access to dashboard and content
+
+### CRUD Operations
+- All content types support create/read/update operations
+- Delete operations restricted to admin role only
+- Slug auto-generation with uniqueness checking
+- Status workflow (draft/published) with publish timestamp
+- Optimistic UI updates with proper error handling
+
+### Export Features
 - CSV export for contact submissions
-- File upload for media management
+- Formatted data with proper encoding
 
-## Edge Functions
+## Security
+- RLS policies ensure data isolation
+- Rate limiting on contact forms (5 requests per minute)
+- CAPTCHA verification stub for contact forms
+- Admin-only access to sensitive operations
+- IP tracking for contact submissions
+- Theme isolation for admin vs public areas
 
-### submit-contact
-- **Purpose**: Handles contact form submissions with validation and rate limiting
-- **Rate Limiting**: 5 requests per minute per IP address
-- **Validation**: Email format, field lengths, required fields
-- **CAPTCHA**: Stub implementation ready for hCaptcha/reCAPTCHA integration
-- **Security**: Server-side validation, IP tracking, error handling
-
-## Environment Variables Required
-- `ADMIN_EMAIL`: Initial admin user email
-- `RESEND_API_KEY`: For email notifications (future)
-- `CAPTCHA_SECRET`: For form protection (future)
-- `SUPABASE_URL`: Automatically provided
-- `SUPABASE_SERVICE_ROLE_KEY`: Automatically provided for edge functions
+## Performance
+- Optimized queries with selective field loading
+- Lazy loading for large content
+- CDN-ready asset handling
+- Efficient pagination for content lists
+- Admin bundle separation from public frontend

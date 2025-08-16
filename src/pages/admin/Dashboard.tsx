@@ -82,12 +82,18 @@ export default function AdminDashboard() {
         // Recent contact submissions
         const { data: recentContact } = await supabase
           .from('contact_submissions')
-          .select('id, name as title, created_at')
+          .select('id, name, email, subject, created_at')
           .order('created_at', { ascending: false })
           .limit(3);
 
         recentContact?.forEach(item => {
-          recentData.push({ id: item.id, title: item.title, status: 'new', created_at: item.created_at, type: 'contact' });
+          recentData.push({ 
+            id: item.id, 
+            title: item.subject || `Message from ${item.name}`, 
+            status: 'new', 
+            created_at: item.created_at, 
+            type: 'contact' 
+          });
         });
 
         // Sort by date and limit
