@@ -158,6 +158,15 @@ carousel: {
 
 ### Data Integrity
 - **Unique Constraints**: `project_images(project_id, sort_order)` prevents duplicate sort positions
+- **URL Uniqueness**: `project_images(project_id, url)` prevents duplicate URLs per project
+- **Idempotent Upserts**: All seed operations use `ON CONFLICT (slug) DO NOTHING` for safe re-runs
+- **Content Requirements**: Minimum 6 published items each for blog and portfolio carousels
+
+### Carousel Content Strategy
+- **Blog Posts**: Target ≥6 published posts for balanced display at lg=3 breakpoint
+- **Portfolio Projects**: Target ≥6 published projects for consistent carousel experience
+- **Homepage Limits**: Both blog and portfolio preview sections configured with `limit: 6`
+- **Breakpoint Coverage**: Ensures no empty slots at xs=1, sm=1, md=2, lg=3 slides per view
 - **Performance Indexes**: Optimized queries for published content and slug-based lookups
 - **Idempotent Seeding**: `scripts/seed-devmart-extra.ts` safely re-runs without duplicates
 
