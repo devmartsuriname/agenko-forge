@@ -75,7 +75,7 @@ const Index = () => {
         />
         <div className="min-h-screen bg-background">
           <Navigation />
-          <main className="pt-16">
+          <main id="main-content" className="pt-16">
             <SectionRenderer sections={sections} context="home" />
           </main>
           <Footer />

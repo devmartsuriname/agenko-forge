@@ -249,8 +249,14 @@ export function SectionEditorRow({
   );
 }
 
-// Individual section editors (simplified for brevity)
-function HeroSectionEditor({ section, updateSectionData }: { section: Section; updateSectionData: (updates: any) => void }) {
+// Individual section editors
+function HeroSectionEditor({ 
+  section, 
+  updateSectionData 
+}: { 
+  section: Section; 
+  updateSectionData: (updates: any) => void; 
+}) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -320,7 +326,13 @@ function HeroSectionEditor({ section, updateSectionData }: { section: Section; u
   );
 }
 
-function AboutSectionEditor({ section, updateSectionData }: { section: Section; updateSectionData: (updates: any) => void }) {
+function AboutSectionEditor({ 
+  section, 
+  updateSectionData 
+}: { 
+  section: Section; 
+  updateSectionData: (updates: any) => void; 
+}) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -346,7 +358,13 @@ function AboutSectionEditor({ section, updateSectionData }: { section: Section; 
   );
 }
 
-function ServicesPreviewEditor({ section, updateSectionData }: { section: Section; updateSectionData: (updates: any) => void }) {
+function ServicesPreviewEditor({ 
+  section, 
+  updateSectionData 
+}: { 
+  section: Section; 
+  updateSectionData: (updates: any) => void; 
+}) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -380,4 +398,160 @@ function ServicesPreviewEditor({ section, updateSectionData }: { section: Sectio
   );
 }
 
-function PortfolioPreviewEditor({ section, updateSectionData }: { section: Section; updateSectionData: (updates: any)
+function PortfolioPreviewEditor({ 
+  section, 
+  updateSectionData 
+}: { 
+  section: Section; 
+  updateSectionData: (updates: any) => void; 
+}) {
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor={`portfolio-title-${section.id}`}>Title *</Label>
+        <Input
+          id={`portfolio-title-${section.id}`}
+          value={section.data.title || ''}
+          onChange={(e) => updateSectionData({ title: e.target.value })}
+          placeholder="Our Work"
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor={`portfolio-limit-${section.id}`}>Number to Show</Label>
+          <Select
+            value={String((section.data as any).limit || 6)}
+            onValueChange={(value) => updateSectionData({ limit: parseInt(value) })}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {[3, 6, 9, 12].map((num) => (
+                <SelectItem key={num} value={String(num)}>
+                  {num} Projects
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor={`portfolio-layout-${section.id}`}>Display Style</Label>
+          <Select
+            value={(section.data as any).layout || 'grid'}
+            onValueChange={(value) => updateSectionData({ layout: value as 'grid' | 'carousel' })}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="grid">Grid</SelectItem>
+              <SelectItem value="carousel">Carousel</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TestimonialsSectionEditor({ 
+  section, 
+  updateSectionData 
+}: { 
+  section: Section; 
+  updateSectionData: (updates: any) => void; 
+}) {
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor={`testimonials-title-${section.id}`}>Title *</Label>
+        <Input
+          id={`testimonials-title-${section.id}`}
+          value={section.data.title || ''}
+          onChange={(e) => updateSectionData({ title: e.target.value })}
+          placeholder="What Our Clients Say"
+        />
+      </div>
+    </div>
+  );
+}
+
+function BlogPreviewEditor({ 
+  section, 
+  updateSectionData 
+}: { 
+  section: Section; 
+  updateSectionData: (updates: any) => void; 
+}) {
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor={`blog-title-${section.id}`}>Title *</Label>
+        <Input
+          id={`blog-title-${section.id}`}
+          value={section.data.title || ''}
+          onChange={(e) => updateSectionData({ title: e.target.value })}
+          placeholder="Latest from Our Blog"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor={`blog-layout-${section.id}`}>Display Style</Label>
+        <Select
+          value={(section.data as any).layout || 'grid'}
+          onValueChange={(value) => updateSectionData({ layout: value as 'grid' | 'carousel' })}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="grid">Grid</SelectItem>
+            <SelectItem value="carousel">Carousel</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  );
+}
+
+function CtaSectionEditor({ 
+  section, 
+  updateSectionData 
+}: { 
+  section: Section; 
+  updateSectionData: (updates: any) => void; 
+}) {
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor={`cta-title-${section.id}`}>Title *</Label>
+        <Input
+          id={`cta-title-${section.id}`}
+          value={section.data.title || ''}
+          onChange={(e) => updateSectionData({ title: e.target.value })}
+          placeholder="Ready to Get Started?"
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor={`cta-button-text-${section.id}`}>Button Text</Label>
+          <Input
+            id={`cta-button-text-${section.id}`}
+            value={(section.data as any).buttonText || ''}
+            onChange={(e) => updateSectionData({ buttonText: e.target.value })}
+            placeholder="Contact Us"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor={`cta-button-link-${section.id}`}>Button Link</Label>
+          <Input
+            id={`cta-button-link-${section.id}`}
+            value={(section.data as any).buttonLink || ''}
+            onChange={(e) => updateSectionData({ buttonLink: e.target.value })}
+            placeholder="/contact"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}

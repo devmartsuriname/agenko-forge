@@ -25,80 +25,110 @@ const Navigation = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-agenko-dark/95 backdrop-blur-sm border-b border-agenko-dark-lighter">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-agenko-green rounded-full flex items-center justify-center">
-              <span className="text-agenko-dark font-bold text-lg">A</span>
-            </div>
-            <span className="text-agenko-white font-heading font-bold text-xl">Agenko</span>
-          </Link>
+    <>
+      {/* Skip to main content link */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-primary-foreground px-4 py-2 rounded-md z-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+      >
+        Skip to main content
+      </a>
+      
+      <nav 
+        className="fixed top-0 left-0 right-0 z-50 bg-agenko-dark/95 backdrop-blur-sm border-b border-agenko-dark-lighter"
+        role="navigation"
+        aria-label="Main navigation"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo */}
+            <Link to="/" className="flex items-center space-x-2" aria-label="Agenko Home">
+              <div className="w-8 h-8 bg-agenko-green rounded-full flex items-center justify-center">
+                <span className="text-agenko-dark font-bold text-lg" aria-hidden="true">A</span>
+              </div>
+              <span className="text-agenko-white font-heading font-bold text-xl">Agenko</span>
+            </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className={`text-sm font-medium transition-colors duration-200 ${
-                  isActive(item.href)
-                    ? 'text-agenko-green'
-                    : 'text-agenko-gray-light hover:text-agenko-white'
-                }`}
-              >
-                {item.name}
-              </Link>
-            ))}
-          </div>
-
-          {/* CTA Button */}
-          <div className="hidden md:flex">
-            <Button variant="hero" size="sm">
-              LET'S TALK
-            </Button>
-          </div>
-
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-agenko-gray-light hover:text-agenko-white"
-            >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-agenko-dark-lighter rounded-lg mt-2">
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-8" role="menubar">
               {navItems.map((item) => (
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`block px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                  className={`text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm px-2 py-1 ${
                     isActive(item.href)
-                      ? 'text-agenko-green bg-agenko-dark'
-                      : 'text-agenko-gray-light hover:text-agenko-white hover:bg-agenko-dark'
+                      ? 'text-agenko-green'
+                      : 'text-agenko-gray-light hover:text-agenko-white'
                   }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  role="menuitem"
+                  aria-current={isActive(item.href) ? 'page' : undefined}
                 >
                   {item.name}
                 </Link>
               ))}
-              <div className="px-3 py-2">
-                <Button variant="hero" size="sm" className="w-full">
+            </div>
+
+            {/* CTA Button */}
+            <div className="hidden md:flex">
+              <Button variant="hero" size="sm" asChild>
+                <Link to="/contact">
                   LET'S TALK
-                </Button>
-              </div>
+                </Link>
+              </Button>
+            </div>
+
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="text-agenko-gray-light hover:text-agenko-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm p-1"
+                aria-expanded={isMobileMenuOpen}
+                aria-controls="mobile-menu"
+                aria-label={`${isMobileMenuOpen ? 'Close' : 'Open'} navigation menu`}
+              >
+                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
             </div>
           </div>
-        )}
-      </div>
-    </nav>
+
+          {/* Mobile Navigation */}
+          {isMobileMenuOpen && (
+            <div 
+              className="md:hidden"
+              id="mobile-menu"
+              role="menu"
+              aria-labelledby="mobile-menu-button"
+            >
+              <div className="px-2 pt-2 pb-3 space-y-1 bg-agenko-dark-lighter rounded-lg mt-2">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className={`block px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+                      isActive(item.href)
+                        ? 'text-agenko-green bg-agenko-dark'
+                        : 'text-agenko-gray-light hover:text-agenko-white hover:bg-agenko-dark'
+                    }`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    role="menuitem"
+                    aria-current={isActive(item.href) ? 'page' : undefined}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+                <div className="px-3 py-2">
+                  <Button variant="hero" size="sm" className="w-full" asChild>
+                    <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)}>
+                      LET'S TALK
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </nav>
+    </>
   );
 };
 
