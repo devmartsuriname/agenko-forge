@@ -104,6 +104,75 @@ export type Database = {
         }
         Relationships: []
       }
+      logs_app_events: {
+        Row: {
+          area: string
+          id: string
+          level: string
+          message: string
+          meta: Json | null
+          route: string | null
+          ts: string
+          user_id: string | null
+        }
+        Insert: {
+          area: string
+          id?: string
+          level: string
+          message: string
+          meta?: Json | null
+          route?: string | null
+          ts?: string
+          user_id?: string | null
+        }
+        Update: {
+          area?: string
+          id?: string
+          level?: string
+          message?: string
+          meta?: Json | null
+          route?: string | null
+          ts?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      logs_errors: {
+        Row: {
+          area: string
+          error_code: string | null
+          id: string
+          message: string
+          meta: Json | null
+          route: string | null
+          stack: string | null
+          ts: string
+          user_id: string | null
+        }
+        Insert: {
+          area: string
+          error_code?: string | null
+          id?: string
+          message: string
+          meta?: Json | null
+          route?: string | null
+          stack?: string | null
+          ts?: string
+          user_id?: string | null
+        }
+        Update: {
+          area?: string
+          error_code?: string | null
+          id?: string
+          message?: string
+          meta?: Json | null
+          route?: string | null
+          stack?: string | null
+          ts?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       pages: {
         Row: {
           body: Json | null
@@ -302,6 +371,10 @@ export type Database = {
       is_registration_enabled: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      redact_pii: {
+        Args: { input_text: string }
+        Returns: string
       }
       set_bootstrap_hash: {
         Args: { p_code: string }
