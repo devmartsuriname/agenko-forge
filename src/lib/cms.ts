@@ -1,4 +1,79 @@
 import { supabase } from '@/integrations/supabase/client';
+import { logger, LogArea } from '@/lib/observability';
+
+export interface Page {
+  id: string;
+  title: string;
+  slug: string;
+  body: any;
+  status: 'draft' | 'published';
+  published_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  body: any;
+  tags?: string[];
+  status: 'draft' | 'published';
+  published_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Project {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  body: any;
+  status: 'draft' | 'published';
+  published_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Service {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  content: any;
+  status: 'draft' | 'published';
+  published_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface HomepagePreview {
+  blog_posts: Array<{
+    id: string;
+    title: string;
+    excerpt?: string;
+    slug: string;
+    published_at?: string;
+    tags?: string[];
+  }>;
+  projects: Array<{
+    id: string;
+    title: string;
+    excerpt?: string;
+    slug: string;
+    published_at?: string;
+    first_image?: string;
+  }>;
+  services: Array<{
+    id: string;
+    title: string;
+    excerpt?: string;
+    slug: string;
+    published_at?: string;
+  }>;
+}
 
 export interface Service {
   id: string;

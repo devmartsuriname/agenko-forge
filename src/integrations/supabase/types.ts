@@ -364,9 +364,33 @@ export type Database = {
         Args: { p_code: string }
         Returns: Json
       }
+      check_rate_limit: {
+        Args: {
+          p_identifier: string
+          p_max_requests?: number
+          p_window_minutes?: number
+        }
+        Returns: boolean
+      }
+      cleanup_old_logs: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_homepage_previews: {
+        Args: {
+          p_blog_limit?: number
+          p_project_limit?: number
+          p_service_limit?: number
+        }
+        Returns: Json
+      }
+      health_check: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
       }
       is_registration_enabled: {
         Args: Record<PropertyKey, never>
