@@ -161,6 +161,14 @@ UPDATE profiles SET role = 'admin' WHERE id = 'user_id_here';
 - Admin actions logged and auditable
 - Regular access reviews
 
+### Auth Security Configuration
+- **Email OTP Expiration**: 600 seconds (10 minutes)
+- **Prevent leaked passwords**: ENABLED (powered by HaveIBeenPwned.org)
+- **Secure email change**: ENABLED (requires confirmation on both addresses)
+- **Public signup**: DISABLED (invite-only via admin seeding)
+- **Email confirmations**: Can be disabled for faster testing
+- **Minimum password length**: 6 characters minimum, 8+ recommended
+
 ## Troubleshooting
 
 ### Common Issues
