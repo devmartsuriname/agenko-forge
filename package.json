@@ -42,6 +42,9 @@
     "@radix-ui/react-tooltip": "^1.2.7",
     "@supabase/supabase-js": "^2.55.0",
     "@tanstack/react-query": "^5.83.0",
+    "@testing-library/jest-dom": "^6.7.0",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "chrome-launcher": "^1.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -50,6 +53,7 @@
     "embla-carousel-react": "^8.6.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "input-otp": "^1.4.2",
+    "jsdom": "^26.1.0",
     "lighthouse": "^12.8.1",
     "lucide-react": "^0.462.0",
     "next-themes": "^0.3.0",
@@ -66,6 +70,7 @@
     "tailwindcss-animate": "^1.0.7",
     "ts-node": "^10.9.2",
     "vaul": "^0.9.9",
+    "vitest": "^3.2.4",
     "zod": "^3.25.76"
   },
   "devDependencies": {
