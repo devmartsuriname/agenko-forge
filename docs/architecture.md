@@ -148,5 +148,41 @@ carousel: {
 }
 ```
 
+## Content Management & Storage Strategy
+
+### Local Image Storage
+- **Media Bucket**: All project and blog images stored in Supabase Storage `media` bucket
+- **Aspect Ratio**: Standard 16/9 (1200x675) to prevent CLS during carousel initialization
+- **Path Structure**: `projects/{slug}/image-{sort}.jpg` and `blog/{slug}/cover.jpg`
+- **Migration**: Use `scripts/migrate-images-to-storage.ts` for idempotent external → local migration
+
+### Data Integrity
+- **Unique Constraints**: `project_images(project_id, sort_order)` prevents duplicate sort positions
+- **Performance Indexes**: Optimized queries for published content and slug-based lookups
+- **Idempotent Seeding**: `scripts/seed-devmart-extra.ts` safely re-runs without duplicates
+
+### Carousel Content Requirements
+- **Minimum Items**: 6 published items per carousel for optimal `lg=3` display
+- **Configurable Counts**: Editors can adjust `count` via Sections editor for campaigns
+- **Homepage Only**: Carousel layout restricted to homepage; `/blog` and `/portfolio` use grid/list
+- **Future Enhancement**: Consider `settings.homepage_carousel_counts` for seasonal overrides
+
+### Seeding & Migration Scripts
+```bash
+# Image migration (external → Supabase Storage)
+npx ts-node scripts/migrate-images-to-storage.ts
+
+# Content seeding (idempotent upsert)
+npx ts-node scripts/seed-devmart-extra.ts
+```
+
+**Quality Assurance Checklist:**
+- ✅ Blog ≥ 6 published posts with `published_at` timestamps  
+- ✅ Projects ≥ 6 published with images and proper `sort_order`  
+- ✅ No empty carousel slots at any breakpoint (xs/sm/md/lg)  
+- ✅ Smooth swipe on Android Chrome, reduced-motion support  
+- ✅ Aspect-ratio boxes prevent CLS, keyboard navigation functional  
+- ✅ Console clean, 0 TypeScript errors, Lighthouse Mobile ≥ 80
+
 ## Style Isolation
 Admin styles use semantic tokens and can be scoped with `.admin-root` class to prevent conflicts with public frontend.

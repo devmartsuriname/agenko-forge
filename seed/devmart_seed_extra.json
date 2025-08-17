@@ -1,0 +1,115 @@
+{
+  "blog_posts": [
+    {
+      "slug": "ux-that-converts",
+      "title": "UX That Converts",
+      "excerpt": "Design moves that drive action.",
+      "body": { 
+        "blocks": [
+          { "type": "p", "text": "Practical patterns for conversion without dark patterns." },
+          { "type": "p", "text": "User experience design that drives meaningful action requires understanding psychology, not manipulation. We explore evidence-based approaches to creating interfaces that guide users naturally toward desired outcomes while maintaining trust and transparency." }
+        ] 
+      },
+      "tags": ["ux", "conversion"],
+      "status": "published"
+    },
+    {
+      "slug": "ship-faster-with-guardrails",
+      "title": "Ship Faster With Guardrails",
+      "excerpt": "Speed + safety via checklists and RLS.",
+      "body": { 
+        "blocks": [
+          { "type": "p", "text": "Guardrails let you move fast while staying safe." },
+          { "type": "p", "text": "Row Level Security (RLS) policies and systematic checklists enable rapid development without sacrificing security. Learn how to implement automated safety nets that prevent common vulnerabilities while maintaining development velocity." }
+        ] 
+      },
+      "tags": ["process", "quality"],
+      "status": "published"
+    },
+    {
+      "slug": "seo-primer-for-founders",
+      "title": "SEO Primer for Founders",
+      "excerpt": "What actually matters early.",
+      "body": { 
+        "blocks": [
+          { "type": "p", "text": "Focus on IA, content depth, and performance budgets." },
+          { "type": "p", "text": "Early-stage SEO should prioritize information architecture, semantic HTML, and Core Web Vitals over keyword stuffing. We break down the fundamentals that provide long-term organic growth without falling into optimization rabbit holes." }
+        ] 
+      },
+      "tags": ["seo", "content"],
+      "status": "published"
+    },
+    {
+      "slug": "analytics-that-matter",
+      "title": "Analytics That Matter",
+      "excerpt": "Signals, not noise.",
+      "body": { 
+        "blocks": [
+          { "type": "p", "text": "Define events that map to business outcomes." },
+          { "type": "p", "text": "Most analytics implementations collect vanity metrics that don't drive decisions. We explore how to design event tracking that directly correlates with business objectives and user satisfaction, enabling data-driven product decisions." }
+        ] 
+      },
+      "tags": ["analytics", "growth"],
+      "status": "published"
+    }
+  ],
+  "projects": [
+    {
+      "slug": "city-services-portal",
+      "title": "City Services Portal",
+      "excerpt": "Citizen self-service with role-based workflows.",
+      "body": { 
+        "outcomes": ["Faster case handling", "Accessible UI", "Audit logs"],
+        "description": "A comprehensive digital platform enabling citizens to access municipal services online, with automated workflows for common requests and administrative oversight capabilities."
+      },
+      "status": "published",
+      "tags": ["government", "workflow"],
+      "images": [
+        { "url": "https://picsum.photos/seed/city1/1200/675", "alt": "City services dashboard overview", "sort": 1 },
+        { "url": "https://picsum.photos/seed/city2/1200/675", "alt": "Case management view", "sort": 2 }
+      ]
+    },
+    {
+      "slug": "micro-saas-billing",
+      "title": "Micro‑SaaS Billing",
+      "excerpt": "Subscriptions and metered usage.",
+      "body": { 
+        "outcomes": ["Usage tracking", "Invoices", "Webhooks"],
+        "description": "A lightweight billing system designed for micro-SaaS applications, featuring flexible pricing models, automated invoicing, and comprehensive webhook integration for seamless payment processing."
+      },
+      "status": "published",
+      "tags": ["saas", "billing"],
+      "images": [
+        { "url": "https://picsum.photos/seed/bill1/1200/675", "alt": "Billing dashboard overview", "sort": 1 }
+      ]
+    },
+    {
+      "slug": "learning-platform-lite",
+      "title": "Learning Platform Lite",
+      "excerpt": "Courses, quizzes, progress.",
+      "body": { 
+        "outcomes": ["Content authoring", "Progress tracking", "Mobile-first design"],
+        "description": "A streamlined learning management system focused on content delivery and progress tracking, optimized for mobile-first educational experiences with intuitive course creation tools."
+      },
+      "status": "published",
+      "tags": ["edtech"],
+      "images": [
+        { "url": "https://picsum.photos/seed/learn1/1200/675", "alt": "Course content page", "sort": 1 }
+      ]
+    },
+    {
+      "slug": "ops-analytics",
+      "title": "Ops Analytics",
+      "excerpt": "Dashboards that drive decisions.",
+      "body": { 
+        "outcomes": ["ETL pipelines", "Role-based dashboards", "Data exports"],
+        "description": "An operational analytics platform providing real-time insights through customizable dashboards, automated data processing, and flexible export capabilities for business intelligence."
+      },
+      "status": "published",
+      "tags": ["analytics"],
+      "images": [
+        { "url": "https://picsum.photos/seed/ops1/1200/675", "alt": "Analytics metrics dashboard", "sort": 1 }
+      ]
+    }
+  ]
+}
