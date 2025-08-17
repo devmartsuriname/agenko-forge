@@ -115,9 +115,9 @@ export async function logEvent(event: LogEvent): Promise<void> {
     const { error } = await supabase.rpc('log_app_event', {
       p_level: event.level,
       p_area: event.area,
+      p_message: sanitizedMessage,
       p_route: route,
       p_user_id: userId,
-      p_message: sanitizedMessage,
       p_meta: sanitizedMeta
     });
 
@@ -151,10 +151,10 @@ export async function logError(errorEvent: LogError & { error?: Error }): Promis
 
     const { error: logError } = await supabase.rpc('log_error', {
       p_area: errorEvent.area,
+      p_message: sanitizedMessage,
       p_route: route,
       p_user_id: userId,
       p_error_code: errorCode,
-      p_message: sanitizedMessage,
       p_stack: sanitizedStack,
       p_meta: sanitizedMeta
     });

@@ -35,6 +35,7 @@ export interface Project {
   published_at?: string;
   created_at: string;
   updated_at: string;
+  project_images?: ProjectImage[];
 }
 
 export interface Service {
@@ -75,64 +76,6 @@ export interface HomepagePreview {
   }>;
 }
 
-export interface Service {
-  id: string;
-  slug: string;
-  title: string;
-  excerpt: string | null;
-  content: any;
-  status: 'draft' | 'published';
-  published_at: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface Project {
-  id: string;
-  slug: string;
-  title: string;
-  excerpt: string | null;
-  body: any;
-  status: 'draft' | 'published';
-  published_at: string | null;
-  created_at: string;
-  updated_at: string;
-  project_images?: ProjectImage[];
-}
-
-export interface ProjectImage {
-  id: string;
-  project_id: string;
-  url: string;
-  alt: string | null;
-  sort_order: number;
-  created_at: string;
-}
-
-export interface BlogPost {
-  id: string;
-  slug: string;
-  title: string;
-  excerpt: string | null;
-  body: any;
-  status: 'draft' | 'published';
-  published_at: string | null;
-  tags: string[] | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface Page {
-  id: string;
-  slug: string;
-  title: string;
-  body: any;
-  status: 'draft' | 'published';
-  published_at: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
 export interface ContactSubmission {
   id: string;
   name: string;
@@ -149,8 +92,58 @@ export interface Settings {
   updated_at: string;
 }
 
+export interface ProjectImage {
+  id: string;
+  project_id: string;
+  url: string;
+  alt: string | null;
+  sort_order: number;
+  created_at: string;
+}
+
 // CMS Functions
 export const cms = {
+  /**
+   * Get optimized homepage previews using single RPC call
+   */
+  async getHomepagePreviews(
+    blogLimit: number = 3,
+    projectLimit: number = 6,
+    serviceLimit: number = 3
+  ): Promise<HomepagePreview> {
+    try {
+      const { data, error } = await supabase.rpc('get_homepage_previews', {
+        p_blog_limit: blogLimit,
+        p_project_limit: projectLimit,
+        p_service_limit: serviceLimit
+      });
+
+      if (error) {
+        await logger.error(LogArea.CMS, 'Failed to fetch homepage previews', error);
+        throw error;
+      }
+
+      // Type assertion for the RPC response
+      const typedData = data as unknown as HomepagePreview;
+
+      await logger.info(LogArea.CMS, 'Homepage previews fetched successfully', {
+        blog_count: typedData.blog_posts?.length || 0,
+        project_count: typedData.projects?.length || 0,
+        service_count: typedData.services?.length || 0
+      });
+
+      return typedData;
+    } catch (error) {
+      await logger.error(LogArea.CMS, 'Homepage previews fetch failed', error as Error);
+      
+      // Fallback to empty results
+      return {
+        blog_posts: [],
+        projects: [],
+        services: []
+      };
+    }
+  },
   // Services
   async getPublishedServices(): Promise<Service[]> {
     const { data, error } = await supabase

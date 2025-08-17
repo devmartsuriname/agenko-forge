@@ -396,6 +396,29 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      log_app_event: {
+        Args: {
+          p_area: string
+          p_level: string
+          p_message: string
+          p_meta?: Json
+          p_route?: string
+          p_user_id?: string
+        }
+        Returns: undefined
+      }
+      log_error: {
+        Args: {
+          p_area: string
+          p_error_code?: string
+          p_message: string
+          p_meta?: Json
+          p_route?: string
+          p_stack?: string
+          p_user_id?: string
+        }
+        Returns: undefined
+      }
       redact_pii: {
         Args: { input_text: string }
         Returns: string
