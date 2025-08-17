@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { useLocation } from 'react-router-dom';
 import { cms } from '@/lib/cms';
 import { SEOHead } from '@/lib/seo';
 import Navigation from '@/components/Navigation';
@@ -9,8 +8,6 @@ import { PageBodySchema } from '@/lib/sections/schema';
 import { HomeSkeleton } from '@/components/HomeSkeleton';
 
 const Index = () => {
-  const location = useLocation();
-  const isHomePage = location.pathname === '/';
 
   const { data: homePage, isLoading, error } = useQuery({
     queryKey: ['homepage'],
@@ -70,7 +67,7 @@ const Index = () => {
         <div className="min-h-screen bg-background">
           <Navigation />
           <main className="pt-16">
-            <SectionRenderer sections={sections} />
+            <SectionRenderer sections={sections} context="home" />
           </main>
           <Footer />
         </div>

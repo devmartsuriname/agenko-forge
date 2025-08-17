@@ -70,7 +70,7 @@ export default function HomePage() {
         <Navigation />
         <main className="pt-16">
           {sections.length > 0 ? (
-            <SectionRenderer sections={sections} />
+            <SectionRenderer sections={sections} context="home" />
           ) : (
             <div className="container mx-auto px-4 py-8 text-center">
               <h1 className="text-3xl font-bold text-foreground mb-4">Welcome to Devmart</h1>

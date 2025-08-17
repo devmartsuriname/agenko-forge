@@ -1,4 +1,3 @@
-import { useLocation } from 'react-router-dom';
 import { HeroSectionComponent } from './HeroSection';
 import { AboutSectionComponent } from './AboutSection';
 import { ServicesPreviewSectionComponent } from './ServicesPreviewSection';
@@ -8,20 +7,21 @@ import { BlogPreviewSectionComponent } from './BlogPreviewSection';
 import { CtaSectionComponent } from './CtaSection';
 import type { Section } from '@/lib/sections/schema';
 
+type SectionContext = 'home' | 'list' | 'detail';
+
 interface SectionRendererProps {
   sections: Section[];
+  context?: SectionContext;
 }
 
-export function SectionRenderer({ sections }: SectionRendererProps) {
-  const location = useLocation();
-  const isHomePage = location.pathname === '/';
+export function SectionRenderer({ sections, context = 'home' }: SectionRendererProps) {
 
   return (
     <div className="section-renderer">
       {sections.map((section) => {
-        // Force grid layout for portfolio and blog sections on non-homepage routes
+        // Force grid layout for portfolio and blog sections on non-home contexts
         let sectionToRender = section;
-        if (!isHomePage && (section.type === 'portfolioPreview' || section.type === 'blogPreview')) {
+        if (context !== 'home' && (section.type === 'portfolioPreview' || section.type === 'blogPreview')) {
           sectionToRender = {
             ...section,
             data: {
