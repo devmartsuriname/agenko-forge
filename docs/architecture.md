@@ -44,10 +44,48 @@ This is a modern agency website with secure admin CMS, built with React, TypeScr
 - React Query for data fetching
 - React Helmet Async for SEO
 
+## Performance Optimizations
+
+### Hero Preload System (CMS-Driven)
+The hero preload system automatically optimizes the first contentful paint for hero sections:
+
+**Rules:**
+- Only preloads when first section is `type: "hero"` with `backgroundImage`
+- Reads dynamically from CMS data (`pages.body[0]`)
+- Never hardcodes URLs - always CMS-driven
+- Respects user preferences and connection quality
+
+**Connection Awareness:**
+- Skips preload on 2G/slow-2G connections
+- Honors `navigator.connection.saveData` flag
+- Graceful fallback for unsupported browsers
+
+**CLS Prevention:**
+- Hero images use explicit aspect ratios (16:9, 21:9, 32:9)
+- Transform/opacity animations only (no layout changes)
+- `loading="eager"` and `fetchpriority="high"` for hero images
+- Fixed container dimensions prevent layout shifts
+
+**Implementation:**
+```typescript
+// Hero preload injection (src/lib/performance.ts)
+injectHeroPreload(sections: Section[]): void
+
+// Usage in homepage (src/pages/Index.tsx)
+useEffect(() => {
+  if (sections.length > 0) {
+    injectHeroPreload(sections);
+  }
+}, [sections]);
+```
+
 ## Key Features Implemented
 ✅ Database schema with RLS policies
 ✅ Design system with Agenko branding
 ✅ Authentication system
+✅ Dynamic hero preload system
+✅ CLS-optimized image loading
+✅ Connection-aware performance features
 ✅ SEO optimization utilities
 ✅ Hero section with generated image
 ✅ Enhanced button variants

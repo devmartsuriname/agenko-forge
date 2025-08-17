@@ -64,6 +64,11 @@
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
+    /* Performance: Hero aspect ratios for CLS prevention */
+    --hero-aspect-ratio: 16 / 9;
+    --hero-aspect-ratio-sm: 21 / 9;
+    --hero-aspect-ratio-lg: 32 / 9;
+
     --sidebar-background: 0 0% 98%;
 
     --sidebar-foreground: 240 5.3% 26.1%;

@@ -6,6 +6,8 @@ import Footer from '@/components/Footer';
 import { SectionRenderer } from '@/components/sections/SectionRenderer';
 import { PageBodySchema } from '@/lib/sections/schema';
 import { HomeSkeleton } from '@/components/HomeSkeleton';
+import { injectHeroPreload } from '@/lib/performance';
+import { useEffect } from 'react';
 
 const Index = () => {
 
@@ -54,6 +56,13 @@ const Index = () => {
   } catch (parseError) {
     console.error('Error parsing page sections:', parseError);
   }
+
+  // Inject hero preload when sections are available
+  useEffect(() => {
+    if (sections.length > 0) {
+      injectHeroPreload(sections);
+    }
+  }, [sections]);
 
   // If we have sections, render the dynamic homepage
   if (sections.length > 0) {

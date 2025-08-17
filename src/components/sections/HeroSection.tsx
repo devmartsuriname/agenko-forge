@@ -14,12 +14,21 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
     <section className="relative min-h-screen flex items-center justify-center px-4 pt-16">
       {data.backgroundImage && (
         <div className="absolute inset-0">
-          <img 
-            src={data.backgroundImage} 
-            alt="Hero background" 
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
+          <div className="w-full h-full aspect-[16/9] sm:aspect-[21/9] lg:aspect-[32/9]">
+            <img 
+              src={data.backgroundImage} 
+              alt="Hero background" 
+              className="w-full h-full object-cover"
+              loading="eager"
+              fetchPriority="high"
+              style={{ 
+                aspectRatio: 'var(--hero-aspect-ratio, 16 / 9)',
+                objectFit: 'cover',
+                transformOrigin: 'center',
+                willChange: 'transform'
+              }}
+            />
+          </div>
           <div className="absolute inset-0 bg-black/60" />
         </div>
       )}

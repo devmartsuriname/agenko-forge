@@ -1,0 +1,10 @@
+# Performance audit results directory
+
+This directory contains Lighthouse performance audit results in JSON format.
+
+Generated files:
+- *-mobile.json: Mobile Lighthouse reports
+- *-desktop.json: Desktop Lighthouse reports  
+- summary.md: Aggregated performance summary
+
+Run audits with: `node scripts/lighthouse-runner.js`
