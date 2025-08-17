@@ -19,6 +19,24 @@ const Index = () => {
     },
   });
 
+  // Parse sections with error handling (moved before hooks)
+  let sections = [];
+  try {
+    if (homePage?.body?.sections) {
+      const parsedBody = PageBodySchema.parse(homePage.body);
+      sections = parsedBody.sections;
+    }
+  } catch (parseError) {
+    console.error('Error parsing page sections:', parseError);
+  }
+
+  // Inject hero preload when sections are available (moved to top level)
+  useEffect(() => {
+    if (!isLoading && !error && sections.length > 0) {
+      injectHeroPreload(sections);
+    }
+  }, [sections, isLoading, error]);
+
   // Show skeleton while loading
   if (isLoading) {
     return <HomeSkeleton />;
@@ -45,24 +63,6 @@ const Index = () => {
       </>
     );
   }
-
-  // Parse sections with error handling
-  let sections = [];
-  try {
-    if (homePage?.body?.sections) {
-      const parsedBody = PageBodySchema.parse(homePage.body);
-      sections = parsedBody.sections;
-    }
-  } catch (parseError) {
-    console.error('Error parsing page sections:', parseError);
-  }
-
-  // Inject hero preload when sections are available
-  useEffect(() => {
-    if (sections.length > 0) {
-      injectHeroPreload(sections);
-    }
-  }, [sections]);
 
   // If we have sections, render the dynamic homepage
   if (sections.length > 0) {
