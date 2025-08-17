@@ -1,7 +1,8 @@
 import '@testing-library/jest-dom';
-
-// Add vitest globals
 import { vi } from 'vitest';
+
+// Make vi global for tests
+globalThis.vi = vi;
 
 // Mock window.matchMedia for reduced motion tests
 Object.defineProperty(window, 'matchMedia', {

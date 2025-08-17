@@ -180,6 +180,15 @@ export function SectionsTab({ pageBody, onUpdate }: SectionsTabProps) {
         </div>
       )}
       
+      {/* Live announcements for screen readers */}
+      <div 
+        className="sr-only" 
+        role="status" 
+        aria-live="polite" 
+        aria-atomic="true"
+        data-testid="sections-live-region"
+      />
+      
       {/* Live update feedback */}
       <div 
         className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg"
