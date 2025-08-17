@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, RotateCcw } from 'lucide-react';
-import { SectionEditor } from './SectionEditor';
+import { SectionEditorRow } from './SectionEditorRow';
 import { Section, createDefaultSection, SECTION_TYPES, PageBodySchema } from '@/lib/sections/schema';
 import { adminToast } from '@/lib/toast-utils';
 import { EmptyState } from '@/components/admin/EmptyState';
@@ -158,31 +158,40 @@ export function SectionsTab({ pageBody, onUpdate }: SectionsTabProps) {
           actionTo="#"
         />
       ) : (
-        <div className="space-y-4" role="list" aria-label="Page sections">
+        <div 
+          className="space-y-4" 
+          role="list" 
+          aria-label="Page sections - Use Tab to navigate, Enter to edit, Ctrl+Arrow to reorder"
+        >
           {sections.map((section, index) => (
-            <div key={section.id} role="listitem">
-              <SectionEditor
-                section={section}
-                onUpdate={(updatedSection) => updateSection(index, updatedSection)}
-                onRemove={() => removeSection(index)}
-                onMoveUp={() => moveSectionUp(index)}
-                onMoveDown={() => moveSectionDown(index)}
-                canMoveUp={index > 0}
-                canMoveDown={index < sections.length - 1}
-              />
-            </div>
+            <SectionEditorRow
+              key={section.id}
+              section={section}
+              index={index}
+              totalSections={sections.length}
+              onUpdate={(updatedSection) => updateSection(index, updatedSection)}
+              onRemove={() => removeSection(index)}
+              onMoveUp={() => moveSectionUp(index)}
+              onMoveDown={() => moveSectionDown(index)}
+              canMoveUp={index > 0}
+              canMoveDown={index < sections.length - 1}
+            />
           ))}
         </div>
       )}
       
       {/* Live update feedback */}
-      <div className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
-        <p className="font-medium mb-1">💡 Pro Tips:</p>
+      <div 
+        className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg"
+        role="complementary"
+        aria-label="Keyboard navigation help"
+      >
+        <p className="font-medium mb-1">💡 Keyboard Navigation:</p>
         <ul className="list-disc list-inside space-y-1 text-xs">
-          <li>Changes auto-save when you edit section content</li>
-          <li>Use the grip handles to reorder sections</li>
-          <li>Preview sections will automatically pull published content</li>
-          <li>Reset button restores recommended homepage layout</li>
+          <li><kbd className="px-1 py-0.5 bg-muted-foreground/20 rounded text-xs">Tab</kbd> Navigate between sections</li>
+          <li><kbd className="px-1 py-0.5 bg-muted-foreground/20 rounded text-xs">Enter</kbd> Expand/collapse section editor</li>
+          <li><kbd className="px-1 py-0.5 bg-muted-foreground/20 rounded text-xs">Ctrl+↑/↓</kbd> Reorder sections</li>
+          <li>Drag handles also work for mouse users</li>
         </ul>
       </div>
     </div>

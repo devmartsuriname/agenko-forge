@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@axe-core/react": "^4.10.2",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
@@ -47,6 +48,7 @@
     "cmdk": "^1.1.1",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.6.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
     "input-otp": "^1.4.2",
     "lighthouse": "^12.8.1",
     "lucide-react": "^0.462.0",
