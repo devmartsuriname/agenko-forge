@@ -424,7 +424,7 @@ function QuoteDetailsDialog({
         <div className="grid gap-4 md:grid-cols-2">
           <div>
             <Label htmlFor="status-select">Update Status</Label>
-            <Select value={newStatus} onValueChange={setNewStatus}>
+            <Select value={newStatus} onValueChange={(value: any) => setNewStatus(value)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>

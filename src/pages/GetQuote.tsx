@@ -8,7 +8,7 @@ export default function GetQuote() {
       <SEOHead 
         title="Get a Quote - Free Project Estimate"
         description="Get a detailed quote for your project. Our guided wizard helps us understand your needs to provide an accurate estimate within 24 hours."
-        canonicalUrl="/get-quote"
+        url="/get-quote"
       />
       
       <div className="min-h-screen bg-background">
