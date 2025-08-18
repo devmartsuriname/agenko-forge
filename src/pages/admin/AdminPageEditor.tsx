@@ -76,9 +76,13 @@ function AdminPageEditorContent() {
     setSaving(true);
 
     try {
+      // Preserve the existing body structure (sections vs content)
+      // Only use { content } if the body doesn't have sections or if content was explicitly edited
+      const bodyToSave = page.body?.sections ? page.body : { content };
+      
       const pageData = {
         ...page,
-        body: { content },
+        body: bodyToSave,
         published_at: page.status === 'published' && !page.published_at ? new Date().toISOString() : page.published_at,
       };
 
