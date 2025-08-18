@@ -20,7 +20,7 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
               alt="Hero background" 
               className="w-full h-full object-cover"
               loading="eager"
-              fetchpriority="high"
+              {...({ fetchpriority: "high" } as any)}
               style={{ 
                 aspectRatio: 'var(--hero-aspect-ratio, 16 / 9)',
                 objectFit: 'cover',
