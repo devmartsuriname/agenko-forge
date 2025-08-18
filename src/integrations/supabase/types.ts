@@ -191,6 +191,48 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          email: string
+          id: string
+          metadata: Json | null
+          provider: string
+          provider_order_id: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          email: string
+          id?: string
+          metadata?: Json | null
+          provider: string
+          provider_order_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          email?: string
+          id?: string
+          metadata?: Json | null
+          provider?: string
+          provider_order_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       pages: {
         Row: {
           body: Json | null
@@ -241,6 +283,59 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      payments: {
+        Row: {
+          admin_notes: string | null
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          order_id: string
+          provider: string
+          provider_data: Json | null
+          provider_payment_id: string | null
+          status: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          order_id: string
+          provider: string
+          provider_data?: Json | null
+          provider_payment_id?: string | null
+          status: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          order_id?: string
+          provider?: string
+          provider_data?: Json | null
+          provider_payment_id?: string | null
+          status?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
