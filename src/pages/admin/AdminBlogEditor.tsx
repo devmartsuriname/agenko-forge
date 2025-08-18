@@ -15,6 +15,8 @@ import { generateSlug, ensureUniqueSlug } from '@/lib/admin-utils';
 import { adminToast } from '@/lib/toast-utils';
 import { LoadingCardSkeleton } from '@/components/admin/LoadingSkeleton';
 import { TagInput } from '@/components/admin/TagInput';
+import { SEOEditor, SEOData } from '@/components/admin/SEOEditor';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Save, Eye } from 'lucide-react';
 
 function AdminBlogEditor() {
@@ -30,6 +32,12 @@ function AdminBlogEditor() {
     body: {},
     tags: [],
     status: 'draft',
+    seo_title: '',
+    seo_description: '',
+    seo_canonical_url: '',
+    seo_og_image: '',
+    seo_robots: 'index,follow',
+    seo_schema_type: 'Article',
   });
   const [loading, setLoading] = useState(isEditing);
   const [saving, setSaving] = useState(false);
@@ -84,6 +92,12 @@ function AdminBlogEditor() {
         tags: post.tags || [],
         status: post.status!,
         published_at: post.status === 'published' && !post.published_at ? new Date().toISOString() : post.published_at,
+        seo_title: post.seo_title,
+        seo_description: post.seo_description,
+        seo_canonical_url: post.seo_canonical_url,
+        seo_og_image: post.seo_og_image,
+        seo_robots: post.seo_robots,
+        seo_schema_type: post.seo_schema_type,
       };
 
       if (isEditing) {
@@ -181,149 +195,177 @@ function AdminBlogEditor() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Post Details</CardTitle>
-                <CardDescription>Basic information about your blog post</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <Label htmlFor="blog-title">Title *</Label>
-                  <Input
-                    id="blog-title"
-                    placeholder="Enter blog post title"
-                    value={post.title || ''}
-                    onChange={(e) => handleTitleChange(e.target.value)}
-                    disabled={saving}
-                    aria-describedby="title-help"
-                    required
-                  />
-                  <p id="title-help" className="text-sm text-muted-foreground mt-1">
-                    A clear, descriptive title for your blog post
-                  </p>
-                </div>
+        <Tabs defaultValue="content" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="content">Content</TabsTrigger>
+            <TabsTrigger value="seo">SEO</TabsTrigger>
+          </TabsList>
 
-                <div>
-                  <Label htmlFor="blog-slug">URL Slug</Label>
-                  <Input
-                    id="blog-slug"
-                    placeholder="url-friendly-slug"
-                    value={post.slug || ''}
-                    onChange={(e) => setPost(prev => ({ ...prev, slug: e.target.value }))}
-                    disabled={saving}
-                    aria-describedby="slug-help"
-                  />
-                  <p id="slug-help" className="text-sm text-muted-foreground mt-1">
-                    Auto-generated from title, or customize manually
-                  </p>
-                </div>
+          <TabsContent value="content">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Main Content */}
+              <div className="lg:col-span-2 space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Post Details</CardTitle>
+                    <CardDescription>Basic information about your blog post</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div>
+                      <Label htmlFor="blog-title">Title *</Label>
+                      <Input
+                        id="blog-title"
+                        placeholder="Enter blog post title"
+                        value={post.title || ''}
+                        onChange={(e) => handleTitleChange(e.target.value)}
+                        disabled={saving}
+                        aria-describedby="title-help"
+                        required
+                      />
+                      <p id="title-help" className="text-sm text-muted-foreground mt-1">
+                        A clear, descriptive title for your blog post
+                      </p>
+                    </div>
 
-                <div>
-                  <Label htmlFor="blog-excerpt">Excerpt</Label>
-                  <Textarea
-                    id="blog-excerpt"
-                    placeholder="Brief description of the blog post"
-                    value={post.excerpt || ''}
-                    onChange={(e) => setPost(prev => ({ ...prev, excerpt: e.target.value }))}
-                    disabled={saving}
-                    rows={3}
-                    aria-describedby="excerpt-help"
-                  />
-                  <p id="excerpt-help" className="text-sm text-muted-foreground mt-1">
-                    A short summary that appears in blog listings and search results
-                  </p>
-                </div>
+                    <div>
+                      <Label htmlFor="blog-slug">URL Slug</Label>
+                      <Input
+                        id="blog-slug"
+                        placeholder="url-friendly-slug"
+                        value={post.slug || ''}
+                        onChange={(e) => setPost(prev => ({ ...prev, slug: e.target.value }))}
+                        disabled={saving}
+                        aria-describedby="slug-help"
+                      />
+                      <p id="slug-help" className="text-sm text-muted-foreground mt-1">
+                        Auto-generated from title, or customize manually
+                      </p>
+                    </div>
 
-                <div>
-                  <Label htmlFor="blog-content">Content</Label>
-                  <Textarea
-                    id="blog-content"
-                    value={typeof post.body === 'object' ? JSON.stringify(post.body, null, 2) : ''}
-                    onChange={(e) => {
-                      try {
-                        const parsed = JSON.parse(e.target.value || '{}');
-                        setPost(prev => ({ ...prev, body: parsed }));
-                      } catch {
-                        // Invalid JSON, keep as is for now
-                      }
-                    }}
-                    placeholder="Blog post content (JSON format)"
-                    rows={15}
-                    className="font-mono text-sm"
-                    disabled={saving}
-                    aria-describedby="content-help"
-                  />
-                  <p id="content-help" className="text-sm text-muted-foreground mt-1">
-                    Rich content in JSON format (future rich text editor)
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                    <div>
+                      <Label htmlFor="blog-excerpt">Excerpt</Label>
+                      <Textarea
+                        id="blog-excerpt"
+                        placeholder="Brief description of the blog post"
+                        value={post.excerpt || ''}
+                        onChange={(e) => setPost(prev => ({ ...prev, excerpt: e.target.value }))}
+                        disabled={saving}
+                        rows={3}
+                        aria-describedby="excerpt-help"
+                      />
+                      <p id="excerpt-help" className="text-sm text-muted-foreground mt-1">
+                        A short summary that appears in blog listings and search results
+                      </p>
+                    </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Publishing</CardTitle>
-                <CardDescription>Control post visibility</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="blog-status">Status</Label>
-                  <Select value={post.status} onValueChange={(value) => setPost(prev => ({ ...prev, status: value as 'draft' | 'published' }))}>
-                    <SelectTrigger id="blog-status">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="published">Published</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                    <div>
+                      <Label htmlFor="blog-content">Content</Label>
+                      <Textarea
+                        id="blog-content"
+                        value={typeof post.body === 'object' ? JSON.stringify(post.body, null, 2) : ''}
+                        onChange={(e) => {
+                          try {
+                            const parsed = JSON.parse(e.target.value || '{}');
+                            setPost(prev => ({ ...prev, body: parsed }));
+                          } catch {
+                            // Invalid JSON, keep as is for now
+                          }
+                        }}
+                        placeholder="Blog post content (JSON format)"
+                        rows={15}
+                        className="font-mono text-sm"
+                        disabled={saving}
+                        aria-describedby="content-help"
+                      />
+                      <p id="content-help" className="text-sm text-muted-foreground mt-1">
+                        Rich content in JSON format (future rich text editor)
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
 
-                <div className="pt-4 border-t">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Current Status</span>
-                    <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
-                      {post.status}
-                    </Badge>
-                  </div>
-                  {post.published_at && (
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Published {new Date(post.published_at).toLocaleDateString()}
+              {/* Sidebar */}
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Publishing</CardTitle>
+                    <CardDescription>Control post visibility</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <Label htmlFor="blog-status">Status</Label>
+                      <Select value={post.status} onValueChange={(value) => setPost(prev => ({ ...prev, status: value as 'draft' | 'published' }))}>
+                        <SelectTrigger id="blog-status">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="draft">Draft</SelectItem>
+                          <SelectItem value="published">Published</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="pt-4 border-t">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Current Status</span>
+                        <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
+                          {post.status}
+                        </Badge>
+                      </div>
+                      {post.published_at && (
+                        <p className="text-sm text-muted-foreground mt-2">
+                          Published {new Date(post.published_at).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Tags</CardTitle>
+                    <CardDescription>Add tags to categorize your post</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <TagInput
+                      tags={post.tags || []}
+                      onTagsChange={(tags) => setPost(prev => ({ ...prev, tags }))}
+                      placeholder="Add tags (press Enter, comma, or space)"
+                      maxTags={10}
+                      maxTagLength={30}
+                      disabled={saving}
+                      aria-label="Blog post tags"
+                      aria-describedby="tags-help"
+                    />
+                    <p id="tags-help" className="text-sm text-muted-foreground mt-2">
+                      Add relevant tags to help readers find your content
                     </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </TabsContent>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Tags</CardTitle>
-                <CardDescription>Add tags to categorize your post</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <TagInput
-                  tags={post.tags || []}
-                  onTagsChange={(tags) => setPost(prev => ({ ...prev, tags }))}
-                  placeholder="Add tags (press Enter, comma, or space)"
-                  maxTags={10}
-                  maxTagLength={30}
-                  disabled={saving}
-                  aria-label="Blog post tags"
-                  aria-describedby="tags-help"
-                />
-                <p id="tags-help" className="text-sm text-muted-foreground mt-2">
-                  Add relevant tags to help readers find your content
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+          <TabsContent value="seo">
+            <SEOEditor
+              seo={{
+                seo_title: post.seo_title,
+                seo_description: post.seo_description,
+                seo_canonical_url: post.seo_canonical_url,
+                seo_og_image: post.seo_og_image,
+                seo_robots: post.seo_robots,
+                seo_schema_type: post.seo_schema_type,
+              }}
+              onSEOChange={(seo: SEOData) => setPost(prev => ({ ...prev, ...seo }))}
+              fallbackTitle={post.title || 'Untitled Post'}
+              fallbackDescription={post.excerpt || ''}
+              entityType="blog"
+              slug={post.slug}
+              disabled={saving}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </>
   );

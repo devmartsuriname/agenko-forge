@@ -42,6 +42,12 @@ export type Database = {
           excerpt: string | null
           id: string
           published_at: string | null
+          seo_canonical_url: string | null
+          seo_description: string | null
+          seo_og_image: string | null
+          seo_robots: string | null
+          seo_schema_type: string | null
+          seo_title: string | null
           slug: string
           status: string
           tags: string[] | null
@@ -54,6 +60,12 @@ export type Database = {
           excerpt?: string | null
           id?: string
           published_at?: string | null
+          seo_canonical_url?: string | null
+          seo_description?: string | null
+          seo_og_image?: string | null
+          seo_robots?: string | null
+          seo_schema_type?: string | null
+          seo_title?: string | null
           slug: string
           status?: string
           tags?: string[] | null
@@ -66,6 +78,12 @@ export type Database = {
           excerpt?: string | null
           id?: string
           published_at?: string | null
+          seo_canonical_url?: string | null
+          seo_description?: string | null
+          seo_og_image?: string | null
+          seo_robots?: string | null
+          seo_schema_type?: string | null
+          seo_title?: string | null
           slug?: string
           status?: string
           tags?: string[] | null
@@ -179,6 +197,12 @@ export type Database = {
           created_at: string | null
           id: string
           published_at: string | null
+          seo_canonical_url: string | null
+          seo_description: string | null
+          seo_og_image: string | null
+          seo_robots: string | null
+          seo_schema_type: string | null
+          seo_title: string | null
           slug: string
           status: string
           title: string
@@ -189,6 +213,12 @@ export type Database = {
           created_at?: string | null
           id?: string
           published_at?: string | null
+          seo_canonical_url?: string | null
+          seo_description?: string | null
+          seo_og_image?: string | null
+          seo_robots?: string | null
+          seo_schema_type?: string | null
+          seo_title?: string | null
           slug: string
           status?: string
           title: string
@@ -199,6 +229,12 @@ export type Database = {
           created_at?: string | null
           id?: string
           published_at?: string | null
+          seo_canonical_url?: string | null
+          seo_description?: string | null
+          seo_og_image?: string | null
+          seo_robots?: string | null
+          seo_schema_type?: string | null
+          seo_title?: string | null
           slug?: string
           status?: string
           title?: string
@@ -272,6 +308,12 @@ export type Database = {
           excerpt: string | null
           id: string
           published_at: string | null
+          seo_canonical_url: string | null
+          seo_description: string | null
+          seo_og_image: string | null
+          seo_robots: string | null
+          seo_schema_type: string | null
+          seo_title: string | null
           slug: string
           status: string
           title: string
@@ -283,6 +325,12 @@ export type Database = {
           excerpt?: string | null
           id?: string
           published_at?: string | null
+          seo_canonical_url?: string | null
+          seo_description?: string | null
+          seo_og_image?: string | null
+          seo_robots?: string | null
+          seo_schema_type?: string | null
+          seo_title?: string | null
           slug: string
           status?: string
           title: string
@@ -294,6 +342,12 @@ export type Database = {
           excerpt?: string | null
           id?: string
           published_at?: string | null
+          seo_canonical_url?: string | null
+          seo_description?: string | null
+          seo_og_image?: string | null
+          seo_robots?: string | null
+          seo_schema_type?: string | null
+          seo_title?: string | null
           slug?: string
           status?: string
           title?: string
@@ -308,6 +362,12 @@ export type Database = {
           excerpt: string | null
           id: string
           published_at: string | null
+          seo_canonical_url: string | null
+          seo_description: string | null
+          seo_og_image: string | null
+          seo_robots: string | null
+          seo_schema_type: string | null
+          seo_title: string | null
           slug: string
           status: string
           title: string
@@ -319,6 +379,12 @@ export type Database = {
           excerpt?: string | null
           id?: string
           published_at?: string | null
+          seo_canonical_url?: string | null
+          seo_description?: string | null
+          seo_og_image?: string | null
+          seo_robots?: string | null
+          seo_schema_type?: string | null
+          seo_title?: string | null
           slug: string
           status?: string
           title: string
@@ -330,6 +396,12 @@ export type Database = {
           excerpt?: string | null
           id?: string
           published_at?: string | null
+          seo_canonical_url?: string | null
+          seo_description?: string | null
+          seo_og_image?: string | null
+          seo_robots?: string | null
+          seo_schema_type?: string | null
+          seo_title?: string | null
           slug?: string
           status?: string
           title?: string

@@ -13,6 +13,8 @@ import { ArrowLeft, Save } from 'lucide-react';
 import { AdminErrorBoundary } from '@/components/admin/ErrorBoundary';
 import { LoadingCardSkeleton } from '@/components/admin/LoadingSkeleton';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
+import { SEOEditor, SEOData } from '@/components/admin/SEOEditor';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { adminToast } from '@/lib/toast-utils';
 import { Helmet } from 'react-helmet-async';
 import type { Service } from '@/types/content';

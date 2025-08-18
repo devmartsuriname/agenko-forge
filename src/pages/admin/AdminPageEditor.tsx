@@ -17,6 +17,7 @@ import { AdminErrorBoundary } from '@/components/admin/ErrorBoundary';
 import { LoadingCardSkeleton } from '@/components/admin/LoadingSkeleton';
 import { adminToast } from '@/lib/toast-utils';
 import { SectionsTab } from '@/components/admin/sections/SectionsTab';
+import { SEOEditor, SEOData } from '@/components/admin/SEOEditor';
 
 function AdminPageEditorContent() {
   const { id } = useParams();
@@ -30,6 +31,12 @@ function AdminPageEditorContent() {
     body: {},
     status: 'draft',
     published_at: null,
+    seo_title: '',
+    seo_description: '',
+    seo_canonical_url: '',
+    seo_og_image: '',
+    seo_robots: 'index,follow',
+    seo_schema_type: 'WebPage',
   });
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(isEditing);
@@ -146,6 +153,7 @@ function AdminPageEditorContent() {
             <TabsTrigger value="details">Page Details</TabsTrigger>
             <TabsTrigger value="sections">Sections</TabsTrigger>
             <TabsTrigger value="content">Raw Content</TabsTrigger>
+            <TabsTrigger value="seo">SEO</TabsTrigger>
           </TabsList>
 
           <TabsContent value="details">
@@ -229,6 +237,25 @@ function AdminPageEditorContent() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="seo">
+            <SEOEditor
+              seo={{
+                seo_title: page.seo_title,
+                seo_description: page.seo_description,
+                seo_canonical_url: page.seo_canonical_url,
+                seo_og_image: page.seo_og_image,
+                seo_robots: page.seo_robots,
+                seo_schema_type: page.seo_schema_type,
+              }}
+              onSEOChange={(seo: SEOData) => setPage(prev => ({ ...prev, ...seo }))}
+              fallbackTitle={page.title || 'Untitled Page'}
+              fallbackDescription=""
+              entityType="page"
+              slug={page.slug}
+              disabled={saving}
+            />
           </TabsContent>
         </Tabs>
 

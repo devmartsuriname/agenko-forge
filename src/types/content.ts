@@ -18,6 +18,12 @@ export interface Service {
   published_at?: string;
   created_at?: string;
   updated_at?: string;
+  seo_title?: string;
+  seo_description?: string;
+  seo_canonical_url?: string;
+  seo_og_image?: string;
+  seo_robots?: string;
+  seo_schema_type?: string;
 }
 
 export interface Project {
@@ -31,6 +37,12 @@ export interface Project {
   created_at?: string;
   updated_at?: string;
   project_images?: ProjectImage[];
+  seo_title?: string;
+  seo_description?: string;
+  seo_canonical_url?: string;
+  seo_og_image?: string;
+  seo_robots?: string;
+  seo_schema_type?: string;
 }
 
 export interface BlogPost {
@@ -44,6 +56,12 @@ export interface BlogPost {
   published_at?: string;
   created_at?: string;
   updated_at?: string;
+  seo_title?: string;
+  seo_description?: string;
+  seo_canonical_url?: string;
+  seo_og_image?: string;
+  seo_robots?: string;
+  seo_schema_type?: string;
 }
 
 export interface Page {
@@ -55,6 +73,12 @@ export interface Page {
   published_at?: string;
   created_at?: string;
   updated_at?: string;
+  seo_title?: string;
+  seo_description?: string;
+  seo_canonical_url?: string;
+  seo_og_image?: string;
+  seo_robots?: string;
+  seo_schema_type?: string;
 }
 
 export interface ContactSubmission {

@@ -15,6 +15,8 @@ import { generateSlug, ensureUniqueSlug } from '@/lib/admin-utils';
 import { adminToast } from '@/lib/toast-utils';
 import { LoadingCardSkeleton } from '@/components/admin/LoadingSkeleton';
 import { GalleryManager } from '@/components/admin/GalleryManager';
+import { SEOEditor, SEOData } from '@/components/admin/SEOEditor';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Save, Eye } from 'lucide-react';
 
 function AdminProjectEditor() {
