@@ -179,15 +179,26 @@ const Pricing = () => {
                       ))}
                     </ul>
 
-                    <Link to={`/contact?subject=${encodeURIComponent(plan.subject)}`}>
-                      <Button 
-                        variant={plan.popular ? "hero" : "outline-green"} 
-                        className="w-full"
-                        size="lg"
-                      >
-                        {plan.cta}
-                      </Button>
-                    </Link>
+                    <div className="space-y-3">
+                      <Link to={`/get-quote?service=${encodeURIComponent(plan.name.toLowerCase())}&budget=${encodeURIComponent(plan.price === 'Custom' ? 'not-sure' : plan.price.replace('$', '').replace(',', ''))}`}>
+                        <Button 
+                          variant={plan.popular ? "hero" : "outline-green"} 
+                          className="w-full"
+                          size="lg"
+                        >
+                          Get Quote for {plan.name}
+                        </Button>
+                      </Link>
+                      <Link to={`/contact?subject=${encodeURIComponent(plan.subject)}`}>
+                        <Button 
+                          variant="outline" 
+                          className="w-full"
+                          size="sm"
+                        >
+                          Contact Sales
+                        </Button>
+                      </Link>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
@@ -280,13 +291,18 @@ const Pricing = () => {
               Let's discuss your project and find the perfect solution for your business needs.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/contact">
+              <Link to="/get-quote">
                 <Button variant="hero" size="lg" className="text-lg px-12 py-6">
-                  Start Your Project
+                  Get Free Quote
+                </Button>
+              </Link>
+              <Link to="/contact">
+                <Button variant="outline-green" size="lg" className="text-lg px-12 py-6">
+                  Schedule Consultation
                 </Button>
               </Link>
               <Link to="/portfolio">
-                <Button variant="outline-green" size="lg" className="text-lg px-12 py-6">
+                <Button variant="outline" size="lg" className="text-lg px-12 py-6">
                   View Our Work
                 </Button>
               </Link>

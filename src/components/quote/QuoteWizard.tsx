@@ -54,31 +54,94 @@ export function QuoteWizard({ initialData = {}, onComplete }: QuoteWizardProps) 
   const [submitting, setSubmitting] = useState(false);
   const [quoteId, setQuoteId] = useState<string | null>(null);
   
-  const [formData, setFormData] = useState<QuoteFormData>({
-    name: '',
-    email: '',
-    company: '',
-    phone: '',
-    serviceType: '',
-    projectScope: '',
-    budgetRange: '',
-    timeline: '',
-    additionalRequirements: '',
-    ...initialData
+  // Get URL parameters for prefilling
+  const [urlParams] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return {
+        service: params.get('service'),
+        budget: params.get('budget'),
+        timeline: params.get('timeline')
+      };
+    }
+    return {};
   });
+  
+  const [formData, setFormData] = useState<QuoteFormData>(() => {
+    const baseData = {
+      name: '',
+      email: '',
+      company: '',
+      phone: '',
+      serviceType: '',
+      projectScope: '',
+      budgetRange: '',
+      timeline: '',
+      additionalRequirements: '',
+      ...initialData
+    };
 
-  // Auto-save form data to localStorage
-  useEffect(() => {
-    const savedData = localStorage.getItem('quote-wizard-data');
-    if (savedData && Object.keys(initialData).length === 0) {
-      try {
-        const parsed = JSON.parse(savedData);
-        setFormData(prev => ({ ...prev, ...parsed }));
-      } catch (error) {
-        console.error('Error parsing saved quote data:', error);
+    // Try to load from localStorage first
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('quote-wizard-data');
+      if (saved && Object.keys(initialData).length === 0) {
+        try {
+          const parsed = JSON.parse(saved);
+          baseData.name = parsed.name || baseData.name;
+          baseData.email = parsed.email || baseData.email;
+          baseData.company = parsed.company || baseData.company;
+          baseData.phone = parsed.phone || baseData.phone;
+          baseData.serviceType = parsed.serviceType || baseData.serviceType;
+          baseData.projectScope = parsed.projectScope || baseData.projectScope;
+          baseData.budgetRange = parsed.budgetRange || baseData.budgetRange;
+          baseData.timeline = parsed.timeline || baseData.timeline;
+          baseData.additionalRequirements = parsed.additionalRequirements || baseData.additionalRequirements;
+        } catch (error) {
+          console.error('Error parsing saved quote data:', error);
+        }
       }
     }
-  }, [initialData]);
+
+    // Apply URL parameters for prefilling (override saved data)
+    if (urlParams.service) {
+      // Map service names from pricing page to our service types
+      const serviceMap: Record<string, string> = {
+        'starter': 'web-development',
+        'business': 'e-commerce',
+        'pro': 'custom-software',
+        'enterprise': 'consulting'
+      };
+      baseData.serviceType = serviceMap[urlParams.service] || urlParams.service;
+    }
+    
+    if (urlParams.budget) {
+      // Map pricing to budget ranges
+      const budgetMap: Record<string, string> = {
+        '2999': '5k-15k',
+        '5999': '5k-15k', 
+        '9999': '15k-50k',
+        'custom': 'not-sure'
+      };
+      baseData.budgetRange = budgetMap[urlParams.budget] || urlParams.budget;
+    }
+    
+    if (urlParams.timeline) {
+      baseData.timeline = urlParams.timeline;
+    }
+
+    return baseData;
+  });
+
+  // Auto-save form data to localStorage (skip initial effect to avoid overriding URL params)
+  useEffect(() => {
+    let isFirstRun = true;
+    return () => {
+      if (!isFirstRun) {
+        localStorage.setItem('quote-wizard-data', JSON.stringify(formData));
+      }
+      isFirstRun = false;
+    };
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('quote-wizard-data', JSON.stringify(formData));
