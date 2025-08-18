@@ -11,6 +11,7 @@ interface SEOProps {
   modifiedAt?: string;
   author?: string;
   tags?: string[];
+  gscVerificationCode?: string;
 }
 
 export function SEOHead({
@@ -24,6 +25,7 @@ export function SEOHead({
   modifiedAt,
   author,
   tags = [],
+  gscVerificationCode,
 }: SEOProps) {
   const siteName = 'Agenko Digital Agency';
   const defaultDescription = 'Innovative marketing solutions for business growth. A leading digital agency specializing in creative solutions that drive business growth, enhance brand visibility, and increase customer engagement.';
@@ -119,6 +121,11 @@ export function SEOHead({
       {/* Viewport and Mobile */}
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <meta name="robots" content="index, follow" />
+      
+      {/* Google Search Console Verification */}
+      {gscVerificationCode && (
+        <meta name="google-site-verification" content={gscVerificationCode} />
+      )}
       
       {/* Open Graph */}
       <meta property="og:title" content={fullTitle} />

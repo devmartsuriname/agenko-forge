@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/lib/seo';
 import { adminCms } from '@/lib/admin-cms';
 import { useAuth } from '@/lib/auth';
-import { Save, Upload, Palette, Phone, Mail, MapPin, Globe, Search, FileText } from 'lucide-react';
+import { Save, Upload, Palette, Phone, Mail, MapPin, Globe, Search, FileText, AlertTriangle } from 'lucide-react';
 
 interface SiteSettings {
   // Basic Info
@@ -41,6 +41,15 @@ interface SiteSettings {
   footer_content: string;
   footer_legal_text: string;
   footer_links: string;
+  
+  // Integrations
+  ga4_tracking_id?: string;
+  google_ads_id?: string;
+  meta_pixel_id?: string;
+  linkedin_partner_id?: string;
+  gsc_verification_code?: string;
+  tracking_enabled?: boolean;
+  show_consent_banner?: boolean;
 }
 
 export default function Settings() {
@@ -100,6 +109,13 @@ export default function Settings() {
         footer_content: data.footer_content || '',
         footer_legal_text: data.footer_legal_text || '',
         footer_links: data.footer_links || '',
+        ga4_tracking_id: data.ga4_tracking_id || '',
+        google_ads_id: data.google_ads_id || '',
+        meta_pixel_id: data.meta_pixel_id || '',
+        linkedin_partner_id: data.linkedin_partner_id || '',
+        gsc_verification_code: data.gsc_verification_code || '',
+        tracking_enabled: data.tracking_enabled !== false,
+        show_consent_banner: data.show_consent_banner !== false,
       });
     } catch (error) {
       console.error('Error fetching settings:', error);
@@ -235,71 +251,16 @@ export default function Settings() {
           <p className="text-muted-foreground">Manage site settings and configuration</p>
         </div>
 
-        <Tabs defaultValue="general" className="space-y-6">
+        <Tabs defaultValue="appearance" className="space-y-6">
           <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="general" className="flex items-center gap-2">
-              <Globe className="h-4 w-4" />
-              General
-            </TabsTrigger>
-            <TabsTrigger value="appearance" className="flex items-center gap-2">
-              <Palette className="h-4 w-4" />
-              Appearance
-            </TabsTrigger>
-            <TabsTrigger value="contact" className="flex items-center gap-2">
-              <Phone className="h-4 w-4" />
-              Contact
-            </TabsTrigger>
-            <TabsTrigger value="seo" className="flex items-center gap-2">
-              <Search className="h-4 w-4" />
-              SEO
-            </TabsTrigger>
-            <TabsTrigger value="footer" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Footer
-            </TabsTrigger>
+            <TabsTrigger value="appearance">Appearance</TabsTrigger>
+            <TabsTrigger value="contact">Contact</TabsTrigger>
+            <TabsTrigger value="seo">SEO</TabsTrigger>
+            <TabsTrigger value="footer">Footer</TabsTrigger>
+            <TabsTrigger value="integrations">Integrations</TabsTrigger>
           </TabsList>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* General Tab */}
-            <TabsContent value="general" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Site Information</CardTitle>
-                  <CardDescription>Basic information about your website</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="site_title">Site Title</Label>
-                    <Input
-                      id="site_title"
-                      value={settings.site_title}
-                      onChange={(e) => handleInputChange('site_title', e.target.value)}
-                      placeholder="Agenko Agency"
-                      aria-describedby="site-title-help"
-                    />
-                    <p id="site-title-help" className="text-sm text-muted-foreground">
-                      This appears in browser tabs and search results
-                    </p>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="site_description">Site Description</Label>
-                    <Textarea
-                      id="site_description"
-                      value={settings.site_description}
-                      onChange={(e) => handleInputChange('site_description', e.target.value)}
-                      placeholder="Professional agency services for digital transformation"
-                      rows={3}
-                      aria-describedby="site-desc-help"
-                    />
-                    <p id="site-desc-help" className="text-sm text-muted-foreground">
-                      A brief description of your website for search engines
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
             {/* Appearance Tab */}
             <TabsContent value="appearance" className="space-y-6">
               <Card>
@@ -591,7 +552,142 @@ export default function Settings() {
                   </div>
                 </CardContent>
               </Card>
-            </TabsContent>
+          </TabsContent>
+
+          <TabsContent value="integrations">
+            <Card>
+              <CardHeader>
+                <CardTitle>Analytics & Tracking</CardTitle>
+                <CardDescription>
+                  Configure third-party analytics and tracking integrations. These will only be active on production.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Google Analytics 4 */}
+                  <div className="space-y-2">
+                    <Label htmlFor="ga4-id">Google Analytics 4 ID</Label>
+                    <Input
+                      id="ga4-id"
+                      value={settings.ga4_tracking_id || ''}
+                      onChange={(e) => handleInputChange('ga4_tracking_id', e.target.value)}
+                      placeholder="G-XXXXXXXXXX"
+                      disabled={saving}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Google Analytics 4 measurement ID for tracking website visitors
+                    </p>
+                  </div>
+
+                  {/* Google Ads */}
+                  <div className="space-y-2">
+                    <Label htmlFor="google-ads-id">Google Ads Conversion ID</Label>
+                    <Input
+                      id="google-ads-id"
+                      value={settings.google_ads_id || ''}
+                      onChange={(e) => handleInputChange('google_ads_id', e.target.value)}
+                      placeholder="AW-XXXXXXXXXX"
+                      disabled={saving}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Google Ads conversion tracking ID
+                    </p>
+                  </div>
+
+                  {/* Meta Pixel */}
+                  <div className="space-y-2">
+                    <Label htmlFor="meta-pixel-id">Meta Pixel ID</Label>
+                    <Input
+                      id="meta-pixel-id"
+                      value={settings.meta_pixel_id || ''}
+                      onChange={(e) => handleInputChange('meta_pixel_id', e.target.value)}
+                      placeholder="123456789012345"
+                      disabled={saving}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Facebook/Meta pixel ID for social media advertising
+                    </p>
+                  </div>
+
+                  {/* LinkedIn Insight Tag */}
+                  <div className="space-y-2">
+                    <Label htmlFor="linkedin-partner-id">LinkedIn Partner ID</Label>
+                    <Input
+                      id="linkedin-partner-id"
+                      value={settings.linkedin_partner_id || ''}
+                      onChange={(e) => handleInputChange('linkedin_partner_id', e.target.value)}
+                      placeholder="12345"
+                      disabled={saving}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      LinkedIn Insight Tag partner ID for business tracking
+                    </p>
+                  </div>
+
+                  {/* Google Search Console */}
+                  <div className="space-y-2">
+                    <Label htmlFor="gsc-verification">Google Search Console Verification</Label>
+                    <Input
+                      id="gsc-verification"
+                      value={settings.gsc_verification_code || ''}
+                      onChange={(e) => handleInputChange('gsc_verification_code', e.target.value)}
+                      placeholder="abcdefghijklmnopqrstuvwxyz123456"
+                      disabled={saving}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Google Search Console verification meta tag content
+                    </p>
+                  </div>
+
+                  {/* Privacy Settings */}
+                  <div className="space-y-2">
+                    <Label>Privacy & Consent</Label>
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="tracking-enabled"
+                          checked={settings.tracking_enabled !== false}
+                          onChange={(e) => handleInputChange('tracking_enabled', e.target.checked.toString())}
+                          disabled={saving}
+                          className="rounded border-input"
+                        />
+                        <Label htmlFor="tracking-enabled" className="text-sm font-normal">
+                          Enable tracking scripts on production
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="consent-banner"
+                          checked={settings.show_consent_banner !== false}
+                          onChange={(e) => handleInputChange('show_consent_banner', e.target.checked.toString())}
+                          disabled={saving}
+                          className="rounded border-input"
+                        />
+                        <Label htmlFor="consent-banner" className="text-sm font-normal">
+                          Show consent banner (placeholder for future implementation)
+                        </Label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 p-4 bg-muted rounded-lg">
+                  <div className="flex items-start space-x-2">
+                    <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
+                    <div className="space-y-1">
+                      <h4 className="text-sm font-medium">Privacy Notice</h4>
+                      <p className="text-sm text-muted-foreground">
+                        These tracking scripts will only load on production domains and exclude admin routes. 
+                        Ensure you have proper privacy policies and consent mechanisms in place for GDPR/CCPA compliance.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
             {/* Footer Tab */}
             <TabsContent value="footer" className="space-y-6">

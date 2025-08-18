@@ -7,6 +7,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from '@/lib/auth';
 import { Suspense, lazy } from 'react';
 import { Spinner } from "@/components/ui/spinner";
+import { GlobalIntegrations } from "@/components/GlobalIntegrations";
 
 // Public pages
 import Index from "./pages/Index";
@@ -50,6 +51,7 @@ const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <GlobalIntegrations />
         <TooltipProvider>
           <Toaster />
           <Sonner />
