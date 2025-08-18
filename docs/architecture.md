@@ -188,14 +188,18 @@ carousel: {
 
 ## Content Management & Storage Strategy
 
-### Image Pipeline & Responsive Storage
-- **Media Bucket**: All project and blog images stored in Supabase Storage `media` bucket
-- **Format**: WebP-only for optimal compression and browser support
-- **Responsive Variants**: 4 sizes generated per image (320w, 640w, 960w, 1200w)
-- **Aspect Ratio**: Standard 16/9 to prevent CLS during carousel initialization
-- **Path Structure**: `media/projects/{slug}/{basename}-{width}.webp` and `media/blog/{slug}/{basename}-{width}.webp`
-- **Quality**: WebP quality set to 80 for optimal balance of file size and visual quality
-- **Migration**: Use `scripts/migrate-images.ts` for idempotent external → WebP migration with responsive variants
+### Image Pipeline & Responsive Storage (Phase 5E Complete)
+- **Media Bucket**: All images stored in Supabase Storage `media` bucket with public READ policies
+- **Format**: WebP-only for ~30% smaller file sizes vs JPEG while maintaining visual quality
+- **Responsive Variants**: 4 sizes generated per image (320w, 640w, 960w, 1200w) at 16:9 aspect ratio
+- **Path Structure**: 
+  - Projects: `media/projects/{slug}/{basename}-{width}.webp`
+  - Blog: `media/blog/{slug}/{basename}-{width}.webp`
+  - Sections: `media/sections/{pageSlug}/{sectionType}/{basename}-{width}.webp`
+- **Quality**: WebP quality 80 for optimal balance of compression and visual fidelity
+- **Migration**: Complete with `scripts/migrate-images.ts` - idempotent external → WebP conversion
+- **Preconnect**: Automatic DNS preconnect to storage origin for ~100-200ms faster image loads
+- **Hero Preload**: First hero images preloaded with responsive `imagesrcset`/`imagesizes` attributes
 
 ### Responsive Image Implementation
 - **Primary URL**: Always points to largest variant (1200w) for fallback
@@ -228,30 +232,42 @@ carousel: {
 
 ### Seeding & Migration Scripts
 ```bash
-# Phase 5E: Image migration with WebP conversion and responsive variants
-npx ts-node scripts/migrate-images.ts
+# Phase 5E: Complete image migration with WebP conversion and responsive variants
+npm run migrate:images
 
-# Legacy: Basic image migration (external → Supabase Storage JPEG)
-npx ts-node scripts/migrate-images-to-storage.ts
+# Alternative: Direct execution
+npx ts-node scripts/migrate-images.ts
 
 # Content seeding (idempotent upsert)
 npx ts-node scripts/seed-devmart-extra.ts
 ```
 
-### Image Naming Convention
+### Orphan Management
+- **Storage Orphan Scanner**: Automated daily scans at 2:00 AM UTC via cron job
+- **Report-Only Mode**: Identifies orphaned files without deletion for safety
+- **Manual Review**: Detailed logs help identify cleanup opportunities
+- **Zero False Positives**: Only flags truly unreferenced storage files
+
+### Image Naming Convention (Phase 5E Standard)
 ```
 media/projects/ecommerce-platform/
-  ├── image-1-320.webp   (320×180)
-  ├── image-1-640.webp   (640×360) 
-  ├── image-1-960.webp   (960×540)
-  ├── image-1-1200.webp  (1200×675)
+  ├── image-1-320.webp   (320×180)   # Mobile
+  ├── image-1-640.webp   (640×360)   # Small tablet
+  ├── image-1-960.webp   (960×540)   # Large tablet  
+  ├── image-1-1200.webp  (1200×675)  # Desktop (primary)
   ├── image-2-320.webp
   └── ...
 
 media/blog/modern-web-design/
-  ├── hero-320.webp
-  ├── hero-640.webp  
-  ├── hero-960.webp
+  ├── hero-320.webp      # Mobile hero
+  ├── hero-640.webp      # Small tablet hero
+  ├── hero-960.webp      # Large tablet hero
+  └── hero-1200.webp     # Desktop hero (primary)
+
+media/sections/home/hero/
+  ├── hero-320.webp      # Homepage hero variants
+  ├── hero-640.webp
+  ├── hero-960.webp  
   └── hero-1200.webp
 ```
 

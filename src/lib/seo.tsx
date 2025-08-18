@@ -34,6 +34,7 @@ export function SEOHead({
   const seoKeywords = [...keywords, ...defaultKeywords].join(', ');
   const currentUrl = url || typeof window !== 'undefined' ? window.location.href : '';
   const seoImage = image || '/og-image.jpg'; // Default OG image
+  const storageOrigin = 'https://dvgubqqjvmsepkilnkak.supabase.co';
 
   // JSON-LD Schema
   const organizationSchema = {
@@ -149,6 +150,9 @@ export function SEOHead({
       
       {/* Canonical URL */}
       <link rel="canonical" href={currentUrl} />
+      
+      {/* Preconnect to Storage for faster image loading */}
+      <link rel="preconnect" href={storageOrigin} crossOrigin="anonymous" />
       
       {/* JSON-LD Schema */}
       {schemas.map((schema, index) => (

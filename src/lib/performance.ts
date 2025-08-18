@@ -37,32 +37,53 @@ export function injectHeroPreload(sections: Section[]): void {
   if (!backgroundImage) return;
   
   const imageUrl = typeof backgroundImage === 'string' ? backgroundImage : backgroundImage.src;
+  const srcset = typeof backgroundImage === 'object' ? backgroundImage.srcset : undefined;
+  const sizes = typeof backgroundImage === 'object' ? backgroundImage.sizes : '100vw';
   
   // Check if preload link already exists to avoid duplicates
   const existingPreload = document.querySelector(`link[rel="preload"][href="${imageUrl}"]`);
   if (existingPreload) return;
   
-  // Create and inject preload link
+  // Create and inject preload link with responsive attributes
   const link = document.createElement('link');
   link.rel = 'preload';
   link.as = 'image';
   link.href = imageUrl;
   link.setAttribute('fetchpriority', 'high');
   
+  // Add responsive attributes for better preloading
+  if (srcset) {
+    link.setAttribute('imagesrcset', srcset);
+    link.setAttribute('imagesizes', sizes);
+  }
+  
   // Add to head
   document.head.appendChild(link);
 }
 
 /**
- * Creates a responsive image srcset for different screen sizes
+ * Creates a responsive image srcset for Supabase Storage WebP variants
  */
-export function createImageSrcSet(baseUrl: string, sizes: number[] = [640, 768, 1024, 1280, 1920]): string {
-  return sizes.map(size => `${baseUrl}?w=${size} ${size}w`).join(', ');
+export function createImageSrcSet(baseUrl: string, sizes: number[] = [320, 640, 960, 1200]): string {
+  if (!baseUrl.includes('storage/v1/object/public/media') || !baseUrl.includes('-1200.webp')) {
+    return '';
+  }
+  
+  return sizes
+    .map(width => `${baseUrl.replace('-1200.webp', `-${width}.webp`)} ${width}w`)
+    .join(', ');
 }
 
 /**
  * Gets responsive image sizes attribute for hero images
  */
 export function getHeroImageSizes(): string {
-  return '(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw';
+  return '100vw';
+}
+
+/**
+ * Gets responsive image sizes attribute for card images (blog/portfolio)
+ */
+export function getCardImageSizes(): string {
+  return '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw';
 }

@@ -32,7 +32,7 @@ async function fetchAsArrayBuffer(remoteUrl: string): Promise<ArrayBuffer> {
   }
 }
 
-function generateFilePath(kind: "projects" | "blog", slug: string, basename: string, width: number): string {
+function generateFilePath(kind: "projects" | "blog" | "sections", slug: string, basename: string, width: number): string {
   return `media/${kind}/${slug}/${basename}-${width}.webp`.toLowerCase();
 }
 
@@ -50,7 +50,7 @@ async function processImageToWebP(buffer: ArrayBuffer, width: number, height: nu
 }
 
 async function uploadImageVariants(
-  kind: "projects" | "blog", 
+  kind: "projects" | "blog" | "sections", 
   slug: string, 
   srcUrl: string, 
   basename: string = "image"
@@ -173,7 +173,6 @@ async function migrateProjectImages() {
 async function migrateBlogImages() {
   console.log("\n🔄 Migrating blog images...");
   
-  // Check if blog_posts table has hero_url or similar field
   const { data: blogPosts, error: bErr } = await supa
     .from("blog_posts")
     .select("id, slug, body")
@@ -187,11 +186,67 @@ async function migrateBlogImages() {
   for (const post of blogPosts || []) {
     console.log(`\n📝 Processing blog post: ${post.slug}`);
     
-    // Extract images from body content if needed
-    if (post.body && typeof post.body === 'object') {
-      // This would depend on your specific blog body structure
-      // For now, we'll skip blog migration unless you have hero images
-      console.log(`  ℹ️  Blog image migration not implemented yet`);
+    // Extract hero image from body if it exists
+    if (post.body && typeof post.body === 'object' && post.body.blocks) {
+      let bodyUpdated = false;
+      const updatedBlocks = [];
+      
+      for (const block of post.body.blocks) {
+        if (block.type === 'hero' && block.data?.backgroundImage) {
+          const heroImage = block.data.backgroundImage;
+          const imageUrl = typeof heroImage === 'string' ? heroImage : heroImage.src;
+          
+          // Skip if already migrated
+          if (imageUrl.includes('storage/v1/object/public/media') && imageUrl.includes('.webp')) {
+            updatedBlocks.push(block);
+            continue;
+          }
+          
+          try {
+            const basename = 'hero';
+            const { largestUrl, srcset } = await uploadImageVariants("blog", post.slug, imageUrl, basename);
+            
+            // Update the block with new image data
+            const updatedBlock = {
+              ...block,
+              data: {
+                ...block.data,
+                backgroundImage: {
+                  src: largestUrl,
+                  srcset: srcset,
+                  sizes: "100vw",
+                  alt: block.data.backgroundImage?.alt || "Blog hero image",
+                  width: 1200,
+                  height: 675
+                }
+              }
+            };
+            
+            updatedBlocks.push(updatedBlock);
+            bodyUpdated = true;
+            console.log(`  ✅ Updated hero image in block`);
+          } catch (error) {
+            console.error(`  ❌ Failed to migrate hero image:`, error);
+            updatedBlocks.push(block);
+          }
+        } else {
+          updatedBlocks.push(block);
+        }
+      }
+      
+      // Update blog post if any images were migrated
+      if (bodyUpdated) {
+        const { error: updateErr } = await supa
+          .from("blog_posts")
+          .update({ body: { ...post.body, blocks: updatedBlocks } })
+          .eq("id", post.id);
+          
+        if (updateErr) {
+          console.error(`Error updating blog post ${post.id}:`, updateErr);
+        } else {
+          console.log(`  ✅ Updated blog post body with WebP images`);
+        }
+      }
     }
   }
 }
@@ -217,17 +272,116 @@ async function ensureMediaBucket() {
   }
 }
 
+async function migratePageSectionImages() {
+  console.log("\n🔄 Migrating page section images...");
+  
+  const { data: pages, error: pErr } = await supa
+    .from("pages")
+    .select("id, slug, body")
+    .eq("status", "published");
+    
+  if (pErr) {
+    console.error("Error fetching pages:", pErr);
+    return;
+  }
+
+  for (const page of pages || []) {
+    console.log(`\n📄 Processing page: ${page.slug}`);
+    
+    if (page.body && typeof page.body === 'object' && page.body.blocks) {
+      let bodyUpdated = false;
+      const updatedBlocks = [];
+      
+      for (const block of page.body.blocks) {
+        let updatedBlock = { ...block };
+        
+        // Handle different section types with images
+        if (block.type === 'hero' && block.data?.backgroundImage) {
+          const result = await migrateBlockImage(block, 'hero', page.slug || 'home');
+          if (result.updated) {
+            updatedBlock = result.block;
+            bodyUpdated = true;
+          }
+        } else if (block.type === 'about' && block.data?.image) {
+          const result = await migrateBlockImage(block, 'about', page.slug || 'home', 'image');
+          if (result.updated) {
+            updatedBlock = result.block;
+            bodyUpdated = true;
+          }
+        }
+        
+        updatedBlocks.push(updatedBlock);
+      }
+      
+      // Update page if any images were migrated
+      if (bodyUpdated) {
+        const { error: updateErr } = await supa
+          .from("pages")
+          .update({ body: { ...page.body, blocks: updatedBlocks } })
+          .eq("id", page.id);
+          
+        if (updateErr) {
+          console.error(`Error updating page ${page.id}:`, updateErr);
+        } else {
+          console.log(`  ✅ Updated page body with WebP images`);
+        }
+      }
+    }
+  }
+}
+
+async function migrateBlockImage(block: any, sectionType: string, pageSlug: string, imageField: string = 'backgroundImage') {
+  const imageData = block.data?.[imageField];
+  if (!imageData) return { updated: false, block };
+  
+  const imageUrl = typeof imageData === 'string' ? imageData : imageData.src;
+  
+  // Skip if already migrated
+  if (imageUrl.includes('storage/v1/object/public/media') && imageUrl.includes('.webp')) {
+    return { updated: false, block };
+  }
+  
+  try {
+    const basename = sectionType;
+    const { largestUrl, srcset } = await uploadImageVariants("sections", `${pageSlug}/${sectionType}`, imageUrl, basename);
+    
+    // Update the block with new image data
+    const updatedBlock = {
+      ...block,
+      data: {
+        ...block.data,
+        [imageField]: {
+          src: largestUrl,
+          srcset: srcset,
+          sizes: sectionType === 'hero' ? "100vw" : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw",
+          alt: imageData?.alt || `${sectionType} image`,
+          width: 1200,
+          height: 675
+        }
+      }
+    };
+    
+    console.log(`  ✅ Updated ${sectionType} image`);
+    return { updated: true, block: updatedBlock };
+  } catch (error) {
+    console.error(`  ❌ Failed to migrate ${sectionType} image:`, error);
+    return { updated: false, block };
+  }
+}
+
 async function main() {
   try {
-    console.log("🚀 Starting Phase 5E: Image Migration to WebP + Responsive");
+    console.log("🚀 Starting Phase 5E: Complete Image Migration to WebP + Responsive");
     
     await ensureMediaBucket();
     await migrateProjectImages();
     await migrateBlogImages();
+    await migratePageSectionImages();
     
     console.log("\n✅ Phase 5E migration completed successfully!");
     console.log("📊 All images converted to WebP with responsive variants (320w, 640w, 960w, 1200w)");
-    console.log("🎯 Use srcset in components for optimal loading");
+    console.log("🎯 Components now use proper srcset/sizes for optimal loading");
+    console.log("📱 Added preconnect to storage origin for faster DNS resolution");
     
   } catch (error) {
     console.error("\n❌ Migration failed:", error);
