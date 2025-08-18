@@ -14,12 +14,25 @@ export function CtaSectionComponent({ section }: CtaSectionProps) {
     <section className="relative py-20 px-4 overflow-hidden">
       {data.backgroundImage && (
         <div className="absolute inset-0">
-          <img 
-            src={data.backgroundImage} 
-            alt="CTA background" 
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
+          {typeof data.backgroundImage === 'string' ? (
+            <img 
+              src={data.backgroundImage} 
+              alt="CTA background" 
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <img 
+              src={data.backgroundImage.src}
+              srcSet={data.backgroundImage.srcset}
+              sizes={data.backgroundImage.sizes}
+              alt={data.backgroundImage.alt || "CTA background"}
+              width={data.backgroundImage.width}
+              height={data.backgroundImage.height}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          )}
           <div className="absolute inset-0 bg-black/70" />
         </div>
       )}

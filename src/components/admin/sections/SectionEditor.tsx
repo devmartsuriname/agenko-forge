@@ -10,6 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Plus, Trash2, GripVertical } from 'lucide-react';
 import { Section, SectionSchema, SECTION_TYPES } from '@/lib/sections/schema';
 import { adminToast } from '@/lib/toast-utils';
+import { ImageReplacer } from '@/components/admin/ImageReplacer';
 
 interface SectionEditorProps {
   section: Section;
@@ -103,16 +104,13 @@ export function SectionEditor({
         </div>
       </div>
       
-      <div className="space-y-2">
-        <Label htmlFor="hero-bg-image">Background Image URL</Label>
-        <Input
-          id="hero-bg-image"
-          value={(section.data as any).backgroundImage || ''}
-          onChange={(e) => updateSectionData({ backgroundImage: e.target.value })}
-          placeholder="https://example.com/hero-image.jpg"
-          type="url"
-        />
-      </div>
+      {/* Background Image Replacer */}
+      <ImageReplacer
+        sectionType="hero"
+        sectionId={section.id}
+        currentImage={(section.data as any).backgroundImage}
+        onImageUpdate={(imageData) => updateSectionData({ backgroundImage: imageData })}
+      />
     </div>
   );
 
@@ -298,6 +296,14 @@ export function SectionEditor({
           <Label htmlFor="services-show-all">Show "View All" Link</Label>
         </div>
       </div>
+
+      {/* Background Image Replacer */}
+      <ImageReplacer
+        sectionType="servicesPreview"
+        sectionId={section.id}
+        currentImage={(section.data as any).backgroundImage}
+        onImageUpdate={(imageData) => updateSectionData({ backgroundImage: imageData })}
+      />
     </div>
   );
 
@@ -826,6 +832,14 @@ export function SectionEditor({
             </div>
           </div>
         )}
+
+        {/* Background Image Replacer */}
+        <ImageReplacer
+          sectionType="blogPreview"
+          sectionId={section.id}
+          currentImage={(section.data as any).backgroundImage}
+          onImageUpdate={(imageData) => updateSectionData({ backgroundImage: imageData })}
+        />
       </div>
     );
   };
@@ -884,16 +898,13 @@ export function SectionEditor({
         </div>
       </div>
       
-      <div className="space-y-2">
-        <Label htmlFor="cta-bg-image">Background Image URL</Label>
-        <Input
-          id="cta-bg-image"
-          value={(section.data as any).backgroundImage || ''}
-          onChange={(e) => updateSectionData({ backgroundImage: e.target.value })}
-          placeholder="https://example.com/cta-background.jpg"
-          type="url"
-        />
-      </div>
+      {/* Background Image Replacer */}
+      <ImageReplacer
+        sectionType="cta"
+        sectionId={section.id}
+        currentImage={(section.data as any).backgroundImage}
+        onImageUpdate={(imageData) => updateSectionData({ backgroundImage: imageData })}
+      />
     </div>
   );
 

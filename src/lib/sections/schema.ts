@@ -13,7 +13,17 @@ export const HeroSectionSchema = BaseSectionSchema.extend({
     title: z.string().min(1, 'Title is required'),
     subtitle: z.string().optional(),
     description: z.string().optional(),
-    backgroundImage: z.string().url().optional(),
+    backgroundImage: z.union([
+      z.string().url(),
+      z.object({
+        src: z.string().url(),
+        srcset: z.string().optional(),
+        sizes: z.string().optional(),
+        alt: z.string().optional(),
+        width: z.number().optional(),
+        height: z.number().optional(),
+      })
+    ]).optional(),
     ctaText: z.string().optional(),
     ctaLink: z.string().optional(),
     stats: z.array(z.object({
@@ -29,7 +39,17 @@ export const AboutSectionSchema = BaseSectionSchema.extend({
   data: z.object({
     title: z.string().min(1, 'Title is required'),
     description: z.string().min(1, 'Description is required'),
-    image: z.string().url().optional(),
+    image: z.union([
+      z.string().url(),
+      z.object({
+        src: z.string().url(),
+        srcset: z.string().optional(),
+        sizes: z.string().optional(),
+        alt: z.string().optional(),
+        width: z.number().optional(),
+        height: z.number().optional(),
+      })
+    ]).optional(),
     features: z.array(z.object({
       icon: z.string(),
       title: z.string(),
@@ -44,6 +64,17 @@ export const ServicesPreviewSectionSchema = BaseSectionSchema.extend({
   data: z.object({
     title: z.string().min(1, 'Title is required'),
     description: z.string().optional(),
+    backgroundImage: z.union([
+      z.string().url(),
+      z.object({
+        src: z.string().url(),
+        srcset: z.string().optional(),
+        sizes: z.string().optional(),
+        alt: z.string().optional(),
+        width: z.number().optional(),
+        height: z.number().optional(),
+      })
+    ]).optional(),
     limit: z.number().min(1).max(12).default(6),
     showAll: z.boolean().default(true),
   }),
@@ -100,6 +131,17 @@ export const BlogPreviewSectionSchema = BaseSectionSchema.extend({
   data: z.object({
     title: z.string().min(1, 'Title is required'),
     description: z.string().optional(),
+    backgroundImage: z.union([
+      z.string().url(),
+      z.object({
+        src: z.string().url(),
+        srcset: z.string().optional(),
+        sizes: z.string().optional(),
+        alt: z.string().optional(),
+        width: z.number().optional(),
+        height: z.number().optional(),
+      })
+    ]).optional(),
     limit: z.number().min(1).max(12).default(3),
     showAll: z.boolean().default(true),
     layout: z.enum(['grid', 'carousel']).default('grid'),
@@ -134,7 +176,17 @@ export const CtaSectionSchema = BaseSectionSchema.extend({
       text: z.string(),
       link: z.string(),
     }).optional(),
-    backgroundImage: z.string().url().optional(),
+    backgroundImage: z.union([
+      z.string().url(),
+      z.object({
+        src: z.string().url(),
+        srcset: z.string().optional(),
+        sizes: z.string().optional(),
+        alt: z.string().optional(),
+        width: z.number().optional(),
+        height: z.number().optional(),
+      })
+    ]).optional(),
   }),
 });
 

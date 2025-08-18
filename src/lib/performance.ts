@@ -36,15 +36,17 @@ export function injectHeroPreload(sections: Section[]): void {
   
   if (!backgroundImage) return;
   
+  const imageUrl = typeof backgroundImage === 'string' ? backgroundImage : backgroundImage.src;
+  
   // Check if preload link already exists to avoid duplicates
-  const existingPreload = document.querySelector(`link[rel="preload"][href="${backgroundImage}"]`);
+  const existingPreload = document.querySelector(`link[rel="preload"][href="${imageUrl}"]`);
   if (existingPreload) return;
   
   // Create and inject preload link
   const link = document.createElement('link');
   link.rel = 'preload';
   link.as = 'image';
-  link.href = backgroundImage;
+  link.href = imageUrl;
   link.setAttribute('fetchpriority', 'high');
   
   // Add to head

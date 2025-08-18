@@ -60,12 +60,25 @@ export function AboutSectionComponent({ section }: AboutSectionProps) {
           {data.image && (
             <div className="order-first lg:order-last">
               <div className="relative">
-                <img 
-                  src={data.image} 
-                  alt={data.title}
-                  className="w-full h-96 lg:h-[500px] object-cover rounded-2xl shadow-2xl"
-                  loading="lazy"
-                />
+                {typeof data.image === 'string' ? (
+                  <img 
+                    src={data.image} 
+                    alt={data.title}
+                    className="w-full h-96 lg:h-[500px] object-cover rounded-2xl shadow-2xl"
+                    loading="lazy"
+                  />
+                ) : (
+                  <img 
+                    src={data.image.src} 
+                    srcSet={data.image.srcset}
+                    sizes={data.image.sizes}
+                    alt={data.image.alt || data.title}
+                    width={data.image.width}
+                    height={data.image.height}
+                    className="w-full h-96 lg:h-[500px] object-cover rounded-2xl shadow-2xl"
+                    loading="lazy"
+                  />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl" />
               </div>
             </div>

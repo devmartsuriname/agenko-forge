@@ -16,16 +16,30 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
       {data.backgroundImage && (
         <div className="absolute inset-0">
           <div className="w-full h-full aspect-[16/9] sm:aspect-[21/9] lg:aspect-[32/9]">
-            <ResponsiveImage
-              src={data.backgroundImage}
-              alt="Hero background"
-              className="w-full h-full object-cover"
-              priority={true}
-              aspectRatio="var(--hero-aspect-ratio, 16 / 9)"
-              sizes="100vw"
-              loading="eager"
-              fetchPriority="high"
-            />
+            {typeof data.backgroundImage === 'string' ? (
+              <ResponsiveImage
+                src={data.backgroundImage}
+                alt="Hero background"
+                className="w-full h-full object-cover"
+                priority={true}
+                aspectRatio="var(--hero-aspect-ratio, 16 / 9)"
+                sizes="100vw"
+                loading="eager"
+                fetchPriority="high"
+              />
+            ) : (
+              <img
+                src={data.backgroundImage.src}
+                srcSet={data.backgroundImage.srcset}
+                sizes={data.backgroundImage.sizes}
+                alt={data.backgroundImage.alt || "Hero background"}
+                width={data.backgroundImage.width}
+                height={data.backgroundImage.height}
+                className="w-full h-full object-cover"
+                loading="eager"
+                fetchPriority="high"
+              />
+            )}
           </div>
           <div className="absolute inset-0 bg-black/60" />
         </div>
