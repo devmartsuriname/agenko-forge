@@ -51,7 +51,7 @@ function AdminMedia() {
   // Pagination and filters
   const [currentPage, setCurrentPage] = useState(0);
   const [filter, setFilter] = useState<'all' | 'referenced' | 'unreferenced'>('all');
-  const [folderFilter, setFolderFilter] = useState<string>('');
+  const [folderFilter, setFolderFilter] = useState<string>('all-folders');
   const [searchQuery, setSearchQuery] = useState('');
   
   // Deletion state
@@ -85,7 +85,7 @@ function AdminMedia() {
         page: currentPage,
         limit: 20,
         filter,
-        folder: folderFilter || undefined
+        folder: folderFilter === 'all-folders' ? undefined : folderFilter || undefined
       });
       
       // Apply client-side search if needed
@@ -337,7 +337,7 @@ function AdminMedia() {
                   <SelectValue placeholder="All Folders" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Folders</SelectItem>
+                  <SelectItem value="all-folders">All Folders</SelectItem>
                   {getFolderOptions().map(folder => (
                     <SelectItem key={folder} value={folder}>{folder}</SelectItem>
                   ))}
