@@ -6,7 +6,6 @@ import { SEOHead } from '@/lib/seo';
 import { useAuth } from '@/lib/auth';
 import { FileText, Briefcase, FolderOpen, PenTool, MessageSquare } from 'lucide-react';
 import { format } from 'date-fns';
-import { UpdateHomepageImage } from '@/components/admin/UpdateHomepageImage';
 
 interface DashboardStats {
   services: number;
@@ -181,9 +180,6 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
         </div>
-
-        {/* Homepage Image Update Tool */}
-        {isEditor && <UpdateHomepageImage />}
 
         {/* Recent Activity */}
         {isEditor && (
