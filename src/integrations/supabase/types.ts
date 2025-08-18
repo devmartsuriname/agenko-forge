@@ -450,6 +450,125 @@ export type Database = {
         }
         Relationships: []
       }
+      quote_activities: {
+        Row: {
+          activity_type: string
+          created_at: string
+          id: string
+          new_value: string | null
+          notes: string | null
+          old_value: string | null
+          quote_id: string
+          user_id: string | null
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string
+          id?: string
+          new_value?: string | null
+          notes?: string | null
+          old_value?: string | null
+          quote_id: string
+          user_id?: string | null
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          id?: string
+          new_value?: string | null
+          notes?: string | null
+          old_value?: string | null
+          quote_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_activities_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quotes: {
+        Row: {
+          additional_requirements: string | null
+          admin_notes: string | null
+          assigned_to: string | null
+          budget_range: string
+          company: string | null
+          created_at: string
+          email: string
+          estimated_cost: number | null
+          id: string
+          ip_address: string | null
+          name: string
+          phone: string | null
+          priority: string
+          project_scope: string
+          quote_expires_at: string | null
+          quoted_at: string | null
+          referrer: string | null
+          service_type: string
+          status: string
+          timeline: string
+          updated_at: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          additional_requirements?: string | null
+          admin_notes?: string | null
+          assigned_to?: string | null
+          budget_range: string
+          company?: string | null
+          created_at?: string
+          email: string
+          estimated_cost?: number | null
+          id?: string
+          ip_address?: string | null
+          name: string
+          phone?: string | null
+          priority?: string
+          project_scope: string
+          quote_expires_at?: string | null
+          quoted_at?: string | null
+          referrer?: string | null
+          service_type: string
+          status?: string
+          timeline: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          additional_requirements?: string | null
+          admin_notes?: string | null
+          assigned_to?: string | null
+          budget_range?: string
+          company?: string | null
+          created_at?: string
+          email?: string
+          estimated_cost?: number | null
+          id?: string
+          ip_address?: string | null
+          name?: string
+          phone?: string | null
+          priority?: string
+          project_scope?: string
+          quote_expires_at?: string | null
+          quoted_at?: string | null
+          referrer?: string | null
+          service_type?: string
+          status?: string
+          timeline?: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       services: {
         Row: {
           content: Json | null
