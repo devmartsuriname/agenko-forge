@@ -44,6 +44,7 @@ const AdminMedia = lazy(() => import("./pages/admin/AdminMedia"));
 const ContactSubmissions = lazy(() => import("./pages/admin/ContactSubmissions"));
 const Settings = lazy(() => import("./pages/admin/Settings"));
 const Users = lazy(() => import("./pages/admin/Users"));
+const AdminPayments = lazy(() => import("./pages/admin/AdminPayments"));
 
 const queryClient = new QueryClient();
 
