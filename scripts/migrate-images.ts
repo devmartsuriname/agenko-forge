@@ -1,397 +1,345 @@
-import { createClient } from "@supabase/supabase-js";
-import sharp from "sharp";
-import { readFileSync } from "fs";
-import { resolve } from "path";
+/*
+  scripts/migrate-images.ts
+  -------------------------
+  Bulk-migrate external images to your storage with responsive WebP variants.
+  Provider-agnostic (Supabase Storage or S3-compatible). Idempotent.
+*/
 
-const url = process.env.SUPABASE_URL!;
-const service = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supa = createClient(url, service);
+import 'dotenv/config';
+import crypto from 'node:crypto';
+import path from 'node:path';
+import sharp from 'sharp';
+import { Client as Pg } from 'pg';
+import { createClient as createSupabase } from '@supabase/supabase-js';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
-// WebP quality and responsive variants configuration
-const WEBP_QUALITY = 80;
-const VARIANTS = [
-  { width: 1200, height: 675 }, // 16:9
-  { width: 960, height: 540 },
-  { width: 640, height: 360 },
-  { width: 320, height: 180 }
-];
+// ------------------ Config ------------------
+const PROVIDER = (process.env.STORAGE_PROVIDER || 'SUPABASE').toUpperCase();
+const BUCKET = process.env.MEDIA_BUCKET || 'media';
+const IMAGE_QUALITY = Number(process.env.IMAGE_QUALITY || 80);
 
-interface ImageVariant {
-  width: number;
-  url: string;
+const VARIANTS = [1200, 960, 640, 320] as const; // widths (16:9 → height computed)
+const aspect = { w: 16, h: 9 };
+
+// ------------------ Helpers ------------------
+const hash = (s: string) => crypto.createHash('sha1').update(s).digest('hex').slice(0, 8);
+const isExternal = (url?: string | null) => !!url && !/\.(supabase|amazonaws|cloudfront|your-domain)\./i.test(url);
+
+function baseNameFromUrl(u: string, fallback: string) {
+  try { return path.parse(new URL(u).pathname).name || fallback; } catch { return fallback; }
 }
 
-async function fetchAsArrayBuffer(remoteUrl: string): Promise<ArrayBuffer> {
-  try {
-    const res = await fetch(remoteUrl);
-    if (!res.ok) throw new Error(`Fetch failed: ${remoteUrl} - ${res.status}`);
-    return await res.arrayBuffer();
-  } catch (error) {
-    console.error(`Failed to fetch ${remoteUrl}:`, error);
-    throw error;
+async function download(url: string): Promise<Buffer> {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Download failed ${res.status}: ${url}`);
+  return Buffer.from(await res.arrayBuffer());
+}
+
+async function makeVariants(buf: Buffer) {
+  // Force 16:9 letterboxed if needed; output webp in widths
+  const out: Record<number, Buffer> = {};
+  for (const w of VARIANTS) {
+    const h = Math.round((w * aspect.h) / aspect.w);
+    out[w] = await sharp(buf)
+      .resize({ width: w, height: h, fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .webp({ quality: IMAGE_QUALITY })
+      .toBuffer();
   }
+  return out;
 }
 
-function generateFilePath(kind: "projects" | "blog" | "sections", slug: string, basename: string, width: number): string {
-  return `media/${kind}/${slug}/${basename}-${width}.webp`.toLowerCase();
+// ------------------ Storage Adapters ------------------
+interface UploadedRefs { src: string; srcset: string; sizes: string; key1200: string }
+interface StorageAdapter {
+  putObject(key: string, body: Buffer, contentType: string, cacheControl?: string): Promise<string>; // returns public URL
+  publicUrl(key: string): string;
 }
 
-function generateSrcSet(baseUrl: string, basename: string, variants: ImageVariant[]): string {
-  return variants
-    .map(variant => `${baseUrl.replace('-1200.webp', `-${variant.width}.webp`)} ${variant.width}w`)
-    .join(', ');
-}
-
-async function processImageToWebP(buffer: ArrayBuffer, width: number, height: number): Promise<Buffer> {
-  return await sharp(Buffer.from(buffer))
-    .resize(width, height, { fit: 'cover', position: 'center' })
-    .webp({ quality: WEBP_QUALITY })
-    .toBuffer();
-}
-
-async function uploadImageVariants(
-  kind: "projects" | "blog" | "sections", 
-  slug: string, 
-  srcUrl: string, 
-  basename: string = "image"
-): Promise<{ largestUrl: string; srcset: string; variants: ImageVariant[] }> {
-  
-  console.log(`Processing ${srcUrl} for ${kind}/${slug}...`);
-  
-  // Fetch original image
-  const originalBuffer = await fetchAsArrayBuffer(srcUrl);
-  const variants: ImageVariant[] = [];
-  
-  // Process each variant
-  for (const { width, height } of VARIANTS) {
-    const filename = `${basename}-${width}.webp`;
-    const path = generateFilePath(kind, slug, basename, width);
-    
-    // Check if already exists
-    const { data: exists, error: listError } = await supa.storage
-      .from("media")
-      .list(`${kind}/${slug}`, { search: filename });
-    
-    if (listError) {
-      console.warn(`Error checking existing files: ${listError.message}`);
-    }
-
-    let publicUrl: string;
-    
-    if ((exists || []).some(f => f.name === filename)) {
-      console.log(`  ⏭️  File exists: ${path}`);
-      publicUrl = supa.storage.from("media").getPublicUrl(path).data.publicUrl;
-    } else {
-      // Process and upload
-      console.log(`  🔄 Converting to WebP ${width}x${height}...`);
-      const webpBuffer = await processImageToWebP(originalBuffer, width, height);
-      
-      const { error: upErr } = await supa.storage.from("media").upload(path, webpBuffer, {
-        cacheControl: "31536000", // 1 year cache
-        upsert: false,
-        contentType: "image/webp"
-      });
-      
-      if (upErr) {
-        console.error(`Upload error for ${path}:`, upErr);
-        throw upErr;
-      }
-      
-      publicUrl = supa.storage.from("media").getPublicUrl(path).data.publicUrl;
-      console.log(`  ✅ Uploaded: ${filename}`);
-    }
-    
-    variants.push({ width, url: publicUrl });
-  }
-  
-  // Return largest (1200w) as primary URL
-  const largestUrl = variants[0].url; // First variant is 1200w
-  const srcset = generateSrcSet(largestUrl, basename, variants);
-  
-  return { largestUrl, srcset, variants };
-}
-
-async function migrateProjectImages() {
-  console.log("🔄 Migrating project images to WebP with responsive variants...");
-  
-  const { data: projects, error: pErr } = await supa
-    .from("projects")
-    .select(`
-      id, 
-      slug, 
-      project_images(
-        id,
-        url,
-        sort_order,
-        alt
-      )
-    `);
-    
-  if (pErr) {
-    console.error("Error fetching projects:", pErr);
-    throw pErr;
-  }
-
-  for (const project of projects || []) {
-    console.log(`\n📁 Processing project: ${project.slug}`);
-    
-    for (const img of (project as any).project_images || []) {
-      // Skip if already migrated (contains webp and storage URL)
-      if (!img.url || (/storage\/v1\/object\/public\/media/i.test(img.url) && img.url.includes('.webp'))) {
-        console.log(`  ⏭️  Already migrated: ${img.url}`);
-        continue;
-      }
-
-      try {
-        const basename = `image-${img.sort_order || 1}`;
-        const { largestUrl, srcset } = await uploadImageVariants("projects", project.slug, img.url, basename);
-        
-        // Update database with new URL and srcset info
-        const { error: uErr } = await supa
-          .from("project_images")
-          .update({ 
-            url: largestUrl,
-            // Store srcset in alt field temporarily, or add new column
-            alt: img.alt || `Project image ${img.sort_order || 1}`
-          })
-          .eq("id", img.id);
-          
-        if (uErr) {
-          console.error(`Error updating image record ${img.id}:`, uErr);
-          throw uErr;
-        }
-        
-        console.log(`  ✅ Updated image ${img.id} with WebP variants`);
-      } catch (error) {
-        console.error(`  ❌ Failed to migrate image ${img.id}:`, error);
-        // Continue with next image
-      }
-    }
-  }
-}
-
-async function migrateBlogImages() {
-  console.log("\n🔄 Migrating blog images...");
-  
-  const { data: blogPosts, error: bErr } = await supa
-    .from("blog_posts")
-    .select("id, slug, body")
-    .eq("status", "published");
-    
-  if (bErr) {
-    console.error("Error fetching blog posts:", bErr);
-    return;
-  }
-
-  for (const post of blogPosts || []) {
-    console.log(`\n📝 Processing blog post: ${post.slug}`);
-    
-    // Extract hero image from body if it exists
-    if (post.body && typeof post.body === 'object' && post.body.blocks) {
-      let bodyUpdated = false;
-      const updatedBlocks = [];
-      
-      for (const block of post.body.blocks) {
-        if (block.type === 'hero' && block.data?.backgroundImage) {
-          const heroImage = block.data.backgroundImage;
-          const imageUrl = typeof heroImage === 'string' ? heroImage : heroImage.src;
-          
-          // Skip if already migrated
-          if (imageUrl.includes('storage/v1/object/public/media') && imageUrl.includes('.webp')) {
-            updatedBlocks.push(block);
-            continue;
-          }
-          
-          try {
-            const basename = 'hero';
-            const { largestUrl, srcset } = await uploadImageVariants("blog", post.slug, imageUrl, basename);
-            
-            // Update the block with new image data
-            const updatedBlock = {
-              ...block,
-              data: {
-                ...block.data,
-                backgroundImage: {
-                  src: largestUrl,
-                  srcset: srcset,
-                  sizes: "100vw",
-                  alt: block.data.backgroundImage?.alt || "Blog hero image",
-                  width: 1200,
-                  height: 675
-                }
-              }
-            };
-            
-            updatedBlocks.push(updatedBlock);
-            bodyUpdated = true;
-            console.log(`  ✅ Updated hero image in block`);
-          } catch (error) {
-            console.error(`  ❌ Failed to migrate hero image:`, error);
-            updatedBlocks.push(block);
-          }
-        } else {
-          updatedBlocks.push(block);
-        }
-      }
-      
-      // Update blog post if any images were migrated
-      if (bodyUpdated) {
-        const { error: updateErr } = await supa
-          .from("blog_posts")
-          .update({ body: { ...post.body, blocks: updatedBlocks } })
-          .eq("id", post.id);
-          
-        if (updateErr) {
-          console.error(`Error updating blog post ${post.id}:`, updateErr);
-        } else {
-          console.log(`  ✅ Updated blog post body with WebP images`);
-        }
-      }
-    }
-  }
-}
-
-async function ensureMediaBucket() {
-  console.log("📦 Checking media bucket...");
-  
-  const { data: buckets, error: bucketError } = await supa.storage.listBuckets();
-  if (bucketError) throw bucketError;
-  
-  const mediaBucket = buckets?.find(b => b.id === 'media');
-  if (!mediaBucket) {
-    console.log("📦 Creating media bucket...");
-    const { error: createError } = await supa.storage.createBucket('media', { 
-      public: true,
-      allowedMimeTypes: ['image/webp', 'image/jpeg', 'image/png'],
-      fileSizeLimit: 10485760 // 10MB
+class SupabaseStorage implements StorageAdapter {
+  private sb = createSupabase(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+  async putObject(key: string, body: Buffer, contentType: string, cacheControl = 'public, max-age=31536000, immutable') {
+    const { error } = await this.sb.storage.from(BUCKET).upload(key, body, {
+      upsert: true,
+      contentType,
+      cacheControl,
     });
-    if (createError) throw createError;
-    console.log("✅ Media bucket created");
-  } else {
-    console.log("✅ Media bucket exists");
+    if (error) throw error;
+    return this.publicUrl(key);
+  }
+  publicUrl(key: string) {
+    const { data } = this.sb.storage.from(BUCKET).getPublicUrl(key);
+    return data.publicUrl;
   }
 }
 
-async function migratePageSectionImages() {
-  console.log("\n🔄 Migrating page section images...");
+class S3Storage implements StorageAdapter {
+  private s3 = new S3Client({
+    region: process.env.S3_REGION,
+    endpoint: process.env.S3_ENDPOINT,
+    forcePathStyle: true,
+    credentials: {
+      accessKeyId: process.env.S3_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
+    },
+  });
+  async putObject(key: string, body: Buffer, contentType: string, cacheControl = 'public, max-age=31536000, immutable') {
+    await this.s3.send(new PutObjectCommand({
+      Bucket: process.env.S3_BUCKET!,
+      Key: key,
+      Body: body,
+      ContentType: contentType,
+      ACL: 'public-read',
+      CacheControl: cacheControl,
+    }));
+    return this.publicUrl(key);
+  }
+  publicUrl(key: string) {
+    const base = (process.env.S3_PUBLIC_BASE_URL || '').replace(/\/$/, '');
+    if (!base) throw new Error('S3_PUBLIC_BASE_URL required for public URL construction');
+    return `${base}/${key}`;
+  }
+}
+
+function storage(): StorageAdapter {
+  return PROVIDER === 'S3' ? new S3Storage() : new SupabaseStorage();
+}
+
+// ------------------ DB Adapter (PG direct) ------------------
+class Db {
+  private pg: Pg;
   
-  const { data: pages, error: pErr } = await supa
-    .from("pages")
-    .select("id, slug, body")
-    .eq("status", "published");
-    
-  if (pErr) {
-    console.error("Error fetching pages:", pErr);
-    return;
+  constructor() {
+    // Use existing Supabase URL for database connection if no DATABASE_URL provided
+    const dbUrl = process.env.DATABASE_URL || 
+      `postgresql://postgres.dvgubqqjvmsepkilnkak:${process.env.SUPABASE_SERVICE_ROLE_KEY?.split('.')[1] || '[key]'}@aws-0-us-east-1.pooler.supabase.com:6543/postgres`;
+    this.pg = new Pg({ 
+      connectionString: dbUrl,
+      ssl: { rejectUnauthorized: false }
+    });
+  }
+  
+  async init() { await this.pg.connect(); }
+  async end() { await this.pg.end(); }
+
+  // Projects
+  async getProjectImagesExternal() {
+    const q = `
+      SELECT pi.id, pi.url, p.slug as project_slug
+      FROM project_images pi
+      JOIN projects p ON p.id = pi.project_id
+      WHERE pi.url IS NOT NULL AND pi.url <> ''
+      AND pi.url NOT ILIKE '%/storage/v1/object/public/%' -- supabase public
+      AND pi.url NOT ILIKE '%${BUCKET}%' -- quick heuristic
+    `;
+    const { rows } = await this.pg.query(q);
+    return rows as { id: string; url: string; project_slug: string }[];
+  }
+  async updateProjectImageUrl(id: string, url: string) {
+    await this.pg.query('UPDATE project_images SET url = $1 WHERE id = $2', [url, id]);
   }
 
-  for (const page of pages || []) {
-    console.log(`\n📄 Processing page: ${page.slug}`);
-    
-    if (page.body && typeof page.body === 'object' && page.body.blocks) {
-      let bodyUpdated = false;
-      const updatedBlocks = [];
+  // Blog
+  async getBlogHeroesExternal() {
+    const q = `
+      SELECT id, slug, body
+      FROM blog_posts
+      WHERE body IS NOT NULL
+      AND status = 'published'
+    `;
+    const { rows } = await this.pg.query(q);
+    return rows as { id: string; slug: string; body: any }[];
+  }
+  async updateBlogBody(id: string, body: any) {
+    await this.pg.query('UPDATE blog_posts SET body = $1 WHERE id = $2', [JSON.stringify(body), id]);
+  }
+
+  // Pages (sections)
+  async getPagesWithBody() {
+    const { rows } = await this.pg.query(`SELECT id, slug, body FROM pages WHERE body IS NOT NULL`);
+    return rows as { id: string; slug: string; body: any }[];
+  }
+  async updatePageBody(id: string, body: any) {
+    await this.pg.query('UPDATE pages SET body = $1 WHERE id = $2', [JSON.stringify(body), id]);
+  }
+}
+
+// ------------------ Migration core ------------------
+function srcsetFor(basePath: string, keyBase: string, makeUrl: (k: string) => string) {
+  const entries = VARIANTS.map((w) => `${makeUrl(`${basePath}/${keyBase}-${w}.webp`)} ${w}w`);
+  return entries.join(', ');
+}
+
+async function uploadAll(imgBuf: Buffer, basePath: string, keyBase: string, st: StorageAdapter) {
+  const variants = await makeVariants(imgBuf);
+  let src1200 = '';
+  for (const w of VARIANTS) {
+    const key = `${basePath}/${keyBase}-${w}.webp`;
+    const url = await st.putObject(key, variants[w], 'image/webp');
+    if (w === 1200) src1200 = url;
+  }
+  const srcset = srcsetFor(basePath, keyBase, (k) => st.publicUrl(k));
+  return { 
+    src: src1200, 
+    srcset, 
+    sizes: "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw", 
+    key1200: `${basePath}/${keyBase}-1200.webp` 
+  } as UploadedRefs;
+}
+
+function rewriteIfExternal(u?: string | null) {
+  return !!u && isExternal(u) ? u : null;
+}
+
+// Handle blog post images in structured content
+async function migrateBlogImages(slug: string, body: any, st: StorageAdapter) {
+  if (!body || !body.blocks || !Array.isArray(body.blocks)) return body;
+  
+  let changed = false;
+  const updatedBlocks = await Promise.all(body.blocks.map(async (block: any) => {
+    if (block.type === 'hero' && block.data?.backgroundImage) {
+      const imageData = block.data.backgroundImage;
+      const imageUrl = typeof imageData === 'string' ? imageData : imageData.src;
       
-      for (const block of page.body.blocks) {
-        let updatedBlock = { ...block };
-        
-        // Handle different section types with images
-        if (block.type === 'hero' && block.data?.backgroundImage) {
-          const result = await migrateBlockImage(block, 'hero', page.slug || 'home');
-          if (result.updated) {
-            updatedBlock = result.block;
-            bodyUpdated = true;
-          }
-        } else if (block.type === 'about' && block.data?.image) {
-          const result = await migrateBlockImage(block, 'about', page.slug || 'home', 'image');
-          if (result.updated) {
-            updatedBlock = result.block;
-            bodyUpdated = true;
-          }
-        }
-        
-        updatedBlocks.push(updatedBlock);
-      }
-      
-      // Update page if any images were migrated
-      if (bodyUpdated) {
-        const { error: updateErr } = await supa
-          .from("pages")
-          .update({ body: { ...page.body, blocks: updatedBlocks } })
-          .eq("id", page.id);
+      if (isExternal(imageUrl)) {
+        try {
+          const buf = await download(imageUrl);
+          const basePath = `blog/${slug}`;
+          const base = `hero-${hash(imageUrl)}`;
+          const { src, srcset } = await uploadAll(buf, basePath, base, st);
           
-        if (updateErr) {
-          console.error(`Error updating page ${page.id}:`, updateErr);
-        } else {
-          console.log(`  ✅ Updated page body with WebP images`);
+          block.data.backgroundImage = {
+            src,
+            srcset,
+            sizes: "100vw",
+            alt: imageData?.alt || "Blog hero image",
+            width: 1200,
+            height: 675
+          };
+          changed = true;
+        } catch (e) {
+          console.error(`Failed to migrate blog hero image: ${e}`);
         }
       }
     }
-  }
+    return block;
+  }));
+  
+  return changed ? { ...body, blocks: updatedBlocks } : body;
 }
 
-async function migrateBlockImage(block: any, sectionType: string, pageSlug: string, imageField: string = 'backgroundImage') {
-  const imageData = block.data?.[imageField];
-  if (!imageData) return { updated: false, block };
+// Traverse limited, known sections only
+async function migrateSectionsImages(pageSlug: string, body: any, st: StorageAdapter) {
+  if (!body || !body.blocks || !Array.isArray(body.blocks)) return body;
   
-  const imageUrl = typeof imageData === 'string' ? imageData : imageData.src;
-  
-  // Skip if already migrated
-  if (imageUrl.includes('storage/v1/object/public/media') && imageUrl.includes('.webp')) {
-    return { updated: false, block };
-  }
-  
-  try {
-    const basename = sectionType;
-    const { largestUrl, srcset } = await uploadImageVariants("sections", `${pageSlug}/${sectionType}`, imageUrl, basename);
-    
-    // Update the block with new image data
-    const updatedBlock = {
-      ...block,
-      data: {
-        ...block.data,
-        [imageField]: {
-          src: largestUrl,
-          srcset: srcset,
-          sizes: sectionType === 'hero' ? "100vw" : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw",
-          alt: imageData?.alt || `${sectionType} image`,
+  let changed = false;
+  const updatedBlocks = await Promise.all(body.blocks.map(async (sec: any) => {
+    const type = sec?.type;
+    const secBase = `sections/${pageSlug}/${type || 'section'}`;
+
+    const rewriteField = async (field: string, sizesHint?: string) => {
+      const v = sec.data?.[field];
+      // supports string URL or { src, srcset }
+      const url = typeof v === 'string' ? v : v?.src;
+      const ext = rewriteIfExternal(url);
+      if (!ext) return;
+      
+      try {
+        const buf = await download(ext);
+        const base = `${type}-${hash(ext)}`;
+        const { src, srcset } = await uploadAll(buf, secBase, base, st);
+        sec.data = sec.data || {};
+        sec.data[field] = { 
+          src, 
+          srcset, 
+          sizes: sizesHint || sec.data[field]?.sizes || '100vw',
+          alt: sec.data[field]?.alt || `${type} image`,
           width: 1200,
           height: 675
-        }
+        };
+        changed = true;
+      } catch (e) {
+        console.error(`Failed to migrate ${field} in ${type} section: ${e}`);
       }
     };
-    
-    console.log(`  ✅ Updated ${sectionType} image`);
-    return { updated: true, block: updatedBlock };
-  } catch (error) {
-    console.error(`  ❌ Failed to migrate ${sectionType} image:`, error);
-    return { updated: false, block };
-  }
+
+    if (['hero', 'about', 'cta'].includes(type)) {
+      await rewriteField('backgroundImage', '100vw');
+      await rewriteField('image', '100vw');
+    }
+    if (['servicesPreview', 'blogPreview', 'portfolioPreview'].includes(type)) {
+      await rewriteField('image'); // cards image (if present)
+    }
+
+    return sec;
+  }));
+  
+  return changed ? { ...body, blocks: updatedBlocks } : body;
 }
 
 async function main() {
+  console.log(`→ Phase 5E Migration start (provider=${PROVIDER})`);
+  const st = storage();
+  const db = new Db();
+  await db.init();
+
   try {
-    console.log("🚀 Starting Phase 5E: Complete Image Migration to WebP + Responsive");
-    
-    await ensureMediaBucket();
-    await migrateProjectImages();
-    await migrateBlogImages();
-    await migratePageSectionImages();
-    
-    console.log("\n✅ Phase 5E migration completed successfully!");
-    console.log("📊 All images converted to WebP with responsive variants (320w, 640w, 960w, 1200w)");
-    console.log("🎯 Components now use proper srcset/sizes for optimal loading");
-    console.log("📱 Added preconnect to storage origin for faster DNS resolution");
-    
-  } catch (error) {
-    console.error("\n❌ Migration failed:", error);
-    process.exit(1);
+    // 1) Project gallery images
+    const projImgs = await db.getProjectImagesExternal();
+    console.log(`Projects: ${projImgs.length} external images to migrate`);
+    for (const row of projImgs) {
+      try {
+        const buf = await download(row.url);
+        const basePath = `projects/${row.project_slug}`;
+        const base = `${row.project_slug}-${hash(row.url)}`;
+        const { src } = await uploadAll(buf, basePath, base, st);
+        await db.updateProjectImageUrl(row.id, src);
+        console.log(`✓ project_images ${row.id} → ${src}`);
+      } catch (e) {
+        console.error(`✗ project_images ${row.id}:`, e);
+      }
+    }
+
+    // 2) Blog images (from structured content)
+    const blogPosts = await db.getBlogHeroesExternal();
+    console.log(`Blog: ${blogPosts.length} posts to scan for images`);
+    for (const row of blogPosts) {
+      try {
+        const newBody = await migrateBlogImages(row.slug, row.body, st);
+        if (newBody !== row.body) {
+          await db.updateBlogBody(row.id, newBody);
+          console.log(`✓ blog_posts ${row.id} (${row.slug}) updated`);
+        }
+      } catch (e) {
+        console.error(`✗ blog_posts ${row.id} (${row.slug}):`, e);
+      }
+    }
+
+    // 3) Pages sections images
+    const pages = await db.getPagesWithBody();
+    console.log(`Pages: scanning ${pages.length} pages for section images`);
+    for (const p of pages) {
+      try {
+        const newBody = await migrateSectionsImages(p.slug || 'page', p.body, st);
+        if (newBody !== p.body) {
+          await db.updatePageBody(p.id, newBody);
+          console.log(`✓ pages ${p.id} (${p.slug}) updated`);
+        }
+      } catch (e) {
+        console.error(`✗ pages ${p.id} (${p.slug}):`, e);
+      }
+    }
+
+  } finally {
+    await db.end();
   }
+  
+  console.log('✔ Phase 5E Migration complete');
 }
 
-// Only run if called directly
-if (require.main === module) {
-  main();
-}
+main().catch((e) => { 
+  console.error('Migration failed:', e); 
+  process.exit(1); 
+});
 
+// Export for potential programmatic use
 export { main as migrateImages };
