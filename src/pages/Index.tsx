@@ -21,13 +21,40 @@ const Index = () => {
 
   // Parse sections with error handling (moved before hooks)
   let sections = [];
+  let parseError = null;
+  
   try {
     if (homePage?.body?.sections) {
       const parsedBody = PageBodySchema.parse(homePage.body);
       sections = parsedBody.sections;
+      console.log('Successfully parsed sections:', sections.length);
+    } else if (homePage?.body?.content !== undefined) {
+      // Handle case where body has 'content' instead of 'sections' - likely from wrong editor
+      console.warn('Home page has content instead of sections - needs to be re-edited with sections editor');
+      console.warn('Current body structure:', Object.keys(homePage?.body || {}));
+      
+      // Provide a basic fallback hero section if content exists but no sections
+      if (homePage.body.content === "") {
+        console.log('Creating fallback hero section since content is empty');
+        sections = [{
+          id: 'fallback-hero',
+          type: 'hero',
+          data: {
+            title: 'Welcome to Devmart',
+            subtitle: 'Technology Solutions',
+            description: 'Please re-edit the homepage sections in the admin to restore full content.',
+            ctaText: 'Go to Admin',
+            ctaLink: '/admin/pages'
+          }
+        }];
+      }
+    } else {
+      console.warn('No sections found in home page body:', homePage?.body);
+      console.warn('Expected body.sections but got:', Object.keys(homePage?.body || {}));
     }
-  } catch (parseError) {
-    console.error('Error parsing page sections:', parseError);
+  } catch (error) {
+    console.error('Error parsing page sections:', error);
+    parseError = error;
   }
 
   // Inject hero preload when sections are available (moved to top level)
@@ -95,9 +122,27 @@ const Index = () => {
         <Navigation />
         <div className="pt-16 container mx-auto px-4 py-8 text-center">
           <h1 className="text-3xl font-bold text-foreground mb-4">Welcome to Devmart</h1>
-          <p className="text-muted-foreground">
-            Page sections are being configured...
-          </p>
+          <div className="space-y-4">
+            <p className="text-muted-foreground">
+              Page sections are being configured...
+            </p>
+            {parseError && (
+              <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 max-w-2xl mx-auto">
+                <p className="text-sm text-destructive font-medium mb-2">Debug Info:</p>
+                <p className="text-xs text-destructive/80">
+                  {parseError instanceof Error ? parseError.message : 'Unknown error parsing sections'}
+                </p>
+                {homePage?.body && (
+                  <details className="mt-2">
+                    <summary className="text-xs cursor-pointer">Page Body Structure</summary>
+                    <pre className="text-xs mt-1 text-left whitespace-pre-wrap break-all">
+                      {JSON.stringify(homePage.body, null, 2)}
+                    </pre>
+                  </details>
+                )}
+              </div>
+            )}
+          </div>
         </div>
         <Footer />
       </div>
