@@ -450,6 +450,202 @@ export type Database = {
         }
         Relationships: []
       }
+      proposal_events: {
+        Row: {
+          created_at: string
+          details: Json | null
+          event_type: string
+          id: string
+          ip_address: string | null
+          proposal_id: string
+          user_agent: string | null
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          details?: Json | null
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          proposal_id: string
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          details?: Json | null
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          proposal_id?: string
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposal_events_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      proposal_recipients: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string | null
+          proposal_id: string
+          role: string | null
+          token: string
+          viewed_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          name?: string | null
+          proposal_id: string
+          role?: string | null
+          token: string
+          viewed_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string | null
+          proposal_id?: string
+          role?: string | null
+          token?: string
+          viewed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposal_recipients_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      proposal_templates: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          name: string
+          subject: string
+          updated_at: string
+          variables: Json | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          subject: string
+          updated_at?: string
+          variables?: Json | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          subject?: string
+          updated_at?: string
+          variables?: Json | null
+        }
+        Relationships: []
+      }
+      proposals: {
+        Row: {
+          accepted_at: string | null
+          content: string
+          created_at: string
+          created_by: string | null
+          currency: string | null
+          expires_at: string | null
+          id: string
+          quote_id: string | null
+          rejected_at: string | null
+          rejection_reason: string | null
+          sent_at: string | null
+          status: string
+          subject: string
+          template_id: string | null
+          title: string
+          total_amount: number | null
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          content: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          expires_at?: string | null
+          id?: string
+          quote_id?: string | null
+          rejected_at?: string | null
+          rejection_reason?: string | null
+          sent_at?: string | null
+          status?: string
+          subject: string
+          template_id?: string | null
+          title: string
+          total_amount?: number | null
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          expires_at?: string | null
+          id?: string
+          quote_id?: string | null
+          rejected_at?: string | null
+          rejection_reason?: string | null
+          sent_at?: string | null
+          status?: string
+          subject?: string
+          template_id?: string | null
+          title?: string
+          total_amount?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposals_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "proposals_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "proposal_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quote_activities: {
         Row: {
           activity_type: string
@@ -661,6 +857,10 @@ export type Database = {
       cleanup_old_logs: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      generate_proposal_token: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
