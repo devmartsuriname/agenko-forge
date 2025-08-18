@@ -159,15 +159,17 @@ export function SectionEditor({
             />
           </div>
           
-          <div className="space-y-2">
-            <Label htmlFor="about-image">Image URL</Label>
+          <div className="space-y-2 border-l-4 border-primary pl-4">
+            <Label htmlFor="about-image" className="text-base font-semibold">Image URL (Optional)</Label>
             <Input
               id="about-image"
               value={(section.data as any).image || ''}
               onChange={(e) => updateSectionData({ image: e.target.value })}
               placeholder="https://example.com/about-image.jpg"
               type="url"
+              className="border-primary/20"
             />
+            <p className="text-xs text-muted-foreground">Add an image to display alongside the about content</p>
           </div>
         </div>
 
@@ -981,7 +983,7 @@ export function SectionEditor({
       </CardHeader>
       
       {isExpanded && (
-        <CardContent>
+        <CardContent className="max-h-none overflow-visible">
           {renderEditor()}
         </CardContent>
       )}
