@@ -278,6 +278,217 @@ export const adminCms = {
     return data || [];
   },
 
+  // Media Library Management
+  async getAllMediaFiles(options: {
+    page?: number;
+    limit?: number;
+    filter?: 'all' | 'referenced' | 'unreferenced';
+    folder?: string;
+  } = {}): Promise<{
+    files: Array<{
+      name: string;
+      path: string;
+      size: number;
+      created_at: string;
+      isReferenced: boolean;
+      metadata?: any;
+    }>;
+    totalCount: number;
+    hasMore: boolean;
+  }> {
+    const { page = 0, limit = 20 } = options;
+    
+    // Get all files from storage
+    const { data: storageFiles, error: storageError } = await supabase.storage
+      .from('media')
+      .list('', {
+        limit: 1000,
+        offset: 0,
+        sortBy: { column: 'created_at', order: 'desc' }
+      });
+
+    if (storageError) throw storageError;
+
+    // Recursively collect all files
+    const allFiles: any[] = [];
+    
+    async function collectFiles(prefix = '', files: any[] = storageFiles || []) {
+      for (const file of files) {
+        const fullPath = prefix ? `${prefix}/${file.name}` : file.name;
+        
+        if (file.metadata === null) {
+          // This is a folder, get its contents
+          const { data: subFiles } = await supabase.storage
+            .from('media')
+            .list(fullPath, {
+              limit: 1000,
+              offset: 0,
+              sortBy: { column: 'created_at', order: 'desc' }
+            });
+          
+          if (subFiles) {
+            await collectFiles(fullPath, subFiles);
+          }
+        } else {
+          // This is a file
+          allFiles.push({
+            name: file.name,
+            path: fullPath,
+            size: file.metadata?.size || 0,
+            created_at: file.created_at,
+            metadata: file.metadata
+          });
+        }
+      }
+    }
+
+    await collectFiles();
+
+    // Get referenced files
+    const referencedFiles = await this.getReferencedFiles();
+
+    // Add reference status
+    const filesWithStatus = allFiles.map(file => ({
+      ...file,
+      isReferenced: referencedFiles.has(file.path)
+    }));
+
+    // Apply filters
+    let filteredFiles = filesWithStatus;
+    
+    if (options.filter === 'referenced') {
+      filteredFiles = filesWithStatus.filter(f => f.isReferenced);
+    } else if (options.filter === 'unreferenced') {
+      filteredFiles = filesWithStatus.filter(f => !f.isReferenced);
+    }
+
+    if (options.folder) {
+      filteredFiles = filteredFiles.filter(f => f.path.startsWith(options.folder));
+    }
+
+    // Paginate
+    const startIndex = page * limit;
+    const endIndex = startIndex + limit;
+    const paginatedFiles = filteredFiles.slice(startIndex, endIndex);
+
+    return {
+      files: paginatedFiles,
+      totalCount: filteredFiles.length,
+      hasMore: endIndex < filteredFiles.length
+    };
+  },
+
+  async getReferencedFiles(): Promise<Set<string>> {
+    const referencedFiles = new Set<string>();
+
+    // Check project_images
+    const { data: projectImages } = await supabase
+      .from('project_images')
+      .select('url');
+
+    projectImages?.forEach(img => {
+      if (img.url?.includes('/storage/v1/object/public/media/')) {
+        const path = img.url.split('/storage/v1/object/public/media/')[1];
+        if (path) referencedFiles.add(decodeURIComponent(path));
+      }
+    });
+
+    // Check pages
+    const { data: pages } = await supabase
+      .from('pages')
+      .select('body');
+
+    pages?.forEach(page => {
+      if (page.body && typeof page.body === 'object') {
+        const pageBody = page.body as any;
+        if (pageBody.sections && Array.isArray(pageBody.sections)) {
+          pageBody.sections.forEach((section: any) => {
+            if (section.data) {
+              const checkImageField = (field: any) => {
+                if (typeof field === 'string' && field.includes('/storage/v1/object/public/media/')) {
+                  const path = field.split('/storage/v1/object/public/media/')[1];
+                  if (path) referencedFiles.add(decodeURIComponent(path));
+                } else if (field?.src?.includes('/storage/v1/object/public/media/')) {
+                  const path = field.src.split('/storage/v1/object/public/media/')[1];
+                  if (path) referencedFiles.add(decodeURIComponent(path));
+                }
+              };
+              checkImageField(section.data.image);
+              checkImageField(section.data.backgroundImage);
+            }
+          });
+        }
+      }
+    });
+
+    // Check blog posts (hero_url doesn't exist in current schema, so skip it)
+    const { data: blogPosts } = await supabase
+      .from('blog_posts')
+      .select('body');
+
+    blogPosts?.forEach(post => {
+      if (post.body) {
+        const bodyStr = JSON.stringify(post.body);
+        const mediaMatches = bodyStr.match(/\/storage\/v1\/object\/public\/media\/([^"')\s]+)/g);
+        mediaMatches?.forEach(match => {
+          const path = match.split('/storage/v1/object/public/media/')[1];
+          if (path) referencedFiles.add(decodeURIComponent(path));
+        });
+      }
+    });
+
+    return referencedFiles;
+  },
+
+  async deleteMediaFile(filePath: string): Promise<void> {
+    // Check if file is referenced
+    const referencedFiles = await this.getReferencedFiles();
+    if (referencedFiles.has(filePath)) {
+      throw new Error('Cannot delete referenced file. Remove all references first.');
+    }
+
+    const { error } = await supabase.storage
+      .from('media')
+      .remove([filePath]);
+
+    if (error) throw error;
+  },
+
+  async getLatestOrphanScan(): Promise<{
+    timestamp: string;
+    totalFiles: number;
+    referencedFiles: number;
+    orphanedCount: number;
+    orphanedFiles: string[];
+  } | null> {
+    const { data, error } = await supabase
+      .from('logs_app_events')
+      .select('ts, meta')
+      .eq('area', 'storage-orphan-scan')
+      .order('ts', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (error || !data) return null;
+
+    const meta = data.meta as any;
+    return {
+      timestamp: data.ts,
+      totalFiles: meta?.total_files || 0,
+      referencedFiles: meta?.referenced_files || 0,
+      orphanedCount: meta?.orphaned_count || 0,
+      orphanedFiles: meta?.orphaned_files || []
+    };
+  },
+
+  async triggerOrphanScan(): Promise<void> {
+    const { error } = await supabase.functions.invoke('storage-orphan-scan', {
+      body: { manual_trigger: true }
+    });
+
+    if (error) throw error;
+  },
+
   async getProjectImages(projectId: string): Promise<ProjectImage[]> {
     const { data, error } = await supabase
       .from('project_images')
