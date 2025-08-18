@@ -1,95 +1,47 @@
-# Performance Monitoring
+# Lighthouse Runbook (1-pager)
+**Purpose:** Consistent, repeatable performance measurements for Devmart.
 
-This directory contains Lighthouse performance audit results and monitoring tools for the Devmart project.
+## Prep
+- Use a **production build** locally or a stable staging URL.
+- Close extensions, other tabs, VPNs; clear browser cache.
+- Window size ≈ **1366×768** for desktop runs.
+- Warm the server: open each page once before measuring.
 
-## Structure
+## Pages to test
+`/`, `/services`, `/portfolio`, `/blog`, `/pricing`, `/contact`.
 
-- `*.json` - Lighthouse audit results (auto-generated)
-- `summary.md` - Performance summary report
-- `README.md` - This documentation
+## Desktop (target ≥ 90)
+1. Open Chrome → DevTools → Lighthouse → **Mode: Navigation** → **Device: Desktop**.  
+2. Categories: **Performance, Accessibility, Best Practices, SEO**.  
+3. Run **3 times**, keep the **median**.  
+4. Save each report (HTML or JSON) into `docs/perf/`.
 
-## Running Performance Audits
+## Mobile (target ≥ 80)
+1. Same steps, **Device: Mobile**.  
+2. Network throttling: **Default (Lighthouse)**; CPU throttling: **Default**.  
+3. Run **3 times per page**, keep the **median**.  
+4. Save reports to `docs/perf/`.
 
-### Automated Script (Recommended)
-```bash
-# Start production build
-npm run build && npm run preview
+## Automated (optional)
+If scripts exist (Phase 5C added them), you can run:
+- `npm run perf:home:mobile`  
+- `npm run perf:home:desktop`  
+…and replicate for `/services`, `/portfolio`, `/blog`, `/pricing`, `/contact`.  
+> Do not add or change scripts in this task.
 
-# Run comprehensive audits for all routes
-node scripts/lighthouse-runner.js
-```
+## What to record in `docs/perf/summary.md`
+- A table with **Desktop/Mobile scores** per page.
+- Key metrics: **LCP**, **CLS**, **TBT**.
+- Notes: outstanding issues & regressions vs. previous run.
 
-### Manual Lighthouse Commands
-```bash
-# Individual route audits
-npm run perf:home:desktop
-npm run perf:home:mobile
-npm run perf:services:desktop
-# ... etc
-```
+## Quick fix playbook
+- **High LCP on /**: ensure **dynamic hero preload** is active; compress hero image; set correct `sizes`; avoid render-blocking JS.
+- **CLS > 0.05**: enforce aspect-ratio boxes for hero/carousel/media; avoid layout-affecting animations (use transform/opacity).
+- **TBT high**: code-split heavy routes; remove unused JS; defer non-critical scripts; tighten 3rd-party usage.
 
-### Shell Script (Alternative)
-```bash
-chmod +x scripts/run-lighthouse-audits.sh
-./scripts/run-lighthouse-audits.sh
-```
+## Acceptance
+- Reports saved for all pages (Desktop & Mobile).
+- `summary.md` updated with a scores table and brief next steps.
+- No unexpected code or config changes made during documentation updates.
 
-## Performance Targets
-
-| Metric | Desktop Target | Mobile Target |
-|--------|---------------|---------------|
-| Performance Score | ≥90 | ≥80 |
-| LCP (Largest Contentful Paint) | <2.5s | <4.0s |
-| CLS (Cumulative Layout Shift) | <0.05 | <0.05 |
-| TBT (Total Blocking Time) | <300ms | <600ms |
-
-## Optimizations Implemented
-
-### Hero Section Performance
-- **Dynamic preload**: CMS-driven hero image preloading
-- **Aspect ratios**: Fixed dimensions prevent CLS
-- **Connection awareness**: Respects 2G/reduced-data preferences
-- **Priority loading**: `fetchpriority="high"` and `loading="eager"`
-
-### CLS Prevention
-- CSS custom properties for responsive aspect ratios:
-  - `--hero-aspect-ratio: 16 / 9` (default)
-  - `--hero-aspect-ratio-sm: 21 / 9` (tablet)
-  - `--hero-aspect-ratio-lg: 32 / 9` (desktop)
-- Transform/opacity animations only (no layout changes)
-- Reserved space for all critical images
-
-### Bundle Optimization
-- React Query for efficient data fetching
-- Code splitting with React.lazy()
-- Tree shaking enabled in Vite build
-- Production-optimized builds
-
-## Monitoring Schedule
-
-Run performance audits:
-- **Before releases**: Full audit suite
-- **Weekly**: Homepage baseline check
-- **After major changes**: Affected routes only
-
-## Troubleshooting
-
-### Common Issues
-1. **Server not running**: Ensure `npm run preview` is active on port 3000
-2. **Chrome not found**: Install Chrome/Chromium or set CHROME_PATH
-3. **Low mobile scores**: Review image optimization and bundle size
-4. **High CLS**: Check for dynamic content causing layout shifts
-
-### Performance Debugging
-1. Use Chrome DevTools Performance tab
-2. Enable Core Web Vitals in DevTools
-3. Test on throttled connections (Fast 3G, Slow 3G)
-4. Monitor real user metrics if deployed
-
-## Architecture Notes
-
-The performance system is designed to be:
-- **CMS-driven**: No hardcoded optimizations
-- **User-respectful**: Honors reduced-data preferences  
-- **Maintainable**: Clear separation of concerns
-- **Measurable**: Automated monitoring and reporting
+> Tip: Keep all historic JSON reports in `docs/perf/` to spot trends and prevent regressions.
