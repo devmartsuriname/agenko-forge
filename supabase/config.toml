@@ -54,6 +54,9 @@ enable_confirmations = false
 [functions.upload-section-image]
 verify_jwt = true
 
+[functions.storage-orphan-scan]
+verify_jwt = false
+
 [edge_runtime]
 policy = "per_worker"
 inspector_port = 8083
