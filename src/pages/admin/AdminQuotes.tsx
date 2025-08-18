@@ -8,10 +8,11 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Search, Filter, Eye, Edit, MessageSquare, UserCheck, Calendar, DollarSign } from 'lucide-react';
+import { Search, Filter, Eye, Edit, MessageSquare, UserCheck, Calendar, DollarSign, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Quote, QuoteActivity } from '@/types/quote';
 import { toast } from 'sonner';
+import { exportToCSV } from '@/lib/csv-export';
 
 interface QuoteWithActivities extends Quote {
   activities?: QuoteActivity[];
@@ -181,6 +182,26 @@ export default function AdminQuotes() {
     return new Date(dateString).toLocaleString();
   };
 
+  const handleExportCSV = () => {
+    try {
+      const exportData = filteredQuotes.map(quote => ({
+        id: quote.id,
+        company: quote.company || '',
+        contact_email: quote.email,
+        stage: quote.status,
+        created_at: new Date(quote.created_at).toISOString(),
+        amount: quote.estimated_cost || ''
+      }));
+
+      const headers = ['id', 'company', 'contact_email', 'stage', 'created_at', 'amount'];
+      const filename = exportToCSV(exportData, 'quotes.csv', { customHeaders: headers });
+      toast.success(`Exported ${exportData.length} quotes to ${filename}`);
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Failed to export quotes');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -254,10 +275,23 @@ export default function AdminQuotes() {
       {/* Quotes Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Quotes ({filteredQuotes.length})</CardTitle>
-          <CardDescription>
-            Recent quote requests and their status
-          </CardDescription>
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle>Quotes ({filteredQuotes.length})</CardTitle>
+              <CardDescription>
+                Recent quote requests and their status
+              </CardDescription>
+            </div>
+            <Button 
+              onClick={handleExportCSV}
+              variant="outline"
+              size="sm"
+              disabled={filteredQuotes.length === 0}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="rounded-md border">

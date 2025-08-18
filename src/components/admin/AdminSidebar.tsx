@@ -11,7 +11,10 @@ import {
   MessageSquare,
   Settings,
   Users,
-  LogOut
+  LogOut,
+  FileQuestion,
+  CreditCard,
+  FileText as ProposalIcon
 } from 'lucide-react';
 
 const navItems = [
@@ -22,12 +25,19 @@ const navItems = [
   { href: '/admin/blog', icon: PenTool, label: 'Blog' },
   { href: '/admin/media', icon: Image, label: 'Media' },
   { href: '/admin/contact', icon: MessageSquare, label: 'Contact Submissions' },
+  { href: '/admin/quotes', icon: FileQuestion, label: 'Quotes', editorOnly: true },
+  { href: '/admin/payments', icon: CreditCard, label: 'Payments', editorOnly: true },
+  { href: '/admin/proposals', icon: ProposalIcon, label: 'Proposals', editorOnly: true },
   { href: '/admin/settings', icon: Settings, label: 'Settings' },
   { href: '/admin/users', icon: Users, label: 'Users', adminOnly: true },
 ];
 
 export function AdminSidebar() {
-  const { signOut, isAdmin } = useAuth();
+  const { signOut, isAdmin, user } = useAuth();
+  
+  // Get user role from profile or default to viewer
+  const userRole = user?.role || 'viewer';
+  const isEditor = userRole === 'editor' || userRole === 'admin';
 
   const handleSignOut = async () => {
     await signOut();
@@ -43,6 +53,8 @@ export function AdminSidebar() {
         {navItems.map((item) => {
           // Hide admin-only items for non-admins
           if (item.adminOnly && !isAdmin) return null;
+          // Hide editor-only items for viewers
+          if (item.editorOnly && !isEditor) return null;
           
           return (
             <NavLink

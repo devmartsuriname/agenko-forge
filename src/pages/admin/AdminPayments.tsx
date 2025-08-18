@@ -8,10 +8,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Search, Filter, Eye, CheckCircle, XCircle, Clock, CreditCard, Building2 } from 'lucide-react';
+import { Search, Filter, Eye, CheckCircle, XCircle, Clock, CreditCard, Building2, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Order, Payment } from '@/types/payment';
 import { toast } from 'sonner';
+import { exportToCSV } from '@/lib/csv-export';
 
 interface OrderWithPayments extends Order {
   payments: Payment[];
@@ -141,6 +142,27 @@ export default function AdminPayments() {
     return new Date(dateString).toLocaleString();
   };
 
+  const handleExportCSV = () => {
+    try {
+      const exportData = filteredOrders.map(order => ({
+        id: order.id,
+        provider: order.provider,
+        amount_cents: order.amount,
+        currency: order.currency,
+        status: order.status,
+        created_at: new Date(order.created_at).toISOString(),
+        order_id: order.provider_order_id || ''
+      }));
+
+      const headers = ['id', 'provider', 'amount_cents', 'currency', 'status', 'created_at', 'order_id'];
+      const filename = exportToCSV(exportData, 'payments.csv', { customHeaders: headers });
+      toast.success(`Exported ${exportData.length} payments to ${filename}`);
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Failed to export payments');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -212,10 +234,23 @@ export default function AdminPayments() {
       {/* Orders Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Orders ({filteredOrders.length})</CardTitle>
-          <CardDescription>
-            Recent payment orders and their verification status
-          </CardDescription>
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle>Orders ({filteredOrders.length})</CardTitle>
+              <CardDescription>
+                Recent payment orders and their verification status
+              </CardDescription>
+            </div>
+            <Button 
+              onClick={handleExportCSV}
+              variant="outline"
+              size="sm"
+              disabled={filteredOrders.length === 0}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="rounded-md border">

@@ -24,6 +24,11 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import NotFound from "./pages/NotFound";
 
+// Public proposal pages
+import ProposalView from "./pages/ProposalView";
+import ProposalAccept from "./pages/ProposalAccept";
+import ProposalReject from "./pages/ProposalReject";
+
 // Admin layout and error boundary
 import { AdminLayout } from "./components/admin/AdminLayout";
 import { AdminErrorBoundary } from "./components/admin/ErrorBoundary";
@@ -45,6 +50,8 @@ const ContactSubmissions = lazy(() => import("./pages/admin/ContactSubmissions")
 const Settings = lazy(() => import("./pages/admin/Settings"));
 const Users = lazy(() => import("./pages/admin/Users"));
 const AdminPayments = lazy(() => import("./pages/admin/AdminPayments"));
+const AdminQuotes = lazy(() => import("./pages/admin/AdminQuotes"));
+const AdminProposals = lazy(() => import("./pages/admin/AdminProposals"));
 
 const queryClient = new QueryClient();
 
@@ -173,7 +180,27 @@ const App = () => (
                     <Users />
                   </Suspense>
                 } />
+                <Route path="quotes" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminQuotes />
+                  </Suspense>
+                } />
+                <Route path="payments" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminPayments />
+                  </Suspense>
+                } />
+                <Route path="proposals" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminProposals />
+                  </Suspense>
+                } />
               </Route>
+              
+              {/* Public Proposal Routes */}
+              <Route path="/proposal/:id/:token" element={<ProposalView />} />
+              <Route path="/proposal/:id/:token/accept" element={<ProposalAccept />} />
+              <Route path="/proposal/:id/:token/reject" element={<ProposalReject />} />
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

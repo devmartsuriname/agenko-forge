@@ -311,3 +311,25 @@ supabase db benchmark
 - ✅ Rate limiting on public endpoints
 - ✅ Last admin protection active
 - ✅ Function search paths secured
+
+## Phase 6 – Payments & Proposals
+
+### Required Environment Variables
+These environment variables must be configured in Supabase Edge Functions secrets:
+
+- **STRIPE_SECRET_KEY** - Stripe API secret key for processing payments
+- **STRIPE_WEBHOOK_SECRET** - Stripe webhook endpoint secret for signature verification
+- **RESEND_API_KEY** - Resend API key for sending proposal emails
+- **APP_BASE_URL** - Base URL of the application for generating proposal links (e.g., https://yourdomain.com)
+
+### Quick Smoke Test (10 Steps)
+1. Navigate to `/admin/quotes` - should load quote management interface
+2. Navigate to `/admin/payments` - should load payment management interface  
+3. Navigate to `/admin/proposals` - should load proposal management interface
+4. Export CSV from quotes page - should download valid CSV file
+5. Export CSV from payments page - should download valid CSV file
+6. Test proposal public route `/proposal/test-id/test-token` - should show not found or invalid token
+7. Check admin sidebar - should show all navigation items for admin users
+8. Verify role-based access - quotes/payments/proposals should require editor+ role
+9. Test Stripe checkout flow - should redirect to Stripe hosted checkout
+10. Test bank transfer flow - should generate reference number and instructions
