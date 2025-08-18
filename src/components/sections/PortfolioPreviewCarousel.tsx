@@ -7,6 +7,7 @@ import { CarouselBase } from '@/components/ui/carousel/CarouselBase';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import type { PortfolioPreviewSection } from '@/lib/sections/schema';
 import { cn } from '@/lib/utils';
+import { ResponsiveImage } from '@/components/ui/responsive-image';
 
 interface PortfolioPreviewCarouselProps {
   section: PortfolioPreviewSection;
@@ -97,15 +98,14 @@ export function PortfolioPreviewCarousel({ section }: PortfolioPreviewCarouselPr
           <div className="relative">
             <AspectRatio ratio={getAspectRatio()}>
               {firstImage ? (
-                <img 
-                  src={firstImage.url} 
+                <ResponsiveImage
+                  src={firstImage.url}
                   alt={firstImage.alt || project.title}
                   className={cn(
                     "w-full h-full group-hover:scale-105 transition-transform duration-300",
                     getImageClasses()
                   )}
-                  loading="lazy"
-                  decoding="async"
+                  aspectRatio={`${getAspectRatio()}`}
                   sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 />
               ) : (

@@ -6,6 +6,7 @@ import { ArrowRight, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PortfolioPreviewCarousel } from './PortfolioPreviewCarousel';
 import type { PortfolioPreviewSection } from '@/lib/sections/schema';
+import { ResponsiveImage } from '@/components/ui/responsive-image';
 
 interface PortfolioPreviewSectionProps {
   section: PortfolioPreviewSection;
@@ -81,11 +82,12 @@ export function PortfolioPreviewSectionComponent({ section }: PortfolioPreviewSe
               <Card key={project.id} className="group overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                 {firstImage && (
                   <div className="relative h-48 overflow-hidden">
-                    <img 
-                      src={firstImage.url} 
+                    <ResponsiveImage
+                      src={firstImage.url}
                       alt={firstImage.alt || project.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      loading="lazy"
+                      aspectRatio="16/9"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">

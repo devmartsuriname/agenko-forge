@@ -188,11 +188,23 @@ carousel: {
 
 ## Content Management & Storage Strategy
 
-### Local Image Storage
+### Image Pipeline & Responsive Storage
 - **Media Bucket**: All project and blog images stored in Supabase Storage `media` bucket
-- **Aspect Ratio**: Standard 16/9 (1200x675) to prevent CLS during carousel initialization
-- **Path Structure**: `projects/{slug}/image-{sort}.jpg` and `blog/{slug}/cover.jpg`
-- **Migration**: Use `scripts/migrate-images-to-storage.ts` for idempotent external → local migration
+- **Format**: WebP-only for optimal compression and browser support
+- **Responsive Variants**: 4 sizes generated per image (320w, 640w, 960w, 1200w)
+- **Aspect Ratio**: Standard 16/9 to prevent CLS during carousel initialization
+- **Path Structure**: `media/projects/{slug}/{basename}-{width}.webp` and `media/blog/{slug}/{basename}-{width}.webp`
+- **Quality**: WebP quality set to 80 for optimal balance of file size and visual quality
+- **Migration**: Use `scripts/migrate-images.ts` for idempotent external → WebP migration with responsive variants
+
+### Responsive Image Implementation
+- **Primary URL**: Always points to largest variant (1200w) for fallback
+- **srcset Generation**: Automatic generation from primary URL using naming convention
+- **Sizes Attribute**: Context-aware sizing for optimal loading
+  - Cards: `"(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"`
+  - Hero: `"100vw"`
+- **Loading Strategy**: Priority loading for hero images, lazy loading for cards
+- **CLS Prevention**: Fixed aspect ratios maintained across all variants
 
 ### Data Integrity
 - **Unique Constraints**: `project_images(project_id, sort_order)` prevents duplicate sort positions
@@ -216,11 +228,31 @@ carousel: {
 
 ### Seeding & Migration Scripts
 ```bash
-# Image migration (external → Supabase Storage)
+# Phase 5E: Image migration with WebP conversion and responsive variants
+npx ts-node scripts/migrate-images.ts
+
+# Legacy: Basic image migration (external → Supabase Storage JPEG)
 npx ts-node scripts/migrate-images-to-storage.ts
 
 # Content seeding (idempotent upsert)
 npx ts-node scripts/seed-devmart-extra.ts
+```
+
+### Image Naming Convention
+```
+media/projects/ecommerce-platform/
+  ├── image-1-320.webp   (320×180)
+  ├── image-1-640.webp   (640×360) 
+  ├── image-1-960.webp   (960×540)
+  ├── image-1-1200.webp  (1200×675)
+  ├── image-2-320.webp
+  └── ...
+
+media/blog/modern-web-design/
+  ├── hero-320.webp
+  ├── hero-640.webp  
+  ├── hero-960.webp
+  └── hero-1200.webp
 ```
 
 **Quality Assurance Checklist:**

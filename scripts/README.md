@@ -1,52 +1,113 @@
-# Devmart Seed Boost Scripts
+# Scripts Documentation
 
-This directory contains scripts for managing content and media for the Devmart homepage carousels.
+This folder contains utility scripts for seeding and managing content for the Devmart agency website.
 
 ## Scripts Overview
 
-### 1. `seed-devmart-extra.ts`
-Idempotent TypeScript seeding script that adds blog posts and projects to ensure homepage carousels have sufficient content (≥6 items each).
+### `seed-devmart-extra.ts`
 
-**Features:**
-- Safe to run multiple times (uses `ON CONFLICT` upserts)
-- Sets proper `published_at` timestamps for published content
+**Purpose**: Idempotently seed blog posts and projects to ensure sufficient content for homepage carousels.
+
+**Features**:
+- Safe multiple runs with `ON CONFLICT` upserts
+- Sets proper `published_at` timestamps for content visibility  
 - Handles project images with unique constraints
+- Ensures ≥6 published items for optimal carousel display
 
-**Usage:**
+**Usage**:
 ```bash
-# Set environment variable first
-export SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-
-# Run the script
+export SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
 npx ts-node scripts/seed-devmart-extra.ts
 ```
 
-### 2. `migrate-images-to-storage.ts`
-Migrates external image URLs to Supabase Storage for reliability and consistent aspect ratios.
+### `migrate-images.ts` (Phase 5E)
 
-**Features:**
-- Downloads external images and uploads to `media` bucket
-- Maintains 16/9 aspect ratio (1200x675) to prevent CLS
-- Organizes images in `projects/{slug}/` folder structure
-- Updates database records with new storage URLs
+**Purpose**: Migrate external images (e.g., Picsum) to Supabase Storage with WebP conversion and responsive variants.
 
-**Usage:**
+**Features**:
+- Downloads images and converts to WebP format (quality 80)
+- Generates 4 responsive variants: 320w, 640w, 960w, 1200w (16:9 aspect ratio)
+- Deterministic file paths: `media/projects/{slug}/{basename}-{width}.webp`
+- Updates database records with largest (1200w) URL for primary src
+- Idempotent - skips already migrated images
+- Preserves CLS prevention with consistent aspect ratios
+
+**Usage**:
 ```bash
-# Set environment variable first
-export SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+export SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"  
+npx ts-node scripts/migrate-images.ts
+```
 
-# Run the script
+**File Structure Created**:
+```
+media/projects/ecommerce-platform/
+├── image-1-320.webp   (320×180)
+├── image-1-640.webp   (640×360)
+├── image-1-960.webp   (960×540)
+└── image-1-1200.webp  (1200×675)
+```
+
+### `migrate-images-to-storage.ts` (Legacy)
+
+**Purpose**: Basic migration of external image URLs to Supabase Storage with JPEG format.
+
+**Features**:
+- Downloads images and uploads as JPEG to `media` bucket
+- Simple file structure: `projects/{slug}/image-{sort}.jpg`
+- Idempotent operation with existence checks
+- Updates `project_images` table with new storage URLs
+
+**Usage**:
+```bash
+export SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
 npx ts-node scripts/migrate-images-to-storage.ts
 ```
 
-### 3. `run-seed-boost.js`
-Node.js convenience wrapper that handles environment setup and error reporting.
+### `run-seed-boost.js`
 
-**Usage:**
+**Purpose**: Node.js convenience wrapper for simplified environment setup and error reporting.
+
+**Features**:
+- Simplified execution without TypeScript compilation
+- Better error handling and reporting
+- Environment variable management
+
+**Usage**:
 ```bash
-# Make sure SUPABASE_SERVICE_ROLE_KEY is in your environment
+export SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
 ./scripts/run-seed-boost.js
 ```
+
+## Environment Requirements
+
+All scripts require the `SUPABASE_SERVICE_ROLE_KEY` environment variable:
+
+```bash
+export SUPABASE_SERVICE_ROLE_KEY="your-service-role-key-here"
+```
+
+This key provides server-side access to bypass RLS policies for data seeding and migration operations.
+
+## Dependencies
+
+- **TypeScript**: Scripts use TypeScript and require `ts-node` for execution
+- **Sharp**: Image processing library for WebP conversion (Phase 5E only)
+- **Supabase Client**: Database and storage operations
+
+## Execution Order
+
+For a complete setup:
+
+1. **Content Seeding**: `npx ts-node scripts/seed-devmart-extra.ts`
+2. **Image Migration**: `npx ts-node scripts/migrate-images.ts` (Phase 5E WebP + responsive)
+3. **Verification**: Check homepage carousels have ≥6 items and images load from Supabase Storage
+
+## Safety Features
+
+- **Idempotent Operations**: All scripts can be run multiple times safely
+- **Error Handling**: Continue processing even if individual items fail
+- **Existence Checks**: Skip already processed content/images
+- **Transaction Safety**: Database operations use proper conflict resolution
 
 ## Seed Data Structure
 

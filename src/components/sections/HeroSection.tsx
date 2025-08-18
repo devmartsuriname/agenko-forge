@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { HeroSection } from '@/lib/sections/schema';
+import { ResponsiveImage } from '@/components/ui/responsive-image';
 
 interface HeroSectionProps {
   section: HeroSection;
@@ -15,18 +16,15 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
       {data.backgroundImage && (
         <div className="absolute inset-0">
           <div className="w-full h-full aspect-[16/9] sm:aspect-[21/9] lg:aspect-[32/9]">
-            <img 
-              src={data.backgroundImage} 
-              alt="Hero background" 
+            <ResponsiveImage
+              src={data.backgroundImage}
+              alt="Hero background"
               className="w-full h-full object-cover"
+              priority={true}
+              aspectRatio="var(--hero-aspect-ratio, 16 / 9)"
+              sizes="100vw"
               loading="eager"
               fetchPriority="high"
-              style={{ 
-                aspectRatio: 'var(--hero-aspect-ratio, 16 / 9)',
-                objectFit: 'cover',
-                transformOrigin: 'center',
-                willChange: 'transform'
-              }}
             />
           </div>
           <div className="absolute inset-0 bg-black/60" />
