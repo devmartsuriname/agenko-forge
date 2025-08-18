@@ -116,41 +116,133 @@ export function SectionEditor({
     </div>
   );
 
-  const renderAboutEditor = () => (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="about-title">Title *</Label>
-        <Input
-          id="about-title"
-          value={section.data.title || ''}
-          onChange={(e) => updateSectionData({ title: e.target.value })}
-          placeholder="About Devmart"
-        />
+  const renderAboutEditor = () => {
+    const features = (section.data as any).features || [];
+    
+    const addFeature = () => {
+      const newFeatures = [...features, { icon: 'Star', title: '', description: '' }];
+      updateSectionData({ features: newFeatures });
+    };
+    
+    const updateFeature = (index: number, updates: Partial<{ icon: string; title: string; description: string }>) => {
+      const newFeatures = [...features];
+      newFeatures[index] = { ...newFeatures[index], ...updates };
+      updateSectionData({ features: newFeatures });
+    };
+    
+    const removeFeature = (index: number) => {
+      const newFeatures = features.filter((_: any, i: number) => i !== index);
+      updateSectionData({ features: newFeatures });
+    };
+    
+    return (
+      <div className="space-y-6">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="about-title">Title *</Label>
+            <Input
+              id="about-title"
+              value={section.data.title || ''}
+              onChange={(e) => updateSectionData({ title: e.target.value })}
+              placeholder="About Devmart"
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="about-description">Description *</Label>
+            <Textarea
+              id="about-description"
+              value={(section.data as any).description || ''}
+              onChange={(e) => updateSectionData({ description: e.target.value })}
+              placeholder="We are a technology company focused on delivering innovative solutions."
+              rows={4}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="about-image">Image URL</Label>
+            <Input
+              id="about-image"
+              value={(section.data as any).image || ''}
+              onChange={(e) => updateSectionData({ image: e.target.value })}
+              placeholder="https://example.com/about-image.jpg"
+              type="url"
+            />
+          </div>
+        </div>
+
+        {/* Features Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Label className="text-base font-semibold">Features (Optional)</Label>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addFeature}
+              className="flex items-center space-x-2"
+            >
+              <Plus className="h-4 w-4" />
+              <span>Add Feature</span>
+            </Button>
+          </div>
+          
+          {features.length > 0 && (
+            <div className="space-y-4">
+              {features.map((feature: any, index: number) => (
+                <div key={index} className="border rounded-lg p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium">Feature #{index + 1}</Label>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeFeature(index)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor={`feature-${index}-icon`}>Icon</Label>
+                      <Input
+                        id={`feature-${index}-icon`}
+                        value={feature.icon || ''}
+                        onChange={(e) => updateFeature(index, { icon: e.target.value })}
+                        placeholder="Star"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor={`feature-${index}-title`}>Title</Label>
+                      <Input
+                        id={`feature-${index}-title`}
+                        value={feature.title || ''}
+                        onChange={(e) => updateFeature(index, { title: e.target.value })}
+                        placeholder="Feature Title"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor={`feature-${index}-description`}>Description</Label>
+                      <Input
+                        id={`feature-${index}-description`}
+                        value={feature.description || ''}
+                        onChange={(e) => updateFeature(index, { description: e.target.value })}
+                        placeholder="Feature description"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="about-description">Description *</Label>
-        <Textarea
-          id="about-description"
-          value={(section.data as any).description || ''}
-          onChange={(e) => updateSectionData({ description: e.target.value })}
-          placeholder="We are a technology company focused on delivering innovative solutions."
-          rows={4}
-        />
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="about-image">Image URL</Label>
-        <Input
-          id="about-image"
-          value={(section.data as any).image || ''}
-          onChange={(e) => updateSectionData({ image: e.target.value })}
-          placeholder="https://example.com/about-image.jpg"
-          type="url"
-        />
-      </div>
-    </div>
-  );
+    );
+  };
 
   const renderServicePreviewEditor = () => (
     <div className="space-y-4">
