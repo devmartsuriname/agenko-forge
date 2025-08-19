@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { TemplateEditor } from '@/components/proposals/TemplateEditor';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -31,6 +33,9 @@ export default function AdminProposals() {
   const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showTemplateDialog, setShowTemplateDialog] = useState(false);
+  const [activeTab, setActiveTab] = useState('proposals');
+  const [editingTemplate, setEditingTemplate] = useState<ProposalTemplate | null>(null);
+  const [showTemplateEditor, setShowTemplateEditor] = useState(false);
 
   // Form states
   const [proposalForm, setProposalForm] = useState<CreateProposalData>({
