@@ -51,9 +51,9 @@ export function AdminSidebar() {
   return (
     <div 
       className="w-64 bg-card border-r border-border h-screen flex flex-col"
-      data-sidebar-version="P6-DELTA-NAV-v3"
+      data-sidebar-version="P6-DELTA-NAV-v4"
     >
-      <span className="sr-only" data-sidebar-stamp="P6-DELTA-NAV-v3" />
+      <span className="sr-only" data-sidebar-stamp="P6-DELTA-NAV-v4" />
       <div className="p-6 border-b border-border">
         <h2 className="text-xl font-bold text-foreground">Agenko Admin</h2>
       </div>
