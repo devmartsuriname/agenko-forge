@@ -14,9 +14,7 @@ import {
   LogOut,
   FileQuestion,
   CreditCard,
-  FileText as ProposalIcon,
-  Search,
-  Zap
+  FileText as ProposalIcon
 } from 'lucide-react';
 
 const navItems = [
@@ -25,11 +23,11 @@ const navItems = [
   { href: '/admin/services', icon: Briefcase, label: 'Services' },
   { href: '/admin/projects', icon: FolderOpen, label: 'Projects' },
   { href: '/admin/blog', icon: PenTool, label: 'Blog' },
-  { href: '/admin/media', icon: Image, label: 'Media' },
-  { href: '/admin/contact', icon: MessageSquare, label: 'Contact Submissions' },
   { href: '/admin/quotes', icon: FileQuestion, label: 'Quotes', editorOnly: true },
   { href: '/admin/payments', icon: CreditCard, label: 'Payments', editorOnly: true },
   { href: '/admin/proposals', icon: ProposalIcon, label: 'Proposals', editorOnly: true },
+  { href: '/admin/media', icon: Image, label: 'Media' },
+  { href: '/admin/contact', icon: MessageSquare, label: 'Contact Submissions' },
   { href: '/admin/settings', icon: Settings, label: 'Settings' },
   { href: '/admin/users', icon: Users, label: 'Users', adminOnly: true },
 ];
