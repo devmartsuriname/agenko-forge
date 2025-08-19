@@ -27,11 +27,14 @@ const navItems = [
   { href: '/admin/quotes', icon: FileQuestion, label: 'Quotes', editorOnly: true },
   { href: '/admin/payments', icon: CreditCard, label: 'Payments', editorOnly: true },
   { href: '/admin/proposals', icon: ProposalIcon, label: 'Proposals', editorOnly: true },
-  { href: '/admin/test-harness', icon: TestTube, label: 'E2E Test Harness', adminOnly: true },
   { href: '/admin/media', icon: Image, label: 'Media' },
   { href: '/admin/contact', icon: MessageSquare, label: 'Contact Submissions' },
   { href: '/admin/settings', icon: Settings, label: 'Settings' },
   { href: '/admin/users', icon: Users, label: 'Users', adminOnly: true },
+  // E2E Test Harness - only show if explicitly enabled via env var
+  ...(import.meta.env.VITE_E2E_SIDEBAR === 'true' ? [
+    { href: '/admin/test-harness', icon: TestTube, label: 'E2E Test Harness', adminOnly: true }
+  ] : []),
 ];
 
 export function AdminSidebar() {
@@ -46,7 +49,11 @@ export function AdminSidebar() {
   };
 
   return (
-    <div className="w-64 bg-card border-r border-border h-screen flex flex-col">
+    <div 
+      className="w-64 bg-card border-r border-border h-screen flex flex-col"
+      data-sidebar-version="P6-DELTA-NAV-v3"
+    >
+      <span className="sr-only" data-sidebar-stamp="P6-DELTA-NAV-v3" />
       <div className="p-6 border-b border-border">
         <h2 className="text-xl font-bold text-foreground">Agenko Admin</h2>
       </div>
