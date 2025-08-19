@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Search, Filter, Eye, CheckCircle, XCircle, Clock, CreditCard, Building2, Download, MoreHorizontal } from 'lucide-react';
+import { Search, Filter, Eye, CheckCircle, XCircle, Clock, CreditCard, Building2, Download, MoreHorizontal, Activity } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Order, Payment } from '@/types/payment';
 import { toast } from 'sonner';
@@ -311,56 +311,67 @@ export default function AdminPayments() {
                       <TableCell className="text-xs">
                         {formatDate(order.created_at)}
                       </TableCell>
-                       <TableCell>
-                         <div className="flex items-center gap-1">
-                           <Dialog>
-                             <DialogTrigger asChild>
-                               <Button
-                                 variant="ghost"
-                                 size="sm"
-                                 onClick={() => setSelectedOrder(order)}
-                               >
-                                 <Eye className="h-4 w-4" />
-                               </Button>
-                             </DialogTrigger>
-                             <DialogContent className="max-w-3xl">
-                               <DialogHeader>
-                                 <DialogTitle>Order Details</DialogTitle>
-                                 <DialogDescription>
-                                   Order ID: {order.id}
-                                 </DialogDescription>
-                               </DialogHeader>
-                               
-                               {selectedOrder && selectedOrder.id === order.id && (
-                                 <OrderDetailsDialog 
-                                   order={selectedOrder}
-                                   onUpdateStatus={updateOrderStatus}
-                                   verificationNotes={verificationNotes}
-                                   setVerificationNotes={setVerificationNotes}
-                                   verifying={verifying}
-                                 />
-                               )}
-                             </DialogContent>
-                           </Dialog>
+                        <TableCell>
+                          <div className="flex items-center gap-1">
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setSelectedOrder(order)}
+                                >
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-3xl">
+                                <DialogHeader>
+                                  <DialogTitle>Order Details</DialogTitle>
+                                  <DialogDescription>
+                                    Order ID: {order.id}
+                                  </DialogDescription>
+                                </DialogHeader>
+                                
+                                {selectedOrder && selectedOrder.id === order.id && (
+                                  <OrderDetailsDialog 
+                                    order={selectedOrder}
+                                    onUpdateStatus={updateOrderStatus}
+                                    verificationNotes={verificationNotes}
+                                    setVerificationNotes={setVerificationNotes}
+                                    verifying={verifying}
+                                  />
+                                )}
+                              </DialogContent>
+                            </Dialog>
 
-                           <DropdownMenu>
-                             <DropdownMenuTrigger asChild>
-                               <Button variant="ghost" size="sm">
-                                 <MoreHorizontal className="h-4 w-4" />
-                               </Button>
-                             </DropdownMenuTrigger>
-                             <DropdownMenuContent align="end" className="bg-background border shadow-md">
-                               <DropdownMenuItem 
-                                 onClick={() => handleViewEvents(order)}
-                                 className="cursor-pointer"
-                               >
-                                 <Clock className="h-4 w-4 mr-2" />
-                                 View Events
-                               </DropdownMenuItem>
-                             </DropdownMenuContent>
-                           </DropdownMenu>
-                         </div>
-                       </TableCell>
+                            {/* Event Log button - visible on md+ screens */}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleViewEvents(order)}
+                              className="hidden md:flex"
+                              title="View Events"
+                            >
+                              <Activity className="h-4 w-4" />
+                            </Button>
+
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="bg-background border shadow-md">
+                                <DropdownMenuItem 
+                                  onClick={() => handleViewEvents(order)}
+                                  className="cursor-pointer"
+                                >
+                                  <Activity className="h-4 w-4 mr-2" />
+                                  View Events
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </TableCell>
                     </TableRow>
                   );
                 })}

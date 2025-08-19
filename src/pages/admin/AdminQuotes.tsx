@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Search, Filter, Eye, Edit, MessageSquare, UserCheck, Calendar, DollarSign, Download, MoreHorizontal } from 'lucide-react';
+import { Search, Filter, Eye, Edit, MessageSquare, UserCheck, Calendar, DollarSign, Download, MoreHorizontal, Activity } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Quote, QuoteActivity } from '@/types/quote';
 import { toast } from 'sonner';
@@ -347,55 +347,66 @@ export default function AdminQuotes() {
                     <TableCell className="text-xs">
                       {formatDate(quote.created_at)}
                     </TableCell>
-                     <TableCell>
-                       <div className="flex items-center gap-1">
-                         <Dialog>
-                           <DialogTrigger asChild>
-                             <Button
-                               variant="ghost"
-                               size="sm"
-                               onClick={() => setSelectedQuote(quote)}
-                             >
-                               <Eye className="h-4 w-4" />
-                             </Button>
-                           </DialogTrigger>
-                           <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                             <DialogHeader>
-                               <DialogTitle>Quote Details</DialogTitle>
-                               <DialogDescription>
-                                 Quote ID: {quote.id}
-                               </DialogDescription>
-                             </DialogHeader>
-                             
-                             {selectedQuote && selectedQuote.id === quote.id && (
-                               <QuoteDetailsDialog 
-                                 quote={selectedQuote}
-                                 onUpdateStatus={updateQuoteStatus}
-                                 onAddNote={addNote}
-                                 updating={updating}
-                               />
-                             )}
-                           </DialogContent>
-                         </Dialog>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setSelectedQuote(quote)}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                              <DialogHeader>
+                                <DialogTitle>Quote Details</DialogTitle>
+                                <DialogDescription>
+                                  Quote ID: {quote.id}
+                                </DialogDescription>
+                              </DialogHeader>
+                              
+                              {selectedQuote && selectedQuote.id === quote.id && (
+                                <QuoteDetailsDialog 
+                                  quote={selectedQuote}
+                                  onUpdateStatus={updateQuoteStatus}
+                                  onAddNote={addNote}
+                                  updating={updating}
+                                />
+                              )}
+                            </DialogContent>
+                          </Dialog>
 
-                         <DropdownMenu>
-                           <DropdownMenuTrigger asChild>
-                             <Button variant="ghost" size="sm">
-                               <MoreHorizontal className="h-4 w-4" />
-                             </Button>
-                           </DropdownMenuTrigger>
-                           <DropdownMenuContent align="end" className="bg-background border shadow-md">
-                             <DropdownMenuItem 
-                               onClick={() => handleViewEvents(quote)}
-                               className="cursor-pointer"
-                             >
-                               <MessageSquare className="h-4 w-4 mr-2" />
-                               View Events
-                             </DropdownMenuItem>
-                           </DropdownMenuContent>
-                         </DropdownMenu>
-                       </div>
-                     </TableCell>
+                          {/* Event Log button - visible on md+ screens */}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleViewEvents(quote)}
+                            className="hidden md:flex"
+                            title="View Events"
+                          >
+                            <Activity className="h-4 w-4" />
+                          </Button>
+
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-background border shadow-md">
+                              <DropdownMenuItem 
+                                onClick={() => handleViewEvents(quote)}
+                                className="cursor-pointer"
+                              >
+                                <Activity className="h-4 w-4 mr-2" />
+                                View Events
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

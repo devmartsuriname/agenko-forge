@@ -28,6 +28,7 @@ import NotFound from "./pages/NotFound";
 import ProposalView from "./pages/ProposalView";
 import ProposalAccept from "./pages/ProposalAccept";
 import ProposalReject from "./pages/ProposalReject";
+import GetQuote from "./pages/GetQuote";
 
 // Admin layout and error boundary
 import { AdminLayout } from "./components/admin/AdminLayout";
@@ -76,6 +77,7 @@ const App = () => (
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/get-quote" element={<GetQuote />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms-conditions" element={<TermsConditions />} />
               

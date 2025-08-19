@@ -1,8 +1,45 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { SEOHead } from '@/lib/seo';
 import { QuoteWizard } from '@/components/quote/QuoteWizard';
+import { QuoteFormData } from '@/types/quote';
 
 export default function GetQuote() {
+  const [searchParams] = useSearchParams();
+  
+  const initialData = useMemo((): Partial<QuoteFormData> => {
+    const service = searchParams.get('service');
+    const budget = searchParams.get('budget');
+    
+    const data: Partial<QuoteFormData> = {};
+    
+    if (service) {
+      // Map service names to service types
+      const serviceMap: Record<string, string> = {
+        'starter': 'Web Development',
+        'professional': 'Web Development',
+        'enterprise': 'Web Development',
+        'custom': 'Custom Development'
+      };
+      data.serviceType = serviceMap[service.toLowerCase()] || 'Web Development';
+    }
+    
+    if (budget && budget !== 'not-sure') {
+      // Map budget values to budget ranges
+      const budgetNum = parseInt(budget.replace(/[,$]/g, ''));
+      if (budgetNum <= 5000) {
+        data.budgetRange = '$1,000 - $5,000';
+      } else if (budgetNum <= 10000) {
+        data.budgetRange = '$5,000 - $10,000';
+      } else if (budgetNum <= 25000) {
+        data.budgetRange = '$10,000 - $25,000';
+      } else {
+        data.budgetRange = '$25,000+';
+      }
+    }
+    
+    return data;
+  }, [searchParams]);
   return (
     <>
       <SEOHead 
@@ -24,7 +61,7 @@ export default function GetQuote() {
           </div>
 
           {/* Quote Wizard */}
-          <QuoteWizard />
+          <QuoteWizard initialData={initialData} />
         </div>
       </div>
     </>
