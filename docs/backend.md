@@ -182,6 +182,20 @@ const allowed = await checkRateLimit('contact-form:' + ip, 5, 15); // 5 req/15mi
 if (!allowed) {
   throw new Error('Rate limit exceeded');
 }
+
+### Event Log Drawer
+Admin interfaces for payments and quotes include an event log drawer for viewing recent activity:
+
+**Filter Logic:**
+- **Payments**: `area='payments' AND meta->>'entity_id'=<order_id>`
+- **Quotes**: `area='quotes' AND meta->>'entity_id'=<quote_id>`
+
+**Features:**
+- Last 10 events per entity, ordered by timestamp DESC
+- Masked email addresses for privacy (e.g., `us***r@domain.com`)
+- Expandable rows with full message and metadata JSON
+- Copy event JSON button for debugging
+- Responsive design with focus management and accessibility
 ```
 
 ## Rate Limiting & Health

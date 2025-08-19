@@ -8,11 +8,13 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Search, Filter, Eye, Edit, MessageSquare, UserCheck, Calendar, DollarSign, Download } from 'lucide-react';
+import { Search, Filter, Eye, Edit, MessageSquare, UserCheck, Calendar, DollarSign, Download, MoreHorizontal } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Quote, QuoteActivity } from '@/types/quote';
 import { toast } from 'sonner';
 import { exportToCSV } from '@/lib/csv-export';
+import { EventLogDrawer } from '@/components/admin/EventLogDrawer';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 interface QuoteWithActivities extends Quote {
   activities?: QuoteActivity[];
@@ -26,6 +28,9 @@ export default function AdminQuotes() {
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const [selectedQuote, setSelectedQuote] = useState<QuoteWithActivities | null>(null);
   const [updating, setUpdating] = useState(false);
+  const [eventLogOpen, setEventLogOpen] = useState(false);
+  const [eventLogEntityId, setEventLogEntityId] = useState<string>('');
+  const [eventLogEntityLabel, setEventLogEntityLabel] = useState<string>('');
 
   useEffect(() => {
     fetchQuotes();
@@ -202,6 +207,12 @@ export default function AdminQuotes() {
     }
   };
 
+  const handleViewEvents = (quote: QuoteWithActivities) => {
+    setEventLogEntityId(quote.id);
+    setEventLogEntityLabel(`Quote ${quote.id.slice(0, 8)}... (${quote.company || quote.email})`);
+    setEventLogOpen(true);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -336,36 +347,55 @@ export default function AdminQuotes() {
                     <TableCell className="text-xs">
                       {formatDate(quote.created_at)}
                     </TableCell>
-                    <TableCell>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setSelectedQuote(quote)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                          <DialogHeader>
-                            <DialogTitle>Quote Details</DialogTitle>
-                            <DialogDescription>
-                              Quote ID: {quote.id}
-                            </DialogDescription>
-                          </DialogHeader>
-                          
-                          {selectedQuote && selectedQuote.id === quote.id && (
-                            <QuoteDetailsDialog 
-                              quote={selectedQuote}
-                              onUpdateStatus={updateQuoteStatus}
-                              onAddNote={addNote}
-                              updating={updating}
-                            />
-                          )}
-                        </DialogContent>
-                      </Dialog>
-                    </TableCell>
+                     <TableCell>
+                       <div className="flex items-center gap-1">
+                         <Dialog>
+                           <DialogTrigger asChild>
+                             <Button
+                               variant="ghost"
+                               size="sm"
+                               onClick={() => setSelectedQuote(quote)}
+                             >
+                               <Eye className="h-4 w-4" />
+                             </Button>
+                           </DialogTrigger>
+                           <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                             <DialogHeader>
+                               <DialogTitle>Quote Details</DialogTitle>
+                               <DialogDescription>
+                                 Quote ID: {quote.id}
+                               </DialogDescription>
+                             </DialogHeader>
+                             
+                             {selectedQuote && selectedQuote.id === quote.id && (
+                               <QuoteDetailsDialog 
+                                 quote={selectedQuote}
+                                 onUpdateStatus={updateQuoteStatus}
+                                 onAddNote={addNote}
+                                 updating={updating}
+                               />
+                             )}
+                           </DialogContent>
+                         </Dialog>
+
+                         <DropdownMenu>
+                           <DropdownMenuTrigger asChild>
+                             <Button variant="ghost" size="sm">
+                               <MoreHorizontal className="h-4 w-4" />
+                             </Button>
+                           </DropdownMenuTrigger>
+                           <DropdownMenuContent align="end" className="bg-background border shadow-md">
+                             <DropdownMenuItem 
+                               onClick={() => handleViewEvents(quote)}
+                               className="cursor-pointer"
+                             >
+                               <MessageSquare className="h-4 w-4 mr-2" />
+                               View Events
+                             </DropdownMenuItem>
+                           </DropdownMenuContent>
+                         </DropdownMenu>
+                       </div>
+                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -373,6 +403,14 @@ export default function AdminQuotes() {
           </div>
         </CardContent>
       </Card>
+
+      <EventLogDrawer 
+        open={eventLogOpen}
+        onOpenChange={setEventLogOpen}
+        entityType="quotes"
+        entityId={eventLogEntityId}
+        entityLabel={eventLogEntityLabel}
+      />
     </div>
   );
 }
