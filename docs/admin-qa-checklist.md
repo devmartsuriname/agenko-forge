@@ -95,11 +95,33 @@
 - [ ] CSV export with proper UTF-8 encoding
 - [ ] Export includes all required fields
 
+#### Quotes (Phase 6)
+- [ ] Quote request management with status workflow
+- [ ] CSV export with id, company, contact_email, stage, created_at, amount
+- [ ] Event log drawer showing last 10 events per quote
+- [ ] Filter by status (pending, reviewed, quoted, accepted, rejected)
+- [ ] Role-based access (editor+ required)
+
+#### Payments (Phase 6)
+- [ ] Payment order management and verification
+- [ ] CSV export with id, provider, amount_cents, currency, status, created_at, order_id
+- [ ] Event log drawer showing last 10 events per order
+- [ ] Manual verification for bank transfers
+- [ ] Role-based access (editor+ required)
+
+#### Proposals (Phase 6)
+- [ ] Proposal creation and management
+- [ ] Public proposal view/accept/reject routes
+- [ ] PDF generation and email delivery
+- [ ] Role-based access (editor+ required)
+
 ### CSV Export Functionality ✅
 - [ ] UTF-8 with BOM encoding for international characters
-- [ ] Header row: id,name,email,subject,created_at
+- [ ] Contact submissions header: id,name,email,subject,created_at
+- [ ] Quotes header: id,company,contact_email,stage,created_at,amount
+- [ ] Payments header: id,provider,amount_cents,currency,status,created_at,order_id
 - [ ] Proper comma and quote escaping
-- [ ] Timestamped filename: contact_submissions_YYYYMMDD.csv
+- [ ] Timestamped filename generation
 - [ ] Large dataset handling (1000+ records)
 - [ ] Progress indication for large exports
 - [ ] No UI blocking during generation
@@ -190,6 +212,9 @@
 - [ ] CRUD flows documented
 - [ ] Troubleshooting runbook complete
 - [ ] API changes documented
+- [ ] Phase 6 routes documented (quotes, payments, proposals)
+- [ ] Event log filtering documented in backend.md
+- [ ] CSV export formats documented
 
 ## Deployment Readiness
 - [ ] Environment variables configured
