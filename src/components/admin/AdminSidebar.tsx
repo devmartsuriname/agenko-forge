@@ -14,7 +14,8 @@ import {
   LogOut,
   FileQuestion,
   CreditCard,
-  FileText as ProposalIcon
+  FileText as ProposalIcon,
+  TestTube
 } from 'lucide-react';
 
 const navItems = [
@@ -26,6 +27,7 @@ const navItems = [
   { href: '/admin/quotes', icon: FileQuestion, label: 'Quotes', editorOnly: true },
   { href: '/admin/payments', icon: CreditCard, label: 'Payments', editorOnly: true },
   { href: '/admin/proposals', icon: ProposalIcon, label: 'Proposals', editorOnly: true },
+  { href: '/admin/test-harness', icon: TestTube, label: 'E2E Test Harness', adminOnly: true },
   { href: '/admin/media', icon: Image, label: 'Media' },
   { href: '/admin/contact', icon: MessageSquare, label: 'Contact Submissions' },
   { href: '/admin/settings', icon: Settings, label: 'Settings' },

@@ -336,7 +336,36 @@ These environment variables must be configured in Supabase Edge Functions secret
 - **RESEND_API_KEY** - Resend API key for sending proposal emails
 - **APP_BASE_URL** - Base URL of the application for generating proposal links (e.g., https://yourdomain.com)
 
-### Quick Smoke Test (10 Steps)
+### E2E Test Harness
+
+The comprehensive test harness is available at `/admin/test-harness` (admin access required) and provides:
+
+#### Automated Test Flows
+- **Stripe Integration Test**: Creates test orders, opens Stripe Checkout with test card instructions
+- **Bank Transfer Test**: Creates bank transfer orders and simulates admin verification
+- **Proposal Workflow Test**: Creates quotes, proposals, and recipients with public URL generation
+- **CSV Export Validation**: Tests quote and payment CSV export functionality
+
+#### Test Data Generation
+- Creates realistic test data for all Phase 6 modules
+- Generates public proposal URLs for acceptance/rejection testing
+- Simulates webhook idempotency for Stripe payments
+- Validates Event Log Drawer functionality with test events
+
+#### Usage Instructions
+1. Navigate to `/admin/test-harness` as an admin user
+2. Run individual tests or the comprehensive test suite
+3. Follow on-screen instructions for Stripe test card usage
+4. Verify results in the real-time test results panel
+5. Use quick navigation links to view generated data in admin modules
+
+### Event Log Drawer Filtering
+
+Event log queries per module:
+- **Payments**: `area='payments' AND meta->>'entity_id'=<order_id>`
+- **Quotes**: `area='quotes' AND meta->>'entity_id'=<quote_id>`
+- **Proposals**: `area='proposals' AND meta->>'entity_id'=<proposal_id>`
+
 1. Navigate to `/admin/quotes` - should load quote management interface
 2. Navigate to `/admin/payments` - should load payment management interface  
 3. Navigate to `/admin/proposals` - should load proposal management interface
@@ -344,6 +373,8 @@ These environment variables must be configured in Supabase Edge Functions secret
 5. Export CSV from payments page - should download valid CSV file
 6. Test proposal public route `/proposal/test-id/test-token` - should show not found or invalid token
 7. Check admin sidebar - should show all navigation items for admin users
+8. **Access E2E Test Harness** - Navigate to `/admin/test-harness` to run comprehensive automated tests
+9. **Run automated test suite** - Use the test harness to validate all payment flows, proposals, and CSV exports
 8. Verify role-based access - quotes/payments/proposals should require editor+ role
 9. Test Stripe checkout flow - should redirect to Stripe hosted checkout
 10. Test bank transfer flow - should generate reference number and instructions

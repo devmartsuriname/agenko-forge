@@ -29,6 +29,8 @@ import ProposalView from "./pages/ProposalView";
 import ProposalAccept from "./pages/ProposalAccept";
 import ProposalReject from "./pages/ProposalReject";
 import GetQuote from "./pages/GetQuote";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentCanceled from "./pages/PaymentCanceled";
 
 // Admin layout and error boundary
 import { AdminLayout } from "./components/admin/AdminLayout";
@@ -53,6 +55,7 @@ const Users = lazy(() => import("./pages/admin/Users"));
 const AdminPayments = lazy(() => import("./pages/admin/AdminPayments"));
 const AdminQuotes = lazy(() => import("./pages/admin/AdminQuotes"));
 const AdminProposals = lazy(() => import("./pages/admin/AdminProposals"));
+const AdminTestHarness = lazy(() => import("./pages/admin/TestHarness"));
 
 const queryClient = new QueryClient();
 
@@ -78,6 +81,8 @@ const App = () => (
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/get-quote" element={<GetQuote />} />
+              <Route path="/payment-success" element={<PaymentSuccess />} />
+              <Route path="/payment-canceled" element={<PaymentCanceled />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms-conditions" element={<TermsConditions />} />
               
@@ -195,6 +200,11 @@ const App = () => (
                 <Route path="proposals" element={
                   <Suspense fallback={<Spinner />}>
                     <AdminProposals />
+                  </Suspense>
+                } />
+                <Route path="test-harness" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminTestHarness />
                   </Suspense>
                 } />
               </Route>
