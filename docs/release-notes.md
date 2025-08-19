@@ -1,10 +1,9 @@
 # Release Notes
 
-## Phase 7 - Restore Point: Devmart-v1.0-Phase7-Restore
+## Phase 7 - Settings-driven Payments & Proposals: Devmart-RP-P7-20241219
 - **Date**: 2024-12-19
-- **Version**: P6-DELTA-NAV-v4
-- **Commit SHA**: [Current commit before Phase 7 changes]
-- **Status**: RBAC sidebar visibility issue identified - Quotes/Payments/Proposals not showing for editor+ users
+- **Version**: P7-SETTINGS-TEMPLATES-v1
+- **Status**: ✅ IMPLEMENTED - Settings foundation, templates, and database migration complete
 
 ### Known Issues Before Phase 7:
 - AdminSidebar.tsx incorrectly checking `user?.role` instead of `userRole` from auth context

@@ -10,6 +10,9 @@ import { SEOHead } from '@/lib/seo';
 import { adminCms } from '@/lib/admin-cms';
 import { useAuth } from '@/lib/auth';
 import { Save, Upload, Palette, Phone, Mail, MapPin, Globe, Search, FileText, AlertTriangle } from 'lucide-react';
+import { PaymentsTab } from '@/components/settings/PaymentsTab';
+import { ProposalsTab } from '@/components/settings/ProposalsTab';
+import { PaymentSettings, ProposalSettings, getPaymentSettings, getProposalSettings } from '@/types/settings';
 
 interface SiteSettings {
   // Basic Info
@@ -77,6 +80,21 @@ export default function Settings() {
     footer_legal_text: '',
     footer_links: '',
   });
+  
+  // Phase 7: New settings for Payments and Proposals
+  const [paymentSettings, setPaymentSettings] = useState<PaymentSettings>({
+    provider_order: ["stripe", "bank_transfer"],
+    stripe: { mode: "test" },
+    bank_transfer: { enabled: false, instructions_md: "" }
+  });
+  
+  const [proposalSettings, setProposalSettings] = useState<ProposalSettings>({
+    branding: { primary_color: "#6366f1" },
+    email: { from_name: "", from_email: "", bcc_me: false },
+    tokens: { ttl_hours: 168, single_use: false },
+    attachments: { enabled: true, max_mb: 10 }
+  });
+  
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -117,6 +135,10 @@ export default function Settings() {
         tracking_enabled: data.tracking_enabled !== false,
         show_consent_banner: data.show_consent_banner !== false,
       });
+
+      // Phase 7: Load payment and proposal settings
+      setPaymentSettings(getPaymentSettings(data));
+      setProposalSettings(getProposalSettings(data));
     } catch (error) {
       console.error('Error fetching settings:', error);
       toast({
@@ -195,7 +217,11 @@ export default function Settings() {
         adminCms.updateSetting(key, value as string)
       );
       
-      await Promise.all(settingsToUpdate);
+      // Phase 7: Save payment and proposal settings to app_config
+      const paymentUpdate = adminCms.updateSetting('payments', JSON.stringify(paymentSettings));
+      const proposalUpdate = adminCms.updateSetting('proposals', JSON.stringify(proposalSettings));
+      
+      await Promise.all([...settingsToUpdate, paymentUpdate, proposalUpdate]);
 
       toast({
         title: 'Success',
@@ -218,6 +244,13 @@ export default function Settings() {
     // Clear error when user starts typing
     if (errors[key]) {
       setErrors(prev => ({ ...prev, [key]: '' }));
+    }
+  };
+
+  // Phase 7: Helper to clear errors
+  const clearError = (field: string) => {
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
     }
   };
 
@@ -252,12 +285,14 @@ export default function Settings() {
         </div>
 
         <Tabs defaultValue="appearance" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="appearance">Appearance</TabsTrigger>
             <TabsTrigger value="contact">Contact</TabsTrigger>
             <TabsTrigger value="seo">SEO</TabsTrigger>
             <TabsTrigger value="footer">Footer</TabsTrigger>
             <TabsTrigger value="integrations">Integrations</TabsTrigger>
+            <TabsTrigger value="payments">Payments</TabsTrigger>
+            <TabsTrigger value="proposals">Proposals</TabsTrigger>
           </TabsList>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -746,6 +781,26 @@ export default function Settings() {
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            {/* Phase 7: Payments Tab */}
+            <TabsContent value="payments" className="space-y-6">
+              <PaymentsTab
+                settings={paymentSettings}
+                onChange={setPaymentSettings}
+                errors={errors}
+                onClearError={clearError}
+              />
+            </TabsContent>
+
+            {/* Phase 7: Proposals Tab */}
+            <TabsContent value="proposals" className="space-y-6">
+              <ProposalsTab
+                settings={proposalSettings}
+                onChange={setProposalSettings}
+                errors={errors}
+                onClearError={clearError}
+              />
             </TabsContent>
 
             {/* Save Button */}
