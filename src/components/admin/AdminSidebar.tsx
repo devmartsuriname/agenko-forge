@@ -38,10 +38,10 @@ const navItems = [
 ];
 
 export function AdminSidebar() {
-  const { signOut, isAdmin, user } = useAuth();
+  const { signOut, isAdmin, userRole, loading } = useAuth();
   
-  // Get user role from profile or default to viewer
-  const userRole = user?.role || 'viewer';
+  // Use userRole from auth context (fetched from profiles table)
+  // Fix: Don't use user?.role as it's always undefined
   const isEditor = userRole === 'editor' || userRole === 'admin';
 
   const handleSignOut = async () => {
@@ -51,15 +51,25 @@ export function AdminSidebar() {
   return (
     <div 
       className="w-64 bg-card border-r border-border h-screen flex flex-col"
-      data-sidebar-version="P6-DELTA-NAV-v4"
+      data-sidebar-version="P7-RBAC-FIX"
     >
-      <span className="sr-only" data-sidebar-stamp="P6-DELTA-NAV-v4" />
+      <span className="sr-only" data-sidebar-stamp="P7-RBAC-FIX" />
       <div className="p-6 border-b border-border">
         <h2 className="text-xl font-bold text-foreground">Agenko Admin</h2>
       </div>
       
       <nav className="flex-1 p-4 space-y-2">
         {navItems.map((item) => {
+          // Show loading skeleton while role is being fetched
+          if (loading && (item.adminOnly || item.editorOnly)) {
+            return (
+              <div key={item.href} className="flex items-center space-x-3 px-3 py-2">
+                <div className="h-5 w-5 bg-muted animate-pulse rounded" />
+                <div className="h-4 w-20 bg-muted animate-pulse rounded" />
+              </div>
+            );
+          }
+          
           // Hide admin-only items for non-admins
           if (item.adminOnly && !isAdmin) return null;
           // Hide editor-only items for viewers

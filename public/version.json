@@ -1,5 +1,5 @@
 {
-  "version": "P6-DELTA-NAV-v4",
-  "build_id": "20241219-164500",
-  "features": ["quotes", "payments", "proposals", "event-logs", "csv-exports"]
+  "version": "P7-RBAC-FIX",
+  "build_id": "20241219-170000",
+  "features": ["quotes", "payments", "proposals", "event-logs", "csv-exports", "rbac-fix"]
 }

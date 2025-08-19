@@ -50,7 +50,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           <main className="flex-1 overflow-y-auto p-6 relative">
             {children || <Outlet />}
             <div className="fixed bottom-2 right-2 text-xs text-muted-foreground/50 pointer-events-none">
-              v:P6-DELTA-NAV-v4
+              v:P7-RBAC-FIX
             </div>
           </main>
         </div>
