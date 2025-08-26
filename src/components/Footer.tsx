@@ -102,7 +102,7 @@ const Footer = () => {
         <div className="border-t border-agenko-dark-lighter mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-agenko-gray text-sm">
-              © 2025 <span className="text-agenko-green">{settings.site_title}</span> - All Rights Reserved.
+              {settings.footer_legal_text}
             </p>
             <div className="flex space-x-6 text-agenko-gray-light text-sm">
               <Link to="/terms-conditions" className="hover:text-agenko-green transition-colors">
