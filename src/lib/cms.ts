@@ -333,11 +333,11 @@ export const cms = {
     }));
   },
 
-  async getBlogPostCategories(postId: string) {
+  async getBlogPostCategories(postId: string): Promise<BlogCategory[]> {
     const { data, error } = await supabase
       .from('blog_post_categories')
       .select(`
-        blog_categories (
+        blog_categories!inner(
           id,
           name,
           slug,
@@ -352,7 +352,16 @@ export const cms = {
 
     if (error) throw error;
     
-    return (data || []).map(item => item.blog_categories);
+    return (data || []).map(item => ({
+      id: (item as any).blog_categories.id,
+      name: (item as any).blog_categories.name,
+      slug: (item as any).blog_categories.slug,
+      color: (item as any).blog_categories.color,
+      description: (item as any).blog_categories.description,
+      status: (item as any).blog_categories.status as 'draft' | 'published',
+      created_at: (item as any).blog_categories.created_at,
+      updated_at: (item as any).blog_categories.updated_at
+    }));
   },
 
   // Get category by slug
