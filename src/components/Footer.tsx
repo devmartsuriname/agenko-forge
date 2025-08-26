@@ -3,8 +3,29 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import logo from '@/assets/logo.png';
+import { useContactSettings } from '@/hooks/useContactSettings';
 
 const Footer = () => {
+  const { settings, loading } = useContactSettings();
+
+  // Parse address lines
+  const addressLines = settings.contact_address?.split('\n') || ['6801 Hollywood Blvd, Los Angeles, CA 90028'];
+  const mainAddress = addressLines[0] || '6801 Hollywood Blvd, Los Angeles, CA 90028';
+  const subAddress = addressLines[1] || 'Los Angeles, CA 90028';
+
+  if (loading) {
+    return (
+      <footer className="bg-agenko-dark border-t border-agenko-dark-lighter">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-agenko-gray/20 rounded w-32"></div>
+            <div className="h-4 bg-agenko-gray/20 rounded w-full max-w-sm"></div>
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
   return (
     <footer className="bg-agenko-dark border-t border-agenko-dark-lighter">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -19,7 +40,7 @@ const Footer = () => {
               />
             </Link>
             <p className="text-agenko-gray-light text-sm mb-6 max-w-sm">
-              Agenko creative digital agency delivering innovate web Development marketing.
+              {settings.site_description}
             </p>
             <div className="flex items-center space-x-2">
               <Input
@@ -37,12 +58,16 @@ const Footer = () => {
           <div>
             <h3 className="text-agenko-white font-semibold mb-4">Main Address</h3>
             <div className="space-y-3 text-agenko-gray-light text-sm">
-              <p>6801 Hollywood Blvd, Los Angeles, CA 90028</p>
+              <p>{mainAddress}</p>
             </div>
-            <h4 className="text-agenko-white font-semibold mt-6 mb-3">Sub-Address</h4>
-            <div className="space-y-3 text-agenko-gray-light text-sm">
-              <p>200 Santa Monica Pier, Santa Monica, CA 90401</p>
-            </div>
+            {addressLines.length > 1 && (
+              <>
+                <h4 className="text-agenko-white font-semibold mt-6 mb-3">Sub-Address</h4>
+                <div className="space-y-3 text-agenko-gray-light text-sm">
+                  <p>{subAddress}</p>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Our Links */}
@@ -63,11 +88,11 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-2 text-agenko-gray-light text-sm">
                 <Mail size={16} className="text-agenko-green" />
-                <span>info@agenko.com</span>
+                <span>{settings.contact_email}</span>
               </div>
               <div className="flex items-center space-x-2 text-agenko-gray-light text-sm">
                 <Phone size={16} className="text-agenko-green" />
-                <span>+555-759-9854</span>
+                <span>{settings.contact_phone}</span>
               </div>
             </div>
           </div>
@@ -77,7 +102,7 @@ const Footer = () => {
         <div className="border-t border-agenko-dark-lighter mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-agenko-gray text-sm">
-              © 2025 <span className="text-agenko-green">Agenko</span> - All Rights Reserved.
+              © 2025 <span className="text-agenko-green">{settings.site_title}</span> - All Rights Reserved.
             </p>
             <div className="flex space-x-6 text-agenko-gray-light text-sm">
               <Link to="/terms-conditions" className="hover:text-agenko-green transition-colors">

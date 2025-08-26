@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Mail, Phone, MapPin, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { useContactSettings } from '@/hooks/useContactSettings';
 
 interface ContactFormData {
   name: string;
@@ -34,6 +35,7 @@ const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
+  const { settings: contactSettings, loading: contactLoading } = useContactSettings();
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -292,41 +294,64 @@ const Contact = () => {
                     <h3 className="text-xl font-bold text-agenko-white mb-6">
                       Get in Touch
                     </h3>
-                    <div className="space-y-4">
-                      <div className="flex items-start space-x-3">
-                        <Mail className="w-5 h-5 text-agenko-green mt-1" />
-                        <div>
-                          <p className="text-agenko-white font-medium">Email</p>
-                          <p className="text-agenko-gray-light text-sm">info@agenko.com</p>
+                    {contactLoading ? (
+                      <div className="space-y-4 animate-pulse">
+                        <div className="flex items-start space-x-3">
+                          <div className="w-5 h-5 bg-agenko-gray/20 rounded"></div>
+                          <div className="space-y-2 flex-1">
+                            <div className="h-4 bg-agenko-gray/20 rounded w-16"></div>
+                            <div className="h-3 bg-agenko-gray/20 rounded w-32"></div>
+                          </div>
+                        </div>
+                        <div className="flex items-start space-x-3">
+                          <div className="w-5 h-5 bg-agenko-gray/20 rounded"></div>
+                          <div className="space-y-2 flex-1">
+                            <div className="h-4 bg-agenko-gray/20 rounded w-16"></div>
+                            <div className="h-3 bg-agenko-gray/20 rounded w-32"></div>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-start space-x-3">
-                        <Phone className="w-5 h-5 text-agenko-green mt-1" />
-                        <div>
-                          <p className="text-agenko-white font-medium">Phone</p>
-                          <p className="text-agenko-gray-light text-sm">+555-759-9854</p>
+                    ) : (
+                      <div className="space-y-4">
+                        <div className="flex items-start space-x-3">
+                          <Mail className="w-5 h-5 text-agenko-green mt-1" />
+                          <div>
+                            <p className="text-agenko-white font-medium">Email</p>
+                            <p className="text-agenko-gray-light text-sm">{contactSettings.contact_email}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start space-x-3">
+                          <Phone className="w-5 h-5 text-agenko-green mt-1" />
+                          <div>
+                            <p className="text-agenko-white font-medium">Phone</p>
+                            <p className="text-agenko-gray-light text-sm">{contactSettings.contact_phone}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start space-x-3">
+                          <MapPin className="w-5 h-5 text-agenko-green mt-1" />
+                          <div>
+                            <p className="text-agenko-white font-medium">Address</p>
+                            <p className="text-agenko-gray-light text-sm">
+                              {contactSettings.contact_address?.split('\n').map((line, index) => (
+                                <span key={index}>
+                                  {line}
+                                  {index < (contactSettings.contact_address?.split('\n').length || 1) - 1 && <br />}
+                                </span>
+                              ))}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-start space-x-3">
+                          <Clock className="w-5 h-5 text-agenko-green mt-1" />
+                          <div>
+                            <p className="text-agenko-white font-medium">Hours</p>
+                            <p className="text-agenko-gray-light text-sm">
+                              {contactSettings.business_hours}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-start space-x-3">
-                        <MapPin className="w-5 h-5 text-agenko-green mt-1" />
-                        <div>
-                          <p className="text-agenko-white font-medium">Address</p>
-                          <p className="text-agenko-gray-light text-sm">
-                            6801 Hollywood Blvd<br />
-                            Los Angeles, CA 90028
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-start space-x-3">
-                        <Clock className="w-5 h-5 text-agenko-green mt-1" />
-                        <div>
-                          <p className="text-agenko-white font-medium">Hours</p>
-                          <p className="text-agenko-gray-light text-sm">
-                            Mon - Fri: 9:00 AM - 6:00 PM PST
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                    )}
                   </CardContent>
                 </Card>
 
