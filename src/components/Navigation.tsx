@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
+import logo from '@/assets/logo.png';
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -42,11 +43,12 @@ const Navigation = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2" aria-label="Agenko Home">
-              <div className="w-8 h-8 bg-agenko-green rounded-full flex items-center justify-center">
-                <span className="text-agenko-dark font-bold text-lg" aria-hidden="true">A</span>
-              </div>
-              <span className="text-agenko-white font-heading font-bold text-xl">Agenko</span>
+            <Link to="/" className="flex items-center space-x-2" aria-label="DevMart Home">
+              <img 
+                src={logo} 
+                alt="DevMart Logo" 
+                className="h-8 w-auto"
+              />
             </Link>
 
             {/* Desktop Navigation */}

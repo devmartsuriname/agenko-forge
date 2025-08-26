@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Mail, Phone, MapPin } from 'lucide-react';
+import logo from '@/assets/logo.png';
 
 const Footer = () => {
   return (
@@ -11,10 +12,11 @@ const Footer = () => {
           {/* Brand & Description */}
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-agenko-green rounded-full flex items-center justify-center">
-                <span className="text-agenko-dark font-bold text-lg">A</span>
-              </div>
-              <span className="text-agenko-white font-heading font-bold text-xl">Agenko</span>
+              <img 
+                src={logo} 
+                alt="DevMart Logo" 
+                className="h-8 w-auto"
+              />
             </Link>
             <p className="text-agenko-gray-light text-sm mb-6 max-w-sm">
               Agenko creative digital agency delivering innovate web Development marketing.
