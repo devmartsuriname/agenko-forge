@@ -126,7 +126,7 @@ export function AdminSidebar() {
           </div>
           
           {isExpanded && (
-            <div className="ml-4 space-y-1">
+            <div className="ml-4 mt-2 space-y-1">
               {item.subItems.map((subItem: any) => renderNavItem(subItem, true))}
             </div>
           )}
