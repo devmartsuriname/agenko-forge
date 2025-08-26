@@ -158,8 +158,10 @@ export function AdminSidebar() {
 
   return (
     <div 
+      id="admin-sidebar-main"
       className="w-64 bg-card border-r border-border h-screen flex flex-col"
-      data-sidebar-version="P7-RBAC-FIX"
+      data-sidebar-version="P7-RBAC-FIX-UNIQUE"
+      data-component-id={`sidebar-${Date.now()}`}
     >
       <span className="sr-only" data-sidebar-stamp="P7-RBAC-FIX" />
       <div className="p-6 border-b border-border">
