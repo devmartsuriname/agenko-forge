@@ -43,7 +43,8 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
     name: template?.name || '',
     subject: template?.subject || '',
     content: template?.content || '',
-    service: template?.variables?.find(v => v.name === 'service_type')?.default_value || '',
+    service: template?.service_type || template?.variables?.find(v => v.name === 'service_type')?.default_value || '',
+    status: template?.status || (template?.is_active ? 'active' : 'draft'),
     is_active: template?.is_active ?? true,
     variables: template?.variables || DEFAULT_VARIABLES
   });
@@ -56,6 +57,8 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
       name: formData.name,
       subject: formData.subject,
       content: formData.content,
+      status: formData.status as 'active' | 'draft' | 'archived',
+      service_type: formData.service,
       is_active: formData.is_active,
       variables: [
         ...formData.variables,
@@ -156,6 +159,26 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
                   onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
                 />
                 <Label htmlFor="active">Active Template</Label>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="status">Status</Label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(value) => setFormData(prev => ({ 
+                    ...prev, 
+                    status: value as 'active' | 'draft' | 'archived'
+                  }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="archived">Archived</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </CardContent>
           </Card>

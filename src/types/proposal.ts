@@ -5,6 +5,8 @@ export interface ProposalTemplate {
   content: string;
   variables: TemplateVariable[];
   is_active: boolean;
+  status?: 'active' | 'draft' | 'archived';
+  service_type?: string;
   created_by: string;
   created_at: string;
   updated_at: string;

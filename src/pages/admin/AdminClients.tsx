@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Plus, Search, FileText, Edit, Trash2, Download, Upload } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { exportToCSV } from '@/lib/csv-export';
@@ -37,6 +38,7 @@ export default function AdminClients() {
     notes: ''
   });
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchClients();
@@ -154,6 +156,16 @@ export default function AdminClients() {
     setEditingClient(null);
   };
 
+  const createProposalForClient = (client: Client) => {
+    const params = new URLSearchParams({
+      clientName: client.name,
+      clientEmail: client.email,
+      clientCompany: client.company || '',
+      fromClients: 'true'
+    });
+    navigate(`/admin/proposals?${params.toString()}&tab=proposals&action=create`);
+  };
+
   if (loading) {
     return <div className="p-6">Loading clients...</div>;
   }
@@ -224,6 +236,14 @@ export default function AdminClients() {
                   <TableCell>{new Date(client.created_at).toLocaleDateString()}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => createProposalForClient(client)}
+                        title="Create Proposal"
+                      >
+                        <FileText className="h-4 w-4" />
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"

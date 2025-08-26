@@ -617,6 +617,8 @@ export type Database = {
           id: string
           is_active: boolean
           name: string
+          service_type: string | null
+          status: string | null
           subject: string
           updated_at: string
           variables: Json | null
@@ -628,6 +630,8 @@ export type Database = {
           id?: string
           is_active?: boolean
           name: string
+          service_type?: string | null
+          status?: string | null
           subject: string
           updated_at?: string
           variables?: Json | null
@@ -639,6 +643,8 @@ export type Database = {
           id?: string
           is_active?: boolean
           name?: string
+          service_type?: string | null
+          status?: string | null
           subject?: string
           updated_at?: string
           variables?: Json | null
