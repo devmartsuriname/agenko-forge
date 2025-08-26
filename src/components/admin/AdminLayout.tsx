@@ -42,7 +42,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   return (
-    <div className="admin-root min-h-screen bg-background" data-build="P7-P1-v1">
+    <div className="admin-root min-h-screen bg-background" data-build="P7-P1-CLOSEOUT">
       <div className="flex h-screen">
         <AdminSidebar />
         <div className="flex-1 flex flex-col overflow-hidden">
@@ -50,7 +50,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           <main className="flex-1 overflow-y-auto p-6 relative">
             {children || <Outlet />}
             <div className="fixed bottom-2 right-2 text-xs text-muted-foreground/50 pointer-events-none">
-              v:P7-P1-v1
+              v:P7-P1-CLOSEOUT
             </div>
           </main>
         </div>
