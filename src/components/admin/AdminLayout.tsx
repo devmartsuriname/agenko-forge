@@ -52,7 +52,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   return (
-    <div className="admin-root min-h-screen bg-background" data-build="P7-RLS-AUDIT-v1" data-audit="P7-RLS-AUDIT-v1">
+    <div className="admin-root min-h-screen bg-background" data-build="P71-BLOG-FAQ-v1" data-audit="P7-RLS-AUDIT-v1">
       {/* Debug audit banner */}
       {process.env.NODE_ENV === 'development' && (
         <div className="bg-yellow-500/10 border-b border-yellow-500/20 px-4 py-1 text-xs text-yellow-700 dark:text-yellow-300">

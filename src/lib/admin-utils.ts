@@ -13,7 +13,7 @@ export function generateSlug(title: string): string {
 }
 
 export async function ensureUniqueSlug(
-  table: 'services' | 'projects' | 'blog_posts' | 'pages', 
+  table: 'services' | 'projects' | 'blog_posts' | 'blog_categories' | 'pages', 
   baseSlug: string, 
   excludeId?: string
 ): Promise<string> {

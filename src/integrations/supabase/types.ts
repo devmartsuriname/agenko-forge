@@ -35,11 +35,66 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_categories: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          slug: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          slug: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      blog_post_categories: {
+        Row: {
+          blog_post_id: string
+          category_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          blog_post_id: string
+          category_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          blog_post_id?: string
+          category_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           body: Json | null
           created_at: string | null
           excerpt: string | null
+          feature_image_url: string | null
           id: string
           published_at: string | null
           seo_canonical_url: string | null
@@ -58,6 +113,7 @@ export type Database = {
           body?: Json | null
           created_at?: string | null
           excerpt?: string | null
+          feature_image_url?: string | null
           id?: string
           published_at?: string | null
           seo_canonical_url?: string | null
@@ -76,6 +132,7 @@ export type Database = {
           body?: Json | null
           created_at?: string | null
           excerpt?: string | null
+          feature_image_url?: string | null
           id?: string
           published_at?: string | null
           seo_canonical_url?: string | null
@@ -155,6 +212,36 @@ export type Database = {
           message?: string
           name?: string
           subject?: string | null
+        }
+        Relationships: []
+      }
+      faqs: {
+        Row: {
+          answer: string
+          created_at: string
+          id: string
+          question: string
+          sort_order: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          id?: string
+          question: string
+          sort_order?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          id?: string
+          question?: string
+          sort_order?: number | null
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }

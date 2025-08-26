@@ -45,6 +45,17 @@ export interface Project {
   seo_schema_type?: string;
 }
 
+export interface BlogCategory {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  color: string;
+  status: 'draft' | 'published';
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface BlogPost {
   id: string;
   title: string;
@@ -52,16 +63,28 @@ export interface BlogPost {
   excerpt?: string;
   body?: any; // JSONB
   tags?: string[];
+  feature_image_url?: string;
   status: 'draft' | 'published';
   published_at?: string;
   created_at?: string;
   updated_at?: string;
+  categories?: BlogCategory[];
   seo_title?: string;
   seo_description?: string;
   seo_canonical_url?: string;
   seo_og_image?: string;
   seo_robots?: string;
   seo_schema_type?: string;
+}
+
+export interface FAQ {
+  id: string;
+  question: string;
+  answer: string;
+  status: 'draft' | 'published';
+  sort_order: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Page {

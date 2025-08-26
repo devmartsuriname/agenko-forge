@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { ProjectImage, Service, Project, BlogPost, Page, ContactSubmission } from '@/types/content';
+import { ProjectImage, Service, Project, BlogPost, BlogCategory, FAQ, Page, ContactSubmission } from '@/types/content';
 
 // Admin CMS functions with full CRUD capabilities
 export const adminCms = {
@@ -480,6 +480,114 @@ export const adminCms = {
       orphanedFiles: meta?.orphaned_files || []
     };
   },
+
+  // Blog Categories CRUD
+  async getAllBlogCategories(): Promise<BlogCategory[]> {
+    const { data, error } = await supabase
+      .from('blog_categories')
+      .select('*')
+      .order('name', { ascending: true });
+    
+    if (error) throw error;
+    return (data || []).map(item => ({
+      ...item,
+      status: item.status as 'draft' | 'published'
+    }));
+  },
+
+  async createBlogCategory(category: Omit<BlogCategory, 'id' | 'created_at' | 'updated_at'>): Promise<BlogCategory> {
+    const { data, error } = await supabase
+      .from('blog_categories')
+      .insert(category)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return {
+      ...data,
+      status: data.status as 'draft' | 'published'
+    };
+  },
+
+  async updateBlogCategory(id: string, updates: Partial<BlogCategory>): Promise<BlogCategory> {
+    const { data, error } = await supabase
+      .from('blog_categories')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return {
+      ...data,
+      status: data.status as 'draft' | 'published'
+    };
+  },
+
+  async deleteBlogCategory(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('blog_categories')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  },
+
+  // FAQs CRUD
+  async getAllFAQs(): Promise<FAQ[]> {
+    const { data, error } = await supabase
+      .from('faqs')
+      .select('*')
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true });
+    
+    if (error) throw error;
+    return (data || []).map(item => ({
+      ...item,
+      status: item.status as 'draft' | 'published'
+    }));
+  },
+
+  async createFAQ(faq: Omit<FAQ, 'id' | 'created_at' | 'updated_at'>): Promise<FAQ> {
+    const { data, error } = await supabase
+      .from('faqs')
+      .insert(faq)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return {
+      ...data,
+      status: data.status as 'draft' | 'published'
+    };
+  },
+
+  async updateFAQ(id: string, updates: Partial<FAQ>): Promise<FAQ> {
+    const { data, error } = await supabase
+      .from('faqs')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return {
+      ...data,
+      status: data.status as 'draft' | 'published'
+    };
+  },
+
+  async deleteFAQ(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('faqs')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  },
+
+  // Export CSV
+  exportToCSV,
 
   async triggerOrphanScan(): Promise<void> {
     const { error } = await supabase.functions.invoke('storage-orphan-scan', {

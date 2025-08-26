@@ -23,6 +23,7 @@ import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import NotFound from "./pages/NotFound";
+import { FAQ } from "./pages/FAQ";
 
 // Public proposal pages
 import ProposalView from "./pages/ProposalView";
@@ -55,6 +56,9 @@ const Users = lazy(() => import("./pages/admin/Users"));
 const AdminPayments = lazy(() => import("./pages/admin/AdminPayments"));
 const AdminQuotes = lazy(() => import("./pages/admin/AdminQuotes"));
 const AdminProposals = lazy(() => import("./pages/admin/AdminProposals"));
+const AdminClients = lazy(() => import("./pages/admin/AdminClients"));
+const AdminBlogCategories = lazy(() => import("./pages/admin/AdminBlogCategories"));
+const AdminFAQ = lazy(() => import("./pages/admin/AdminFAQ"));
 const AdminTestHarness = lazy(() => import("./pages/admin/TestHarness"));
 
 const queryClient = new QueryClient();
@@ -77,9 +81,10 @@ const App = () => (
               <Route path="/portfolio" element={<Portfolio />} />
               <Route path="/portfolio/:slug" element={<ProjectDetail />} />
               <Route path="/pricing" element={<Pricing />} />
-              <Route path="/blog" element={<Blog />} />
-              <Route path="/blog/:slug" element={<BlogPost />} />
-              <Route path="/contact" element={<Contact />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/contact" element={<Contact />} />
               <Route path="/get-quote" element={<GetQuote />} />
               <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/payment-canceled" element={<PaymentCanceled />} />
@@ -167,9 +172,24 @@ const App = () => (
                     <AdminBlogEditor />
                   </Suspense>
                 } />
-                <Route path="blog/:id/edit" element={
+                <Route path="blog/edit/:id" element={
                   <Suspense fallback={<Spinner />}>
                     <AdminBlogEditor />
+                  </Suspense>
+                } />
+                <Route path="blog/categories" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminBlogCategories />
+                  </Suspense>
+                } />
+                <Route path="faq" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminFAQ />
+                  </Suspense>
+                } />
+                <Route path="clients" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminClients />
                   </Suspense>
                 } />
                 <Route path="media" element={
