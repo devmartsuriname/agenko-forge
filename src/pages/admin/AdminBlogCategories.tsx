@@ -81,14 +81,12 @@ function AdminBlogCategories() {
 
   if (!isEditor) {
     return (
-      <AdminLayout>
-        <div className="p-6">
-          <div className="text-center">
-            <h2 className="text-xl font-semibold mb-2">Access Denied</h2>
-            <p className="text-muted-foreground">You need editor permissions to manage blog categories.</p>
-          </div>
+      <div className="p-6">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">Access Denied</h2>
+          <p className="text-muted-foreground">You need editor permissions to manage blog categories.</p>
         </div>
-      </AdminLayout>
+      </div>
     );
   }
 
@@ -163,7 +161,7 @@ function AdminBlogCategories() {
   };
 
   return (
-    <AdminLayout>
+    <>
       <div className="p-6 border-b border-border bg-background/95 backdrop-blur">
         <h1 className="text-2xl font-bold text-foreground">Blog Categories</h1>
         <p className="text-muted-foreground mt-1">Manage blog post categories</p>
@@ -349,7 +347,7 @@ function AdminBlogCategories() {
           </CardContent>
         </Card>
       </div>
-    </AdminLayout>
+    </>
   );
 }
 

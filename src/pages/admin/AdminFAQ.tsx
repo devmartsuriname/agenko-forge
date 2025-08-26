@@ -75,14 +75,12 @@ function AdminFAQ() {
 
   if (!isEditor) {
     return (
-      <AdminLayout>
-        <div className="p-6">
-          <div className="text-center">
-            <h2 className="text-xl font-semibold mb-2">Access Denied</h2>
-            <p className="text-muted-foreground">You need editor permissions to manage FAQs.</p>
-          </div>
+      <div className="p-6">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">Access Denied</h2>
+          <p className="text-muted-foreground">You need editor permissions to manage FAQs.</p>
         </div>
-      </AdminLayout>
+      </div>
     );
   }
 
@@ -163,7 +161,7 @@ function AdminFAQ() {
   };
 
   return (
-    <AdminLayout>
+    <>
       <div className="p-6 border-b border-border bg-background/95 backdrop-blur">
         <h1 className="text-2xl font-bold text-foreground">FAQ Management</h1>
         <p className="text-muted-foreground mt-1">Manage frequently asked questions</p>
@@ -351,7 +349,7 @@ function AdminFAQ() {
           </CardContent>
         </Card>
       </div>
-    </AdminLayout>
+    </>
   );
 }
 
