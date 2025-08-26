@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.55.0";
 import { Resend } from "npm:resend@2.0.0";
+import { getProposalSettings } from "../shared/settings-helper.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -57,13 +58,19 @@ serve(async (req: Request) => {
       throw new Error('Proposal ID is required');
     }
 
-    // Get proposal with recipients
+    // Get proposal settings
+    const proposalSettings = await getProposalSettings();
+
+    // Get proposal with recipients and attachments
     const { data: proposal, error: proposalError } = await supabase
       .from('proposals')
       .select(`
         id, title, subject, content, total_amount, currency, expires_at,
         proposal_recipients (
           id, email, name, role, token
+        ),
+        proposal_attachments (
+          id, filename, storage_key, size_bytes, mime_type
         )
       `)
       .eq('id', proposal_id)
@@ -78,6 +85,32 @@ serve(async (req: Request) => {
     }
 
     const baseUrl = Deno.env.get('SUPABASE_URL')?.replace('/v1', '') || 'https://your-app.com';
+    
+    // Generate signed URLs for attachments
+    const attachmentLinks: string[] = [];
+    if (proposal.proposal_attachments?.length > 0) {
+      const ttlSeconds = proposalSettings.tokens.ttl_hours * 3600;
+      
+      for (const attachment of proposal.proposal_attachments) {
+        try {
+          const { data: signedUrl } = await supabase.storage
+            .from('media')
+            .createSignedUrl(attachment.storage_key, ttlSeconds);
+          
+          if (signedUrl?.signedUrl) {
+            attachmentLinks.push(`
+              <p style="margin: 8px 0;">
+                <a href="${signedUrl.signedUrl}" style="color: #1a1a1a; text-decoration: none; padding: 8px 16px; background: #f8f9fa; border-radius: 6px; display: inline-block;">
+                  📎 ${attachment.filename} (${Math.round(attachment.size_bytes / 1024)} KB)
+                </a>
+              </p>
+            `);
+          }
+        } catch (error) {
+          console.error('Error creating signed URL for attachment:', error);
+        }
+      }
+    }
     
     // Send emails to all recipients
     const emailPromises = proposal.proposal_recipients.map(async (recipient: any) => {
@@ -131,6 +164,13 @@ serve(async (req: Request) => {
                 <p><strong>This proposal expires on:</strong> ${new Date(proposal.expires_at).toLocaleDateString()}</p>
               ` : ''}
               
+              ${attachmentLinks.length > 0 ? `
+                <div style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 6px;">
+                  <h3 style="margin: 0 0 10px 0; font-size: 16px;">Attached Files:</h3>
+                  ${attachmentLinks.join('')}
+                </div>
+              ` : ''}
+              
               <div class="actions">
                 <a href="${viewUrl}" class="btn btn-view">View Full Proposal</a>
                 <a href="${acceptUrl}" class="btn btn-accept">Accept Proposal</a>
@@ -139,7 +179,7 @@ serve(async (req: Request) => {
               
               <p>If you have any questions about this proposal, please don't hesitate to reach out to us.</p>
               
-              <p>Best regards,<br>The Agenko Team</p>
+              <p>Best regards,<br>${proposalSettings.email.from_name}</p>
             </div>
             <div class="footer">
               <p>This proposal was sent securely. The action links above are unique to you.</p>
@@ -150,10 +190,12 @@ serve(async (req: Request) => {
       `;
 
       return resend.emails.send({
-        from: 'Agenko <proposals@agenko.com>',
+        from: `${proposalSettings.email.from_name} <${proposalSettings.email.from_email}>`,
         to: [recipient.email],
         subject: proposal.subject,
         html: emailHtml,
+        ...(proposalSettings.email.reply_to ? { reply_to: proposalSettings.email.reply_to } : {}),
+        ...(proposalSettings.email.bcc_me ? { bcc: [proposalSettings.email.from_email] } : {})
       });
     });
 

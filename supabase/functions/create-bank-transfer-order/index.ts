@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { getPaymentSettings } from "../shared/settings-helper.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -35,6 +36,9 @@ serve(async (req) => {
 
   try {
     logStep("Function started");
+
+    // Get payment settings from database
+    const paymentSettings = await getPaymentSettings();
 
     // Create Supabase client with service role for database operations
     const supabaseService = createClient(
@@ -103,21 +107,25 @@ serve(async (req) => {
 
     logStep("Bank transfer order created", { orderId: order.id, reference: bankReference });
 
-    // Bank details for Suriname (these would be configurable in a real app)
+    // Get bank details from settings
+    const bankSettings = paymentSettings.bank_transfer;
     const bankDetails = {
-      bankName: "Suriname Commercial Bank",
-      accountName: "Your Company Name",
-      accountNumber: "123-456-789",
-      swiftCode: "SCBKSR22",
+      bankName: bankSettings.bank_name || "Suriname Commercial Bank",
+      accountName: bankSettings.beneficiary_name || "Your Company Name", 
+      accountNumber: bankSettings.account_number_masked || "123-456-789",
+      swiftCode: bankSettings.swift || "SCBKSR22",
+      iban: bankSettings.iban || "",
       reference: bankReference,
       amount: amount / 100, // Convert cents to dollars
       currency: currency.toUpperCase(),
-      instructions: [
-        "Use the reference number provided when making the transfer",
-        "Include your email address in the transfer description",
-        "Transfer must be completed within 7 days",
-        "Upload proof of payment after completing the transfer"
-      ]
+      instructions: bankSettings.instructions_md ? 
+        bankSettings.instructions_md.split('\n').filter(line => line.trim()) :
+        [
+          "Use the reference number provided when making the transfer",
+          "Include your email address in the transfer description", 
+          "Transfer must be completed within 7 days",
+          "Upload proof of payment after completing the transfer"
+        ]
     };
 
     return new Response(JSON.stringify({

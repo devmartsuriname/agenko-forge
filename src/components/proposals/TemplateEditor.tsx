@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { FileText, Eye, Save, X } from 'lucide-react';
 import { ProposalTemplate, TemplateVariable } from '@/types/proposal';
 import { RichEditor } from './RichEditor';
+import { AttachmentPanel } from './AttachmentPanel';
 
 interface TemplateEditorProps {
   template?: ProposalTemplate;
@@ -48,6 +49,7 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
   });
 
   const [showPreview, setShowPreview] = useState(false);
+  const [attachments, setAttachments] = useState<any[]>([]);
 
   const handleSave = async () => {
     const templateData = {
@@ -198,6 +200,13 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
               />
             </CardContent>
           </Card>
+
+          <AttachmentPanel
+            proposalId={template?.id || null}
+            attachments={attachments}
+            onAttachmentsChange={setAttachments}
+            disabled={!template?.id}
+          />
 
           {showPreview && (
             <Card>

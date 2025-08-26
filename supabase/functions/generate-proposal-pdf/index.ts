@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.55.0";
+import { getProposalSettings } from "../shared/settings-helper.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -54,6 +55,9 @@ serve(async (req: Request) => {
       throw new Error('Proposal ID is required');
     }
 
+    // Get proposal settings
+    const proposalSettings = await getProposalSettings();
+
     // Get proposal with recipients
     const { data: proposal, error: proposalError } = await supabase
       .from('proposals')
@@ -95,7 +99,7 @@ serve(async (req: Request) => {
           .company-name { 
             font-size: 24px; 
             font-weight: bold; 
-            color: #1a1a1a; 
+            color: ${proposalSettings.branding.primary_color || '#1a1a1a'}; 
             margin-bottom: 5px;
           }
           .proposal-title { 
@@ -163,7 +167,11 @@ serve(async (req: Request) => {
       </head>
       <body>
         <div class="header">
-          <div class="company-name">Agenko Digital Agency</div>
+          ${proposalSettings.branding.logo_url_light ? `
+            <img src="${proposalSettings.branding.logo_url_light}" alt="Company Logo" style="max-height: 60px; margin-bottom: 20px;" />
+          ` : `
+            <div class="company-name">${proposalSettings.email.from_name}</div>
+          `}
           <div class="proposal-title">${proposal.title}</div>
           <span class="status-badge status-${proposal.status}">${proposal.status}</span>
         </div>
@@ -215,7 +223,12 @@ serve(async (req: Request) => {
             hour: '2-digit',
             minute: '2-digit'
           })}.</p>
-          <p>Agenko Digital Agency | proposals@agenko.com</p>
+          <p>${proposalSettings.email.from_name} | ${proposalSettings.email.from_email}</p>
+          ${proposalSettings.branding.footer_note_md ? `
+            <div style="margin-top: 10px; font-size: 11px; color: #6b7280;">
+              ${proposalSettings.branding.footer_note_md}
+            </div>
+          ` : ''}
         </div>
       </body>
       </html>

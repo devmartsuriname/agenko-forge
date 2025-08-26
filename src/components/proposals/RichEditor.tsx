@@ -20,6 +20,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { MediaPicker } from '@/components/media/MediaPicker';
 
 interface RichEditorProps {
   content: string;
@@ -100,14 +101,11 @@ export function RichEditor({ content, onChange, onInsertToken }: RichEditorProps
     }
   };
 
-  const insertImage = () => {
-    const imageUrl = prompt('Enter image URL:');
-    const altText = prompt('Enter alt text:') || 'Image';
-    
-    if (imageUrl) {
-      const imageHtml = `<img src="${imageUrl}" alt="${altText}" style="max-width: 100%; height: auto;" />`;
-      onChange(content + imageHtml);
-    }
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
+
+  const handleImageSelect = (media: { url: string; alt: string; width?: number; height?: number }) => {
+    const imageHtml = `<img src="${media.url}" alt="${media.alt}" style="max-width: 100%; height: auto;" />`;
+    onChange(content + imageHtml);
   };
 
   return (
@@ -142,7 +140,7 @@ export function RichEditor({ content, onChange, onInsertToken }: RichEditorProps
         <Button
           variant="ghost"
           size="sm"
-          onClick={insertImage}
+          onClick={() => setShowMediaPicker(true)}
           title="Insert Image"
           className="h-8 w-8 p-1"
         >
@@ -243,6 +241,14 @@ export function RichEditor({ content, onChange, onInsertToken }: RichEditorProps
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Media Picker */}
+      <MediaPicker
+        open={showMediaPicker}
+        onOpenChange={setShowMediaPicker}
+        onSelect={handleImageSelect}
+        uploadPath="proposals/"
+      />
     </div>
   );
 }

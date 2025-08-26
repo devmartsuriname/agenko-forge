@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { getPaymentSettings } from "../shared/settings-helper.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -28,6 +29,9 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
+    // Get payment settings from database
+    const paymentSettings = await getPaymentSettings();
+    
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) {
       throw new Error("STRIPE_SECRET_KEY is not configured");
@@ -86,18 +90,30 @@ serve(async (req) => {
 
     const origin = req.headers.get("origin") || "https://dvgubqqjvmsepkilnkak.supabase.co";
 
+    // Use URLs from settings or defaults
+    const defaultSuccessUrl = successUrl || `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
+    const defaultCancelUrl = cancelUrl || `${origin}/payment-canceled`;
+
     // Create checkout session
     const sessionConfig: any = {
       customer: customerId,
       customer_email: customerId ? undefined : userEmail,
       mode: "payment",
-      success_url: successUrl || `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: cancelUrl || `${origin}/payment-canceled`,
+      success_url: defaultSuccessUrl,
+      cancel_url: defaultCancelUrl,
       metadata: {
         user_id: user?.id || "guest",
-        email: userEmail
+        email: userEmail,
+        stripe_mode: paymentSettings.stripe.mode
       }
     };
+
+    // Add statement descriptor if configured
+    if (paymentSettings.stripe.statement_descriptor) {
+      sessionConfig.payment_intent_data = {
+        statement_descriptor: paymentSettings.stripe.statement_descriptor
+      };
+    }
 
     if (priceId) {
       sessionConfig.line_items = [{ price: priceId, quantity: 1 }];
