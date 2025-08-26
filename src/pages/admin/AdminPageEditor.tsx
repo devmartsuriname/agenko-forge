@@ -22,8 +22,21 @@ import { SEOEditor, SEOData } from '@/components/admin/SEOEditor';
 function AdminPageEditorContent() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isEditor } = useAuth();
+  const { isEditor, userRole, user } = useAuth();
   const isEditing = id !== 'new';
+  
+  // Debug logging for diagnosis
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[AdminPageEditor] Component mounted', {
+        id,
+        isEditing,
+        isEditor,
+        userRole,
+        userEmail: user?.email
+      });
+    }
+  }, [id, isEditing, isEditor, userRole, user]);
   
   const [page, setPage] = useState<Partial<Page>>({
     title: '',
@@ -113,6 +126,7 @@ function AdminPageEditorContent() {
   };
 
   if (!isEditor) {
+    console.log('[AdminPageEditor] Access denied - not editor', { isEditor, userRole });
     return (
       <div className="text-center py-8">
         <h1 className="text-2xl font-bold text-destructive mb-2">Access Denied</h1>
@@ -122,11 +136,13 @@ function AdminPageEditorContent() {
   }
 
   if (loading) {
+    console.log('[AdminPageEditor] Loading state', { loading, isEditing });
     return <LoadingCardSkeleton />;
   }
 
   return (
     <>
+      <div data-probe="pages-new-mount" style={{ display: 'none' }} />
       <Helmet>
         <title>{isEditing ? 'Edit' : 'New'} Page - Admin Panel</title>
         <meta name="robots" content="noindex,nofollow" />

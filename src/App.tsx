@@ -113,7 +113,12 @@ const App = () => (
                   </Suspense>
                 } />
                 <Route path="pages/new" element={
-                  <Suspense fallback={<Spinner />}>
+                  <Suspense fallback={
+                    <div>
+                      <div style={{ display: 'none' }}>Loading AdminPageEditor...</div>
+                      <Spinner />
+                    </div>
+                  }>
                     <AdminPageEditor />
                   </Suspense>
                 } />
