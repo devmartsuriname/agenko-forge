@@ -57,12 +57,32 @@ function AdminPageEditorContent() {
     seo_schema_type: 'WebPage',
   });
   const [content, setContent] = useState('');
-  const [dataLoading, setDataLoading] = useState(isEditing);
+  // Explicit loading control - never load for new pages
+  const [dataLoading, setDataLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  // Debug probe for dataLoading changes
   useEffect(() => {
-    if (isEditing && id) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[AdminPageEditor] dataLoading changed', { 
+        dataLoading, 
+        isEditing, 
+        id,
+        reason: isEditing ? 'editing-mode' : 'new-page-mode'
+      });
+    }
+  }, [dataLoading, isEditing, id]);
+
+  useEffect(() => {
+    // Defensive guard - only fetch for existing pages with valid IDs
+    if (isEditing && id && id !== 'new') {
+      console.log('[AdminPageEditor] Starting fetch for existing page', { id, isEditing });
+      setDataLoading(true);
       fetchPage(id);
+    } else {
+      console.log('[AdminPageEditor] Skipping fetch - new page mode', { id, isEditing });
+      // Ensure we're not loading for new pages
+      setDataLoading(false);
     }
   }, [id, isEditing]);
 
