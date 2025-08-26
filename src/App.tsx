@@ -25,8 +25,8 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import NotFound from "./pages/NotFound";
 import { FAQ } from "./pages/FAQ";
-
-// Public proposal pages
+import Sitemap from "./pages/Sitemap";
+import Login from "./pages/admin/Login";
 import ProposalView from "./pages/ProposalView";
 import ProposalAccept from "./pages/ProposalAccept";
 import ProposalReject from "./pages/ProposalReject";

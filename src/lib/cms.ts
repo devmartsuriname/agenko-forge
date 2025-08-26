@@ -337,23 +337,22 @@ export const cms = {
     const { data, error } = await supabase
       .from('blog_post_categories')
       .select(`
-        id,
-        blog_categories!inner(*)
+        blog_categories (
+          id,
+          name,
+          slug,
+          color,
+          description,
+          status,
+          created_at,
+          updated_at
+        )
       `)
       .eq('blog_post_id', postId);
 
     if (error) throw error;
     
-    return (data || []).map(item => ({
-      id: item.blog_categories.id,
-      name: item.blog_categories.name,
-      slug: item.blog_categories.slug,
-      color: item.blog_categories.color,
-      description: item.blog_categories.description,
-      status: item.blog_categories.status,
-      created_at: item.blog_categories.created_at,
-      updated_at: item.blog_categories.updated_at
-    }));
+    return (data || []).map(item => item.blog_categories);
   },
 
   // Get category by slug
