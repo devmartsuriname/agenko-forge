@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
 import { AdminSidebar } from './AdminSidebar';
@@ -11,6 +11,16 @@ interface AdminLayoutProps {
 export function AdminLayout({ children }: AdminLayoutProps) {
   const { user, loading, userRole } = useAuth();
   const location = useLocation();
+
+  // Dev-only observability hooks
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.info('[build] P7-DIAG-RLS-v1');
+      if (user) {
+        console.info('[whoami]', { email: user.email, role: userRole });
+      }
+    }
+  }, [user, userRole]);
 
   // Show loading state
   if (loading) {
@@ -42,7 +52,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   return (
-    <div className="admin-root min-h-screen bg-background" data-build="P7-P1-CLOSEOUT">
+    <div className="admin-root min-h-screen bg-background" data-build="P7-DIAG-RLS-v1">
       <div className="flex h-screen">
         <AdminSidebar />
         <div className="flex-1 flex flex-col overflow-hidden">
@@ -50,7 +60,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           <main className="flex-1 overflow-y-auto p-6 relative">
             {children || <Outlet />}
             <div className="fixed bottom-2 right-2 text-xs text-muted-foreground/50 pointer-events-none">
-              v:P7-P1-CLOSEOUT
+              v:P7-DIAG-RLS-v1
             </div>
           </main>
         </div>

@@ -1,6 +1,6 @@
 {
-  "version": "P7-P1-v1",
-  "build_id": "20250126-P1-closeout",
+  "version": "P7-DIAG-RLS-v1",
+  "build_id": "20250126-P7-diagnostic",
   "features": [
     "templates-crud-system",
     "client-to-proposal-integration", 

@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Agenko Design System - Based on the Agenko Home 3 design - P7-RBAC-FIX */ 
+/* Agenko Design System - Based on the Agenko Home 3 design - P7-DIAG-RLS-v1 */ 
 
 @layer base {
   :root {
