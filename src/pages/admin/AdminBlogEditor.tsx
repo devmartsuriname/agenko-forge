@@ -17,7 +17,9 @@ import { LoadingCardSkeleton } from '@/components/admin/LoadingSkeleton';
 import { TagInput } from '@/components/admin/TagInput';
 import { SEOEditor, SEOData } from '@/components/admin/SEOEditor';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Save, Eye } from 'lucide-react';
+import { CategorySelector } from '@/components/admin/CategorySelector';
+import { MediaPicker } from '@/components/media/MediaPicker';
+import { ArrowLeft, Save, Eye, Image, Upload } from 'lucide-react';
 
 function AdminBlogEditor() {
   const { id } = useParams();
@@ -32,6 +34,7 @@ function AdminBlogEditor() {
     body: {},
     tags: [],
     status: 'draft',
+    feature_image_url: '',
     seo_title: '',
     seo_description: '',
     seo_canonical_url: '',
@@ -39,6 +42,8 @@ function AdminBlogEditor() {
     seo_robots: 'index,follow',
     seo_schema_type: 'Article',
   });
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
   const [loading, setLoading] = useState(isEditing);
   const [saving, setSaving] = useState(false);
 
@@ -52,6 +57,11 @@ function AdminBlogEditor() {
     try {
       const data = await adminCms.getBlogPost(postId);
       setPost(data);
+      
+      // Set categories if they exist
+      if (data.categories) {
+        setSelectedCategoryIds(data.categories.map(cat => cat.id));
+      }
     } catch (error) {
       console.error('Error fetching blog post:', error);
       if (error instanceof Error && error.message.includes('permission')) {
@@ -91,6 +101,7 @@ function AdminBlogEditor() {
         body: post.body || {},
         tags: post.tags || [],
         status: post.status!,
+        feature_image_url: post.feature_image_url || '',
         published_at: post.status === 'published' && !post.published_at ? new Date().toISOString() : post.published_at,
         seo_title: post.seo_title,
         seo_description: post.seo_description,
@@ -101,10 +112,10 @@ function AdminBlogEditor() {
       };
 
       if (isEditing) {
-        await adminCms.updateBlogPost(post.id!, postData);
+        await adminCms.updateBlogPost(post.id!, postData, selectedCategoryIds);
         adminToast.updated('Blog Post', post.title);
       } else {
-        const newPost = await adminCms.createBlogPost(postData);
+        const newPost = await adminCms.createBlogPost(postData, selectedCategoryIds);
         adminToast.created('Blog Post', post.title);
         navigate(`/admin/blog/${newPost.id}/edit`);
       }
@@ -322,24 +333,64 @@ function AdminBlogEditor() {
                   </CardContent>
                 </Card>
 
+                <CategorySelector
+                  selectedCategoryIds={selectedCategoryIds}
+                  onCategoryChange={setSelectedCategoryIds}
+                  disabled={saving}
+                />
+
                 <Card>
                   <CardHeader>
-                    <CardTitle>Tags</CardTitle>
-                    <CardDescription>Add tags to categorize your post</CardDescription>
+                    <CardTitle className="flex items-center">
+                      <Image className="w-4 h-4 mr-2" />
+                      Feature Image
+                    </CardTitle>
+                    <CardDescription>Set a feature image for this blog post</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <TagInput
-                      tags={post.tags || []}
-                      onTagsChange={(tags) => setPost(prev => ({ ...prev, tags }))}
-                      placeholder="Add tags (press Enter, comma, or space)"
-                      maxTags={10}
-                      maxTagLength={30}
-                      disabled={saving}
-                      aria-label="Blog post tags"
-                      aria-describedby="tags-help"
-                    />
-                    <p id="tags-help" className="text-sm text-muted-foreground mt-2">
-                      Add relevant tags to help readers find your content
+                  <CardContent className="space-y-4">
+                    {post.feature_image_url ? (
+                      <div className="space-y-3">
+                        <div className="aspect-video rounded-lg overflow-hidden border">
+                          <img
+                            src={post.feature_image_url}
+                            alt="Feature image preview"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowMediaPicker(true)}
+                            disabled={saving}
+                          >
+                            <Upload className="w-4 h-4 mr-1" />
+                            Change Image
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setPost(prev => ({ ...prev, feature_image_url: '' }))}
+                            disabled={saving}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
+                        <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowMediaPicker(true)}
+                          disabled={saving}
+                        >
+                          Select Feature Image
+                        </Button>
+                      </div>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      Feature images appear in blog listings and social media previews. Recommended size: 1200x630px.
                     </p>
                   </CardContent>
                 </Card>
@@ -366,6 +417,16 @@ function AdminBlogEditor() {
             />
           </TabsContent>
         </Tabs>
+
+        <MediaPicker
+          open={showMediaPicker}
+          onOpenChange={setShowMediaPicker}
+          onSelect={(media) => {
+            setPost(prev => ({ ...prev, feature_image_url: media.url }));
+            setShowMediaPicker(false);
+          }}
+          uploadPath="blog/"
+        />
       </div>
     </>
   );

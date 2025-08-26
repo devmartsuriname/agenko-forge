@@ -118,45 +118,94 @@ export const adminCms = {
   async getAllBlogPosts(): Promise<BlogPost[]> {
     const { data, error } = await supabase
       .from('blog_posts')
-      .select('*')
+      .select(`
+        *,
+        blog_post_categories(
+          blog_categories(*)
+        )
+      `)
       .order('updated_at', { ascending: false });
 
     if (error) throw error;
-    return (data || []) as BlogPost[];
+    return (data || []).map(item => {
+      const blogPost = item as any;
+      return {
+        ...blogPost,
+        status: blogPost.status as 'draft' | 'published',
+        categories: blogPost.blog_post_categories?.map((bpc: any) => ({
+          ...bpc.blog_categories,
+          status: bpc.blog_categories.status as 'draft' | 'published'
+        })) || []
+      };
+    });
   },
 
-  async createBlogPost(post: Omit<BlogPost, 'id' | 'created_at' | 'updated_at'>): Promise<BlogPost> {
+  async createBlogPost(post: Omit<BlogPost, 'id' | 'created_at' | 'updated_at'>, categoryIds?: string[]): Promise<BlogPost> {
     const { data, error } = await supabase
       .from('blog_posts')
       .insert(post)
       .select()
       .single();
-
+    
     if (error) throw error;
-    return data as BlogPost;
+    
+    // Assign categories if provided
+    if (categoryIds && categoryIds.length > 0) {
+      await this.assignBlogPostCategories(data.id, categoryIds);
+    }
+    
+    return {
+      ...data,
+      status: data.status as 'draft' | 'published'
+    };
   },
 
-  async updateBlogPost(id: string, updates: Partial<BlogPost>): Promise<BlogPost> {
+  async updateBlogPost(id: string, updates: Partial<BlogPost>, categoryIds?: string[]): Promise<BlogPost> {
     const { data, error } = await supabase
       .from('blog_posts')
       .update(updates)
       .eq('id', id)
       .select()
       .single();
-
+    
     if (error) throw error;
-    return data as BlogPost;
+    
+    // Update categories if provided
+    if (categoryIds !== undefined) {
+      await this.assignBlogPostCategories(id, categoryIds);
+    }
+    
+    return {
+      ...data,
+      status: data.status as 'draft' | 'published'
+    };
   },
 
-  async getBlogPost(id: string): Promise<BlogPost> {
+  async getBlogPost(id: string): Promise<BlogPost & { categories?: BlogCategory[] }> {
     const { data, error } = await supabase
       .from('blog_posts')
-      .select('*')
+      .select(`
+        *,
+        blog_post_categories(
+          blog_categories(*)
+        )
+      `)
       .eq('id', id)
       .single();
-
+    
     if (error) throw error;
-    return data as BlogPost;
+    
+    const blogPost = data as any;
+    const categories = blogPost.blog_post_categories?.map((bpc: any) => ({
+      ...bpc.blog_categories,
+      status: bpc.blog_categories.status as 'draft' | 'published'
+    })) || [];
+    
+    return {
+      ...blogPost,
+      status: blogPost.status as 'draft' | 'published',
+      categories
+    };
   },
 
   async deleteBlogPost(id: string): Promise<void> {
@@ -531,6 +580,44 @@ export const adminCms = {
       .eq('id', id);
     
     if (error) throw error;
+  },
+
+  // Blog Post Category Assignments
+  async assignBlogPostCategories(blogPostId: string, categoryIds: string[]): Promise<void> {
+    // First delete existing assignments
+    await supabase
+      .from('blog_post_categories')
+      .delete()
+      .eq('blog_post_id', blogPostId);
+    
+    // Then create new assignments
+    if (categoryIds.length > 0) {
+      const assignments = categoryIds.map(categoryId => ({
+        blog_post_id: blogPostId,
+        category_id: categoryId
+      }));
+      
+      const { error } = await supabase
+        .from('blog_post_categories')
+        .insert(assignments);
+      
+      if (error) throw error;
+    }
+  },
+
+  async getBlogPostCategories(blogPostId: string): Promise<BlogCategory[]> {
+    const { data, error } = await supabase
+      .from('blog_post_categories')
+      .select(`
+        blog_categories(*)
+      `)
+      .eq('blog_post_id', blogPostId);
+    
+    if (error) throw error;
+    return (data || []).map((item: any) => ({
+      ...item.blog_categories,
+      status: item.blog_categories.status as 'draft' | 'published'
+    }));
   },
 
   // FAQs CRUD

@@ -35,7 +35,7 @@ export function SEOHead({
   const seoDescription = description || defaultDescription;
   const seoKeywords = [...keywords, ...defaultKeywords].join(', ');
   const currentUrl = url || typeof window !== 'undefined' ? window.location.href : '';
-  const seoImage = image || '/og-image.jpg'; // Default OG image
+  const seoImage = image || post?.feature_image_url || '/og-image.jpg'; // Use feature image if available
   const storageOrigin = 'https://dvgubqqjvmsepkilnkak.supabase.co';
 
   // JSON-LD Schema

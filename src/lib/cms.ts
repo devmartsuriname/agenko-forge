@@ -19,10 +19,22 @@ export interface BlogPost {
   excerpt?: string;
   body: any;
   tags?: string[];
+  feature_image_url?: string;
   status: 'draft' | 'published';
   published_at?: string;
   created_at: string;
   updated_at: string;
+}
+
+export interface BlogCategory {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  color: string;
+  status: 'draft' | 'published';
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Project {
@@ -277,6 +289,64 @@ export const cms = {
 
     if (error) throw error;
     return (data || []) as Page[];
+  },
+
+  // Get published blog categories
+  getPublishedBlogCategories: async (): Promise<BlogCategory[]> => {
+    const { data, error } = await supabase
+      .from('blog_categories')
+      .select('*')
+      .eq('status', 'published')
+      .order('name', { ascending: true });
+    
+    if (error) throw error;
+    return (data || []).map(item => ({
+      ...item,
+      status: item.status as 'draft' | 'published'
+    }));
+  },
+
+  // Get blog posts by category
+  getBlogPostsByCategory: async (categorySlug: string, limit?: number): Promise<BlogPost[]> => {
+    let query = supabase
+      .from('blog_posts')
+      .select(`
+        *,
+        blog_post_categories!inner(
+          blog_categories!inner(slug)
+        )
+      `)
+      .eq('status', 'published')
+      .eq('blog_post_categories.blog_categories.slug', categorySlug)
+      .order('published_at', { ascending: false });
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    
+    return (data || []).map(item => ({
+      ...item,
+      status: item.status as 'draft' | 'published'
+    }));
+  },
+
+  // Get category by slug
+  getBlogCategoryBySlug: async (slug: string): Promise<BlogCategory | null> => {
+    const { data, error } = await supabase
+      .from('blog_categories')
+      .select('*')
+      .eq('slug', slug)
+      .eq('status', 'published')
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data ? {
+      ...data,
+      status: data.status as 'draft' | 'published'
+    } : null;
   },
 
   async submitContact(submission: {

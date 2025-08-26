@@ -92,9 +92,20 @@ const Blog = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
                   {paginatedPosts.map((post) => (
                     <Card key={post.id} className="bg-agenko-dark-lighter border-agenko-gray/20 overflow-hidden group hover:border-agenko-green/20 transition-all duration-300">
+                    {post.feature_image_url ? (
+                      <div className="aspect-video overflow-hidden">
+                        <img
+                          src={post.feature_image_url}
+                          alt={post.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                        />
+                      </div>
+                    ) : (
                       <div className="aspect-video bg-gradient-to-br from-agenko-green/20 to-agenko-dark flex items-center justify-center">
                         <span className="text-agenko-green text-6xl font-bold">{post.title.charAt(0)}</span>
                       </div>
+                    )}
                       
                       <CardContent className="p-6">
                         <div className="flex items-center space-x-4 text-agenko-gray text-sm mb-4">

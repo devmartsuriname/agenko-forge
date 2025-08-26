@@ -250,6 +250,19 @@ function AdminBlog() {
                         {post.excerpt && (
                           <p className="text-sm text-muted-foreground line-clamp-2">{post.excerpt}</p>
                         )}
+                        {(post as any).categories && (post as any).categories.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-2">
+                            {(post as any).categories.slice(0, 2).map((category: any) => (
+                              <Badge 
+                                key={category.id} 
+                                variant="secondary" 
+                                style={{ backgroundColor: category.color + '20', color: category.color }}
+                              >
+                                {category.name}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
                         {post.tags && post.tags.length > 0 && (
                           <div className="flex flex-wrap gap-1">
                             {post.tags.map(tag => (
