@@ -18,6 +18,7 @@ import Portfolio from "./pages/Portfolio";
 import ProjectDetail from "./pages/ProjectDetail";
 import Pricing from "./pages/Pricing";
 import Blog from "./pages/Blog";
+import BlogCategory from "./pages/BlogCategory";
 import BlogPost from "./pages/BlogPost";
 import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
