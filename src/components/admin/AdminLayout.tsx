@@ -15,7 +15,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   // Dev-only observability hooks
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      console.info('[build] P7-DIAG-RLS-v1');
+      console.info('[build] P7-RLS-AUDIT-v1');
       if (user) {
         console.info('[whoami]', { email: user.email, role: userRole });
       }
@@ -52,7 +52,13 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   return (
-    <div className="admin-root min-h-screen bg-background" data-build="P7-DIAG-RLS-v1">
+    <div className="admin-root min-h-screen bg-background" data-build="P7-RLS-AUDIT-v1" data-audit="P7-RLS-AUDIT-v1">
+      {/* Debug audit banner */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="bg-yellow-500/10 border-b border-yellow-500/20 px-4 py-1 text-xs text-yellow-700 dark:text-yellow-300">
+          🔐 Security & RLS Audit Mode - P7-RLS-AUDIT-v1
+        </div>
+      )}
       <div className="flex h-screen">
         <AdminSidebar />
         <div className="flex-1 flex flex-col overflow-hidden">
@@ -60,7 +66,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           <main className="flex-1 overflow-y-auto p-6 relative">
             {children || <Outlet />}
             <div className="fixed bottom-2 right-2 text-xs text-muted-foreground/50 pointer-events-none">
-              v:P7-DIAG-RLS-v1
+              v:P7-RLS-AUDIT-v1
             </div>
           </main>
         </div>

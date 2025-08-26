@@ -22,21 +22,26 @@ import { SEOEditor, SEOData } from '@/components/admin/SEOEditor';
 function AdminPageEditorContent() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isEditor, userRole, user } = useAuth();
+  const { isEditor, userRole, user, loading } = useAuth();
   const isEditing = id !== 'new';
+  
+  // Check if auth is still loading (either loading state or userRole not resolved)
+  const isAuthLoading = loading || (user && userRole === null);
   
   // Debug logging for diagnosis
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      console.log('[AdminPageEditor] Component mounted', {
+      console.log('[AdminPageEditor] Auth state', {
         id,
         isEditing,
         isEditor,
         userRole,
-        userEmail: user?.email
+        userEmail: user?.email,
+        loading,
+        isAuthLoading
       });
     }
-  }, [id, isEditing, isEditor, userRole, user]);
+  }, [id, isEditing, isEditor, userRole, user, loading, isAuthLoading]);
   
   const [page, setPage] = useState<Partial<Page>>({
     title: '',
@@ -52,7 +57,7 @@ function AdminPageEditorContent() {
     seo_schema_type: 'WebPage',
   });
   const [content, setContent] = useState('');
-  const [loading, setLoading] = useState(isEditing);
+  const [dataLoading, setDataLoading] = useState(isEditing);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -76,7 +81,7 @@ function AdminPageEditorContent() {
       console.error('Error fetching page:', error);
       adminToast.error('Failed to fetch page', error.message);
     } finally {
-      setLoading(false);
+      setDataLoading(false);
     }
   };
 
@@ -125,6 +130,13 @@ function AdminPageEditorContent() {
     }
   };
 
+  // Show loading state if auth is still resolving
+  if (isAuthLoading) {
+    console.log('[AdminPageEditor] Auth loading', { loading, userRole, isAuthLoading });
+    return <LoadingCardSkeleton />;
+  }
+
+  // Check access only after auth is fully resolved
   if (!isEditor) {
     console.log('[AdminPageEditor] Access denied - not editor', { isEditor, userRole });
     return (
@@ -135,8 +147,8 @@ function AdminPageEditorContent() {
     );
   }
 
-  if (loading) {
-    console.log('[AdminPageEditor] Loading state', { loading, isEditing });
+  if (dataLoading) {
+    console.log('[AdminPageEditor] Data loading state', { dataLoading, isEditing });
     return <LoadingCardSkeleton />;
   }
 

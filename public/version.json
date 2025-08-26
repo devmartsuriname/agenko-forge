@@ -1,6 +1,6 @@
 {
-  "version": "P7-DIAG-RLS-v1",
-  "build_id": "20250126-P7-diagnostic",
+  "version": "P7-RLS-AUDIT-v1",
+  "build_id": "20250126-P7-audit-closeout",
   "features": [
     "templates-crud-system",
     "client-to-proposal-integration", 
