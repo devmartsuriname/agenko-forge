@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface TrackingScriptsProps {
   ga4TrackingId?: string;
@@ -23,11 +23,45 @@ const shouldLoadTracking = () => {
   return isProduction && !isAdminRoute;
 };
 
-// Consent management placeholder
-const getConsentStatus = () => {
-  // TODO: Implement proper consent management
-  // For now, return true but this should check actual consent status
-  return true;
+// Consent management with localStorage persistence
+const CONSENT_KEY = 'tracking-consent';
+
+interface ConsentStatus {
+  accepted: boolean;
+  timestamp: number;
+}
+
+const getConsentStatus = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  
+  try {
+    const stored = localStorage.getItem(CONSENT_KEY);
+    if (!stored) return false;
+    
+    const consent: ConsentStatus = JSON.parse(stored);
+    return consent.accepted;
+  } catch {
+    return false;
+  }
+};
+
+const setConsentStatus = (accepted: boolean): void => {
+  if (typeof window === 'undefined') return;
+  
+  const consent: ConsentStatus = {
+    accepted,
+    timestamp: Date.now()
+  };
+  
+  localStorage.setItem(CONSENT_KEY, JSON.stringify(consent));
+  
+  // Trigger a custom event to notify other components
+  window.dispatchEvent(new CustomEvent('consentChanged', { detail: { accepted } }));
+};
+
+const hasConsentChoice = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return localStorage.getItem(CONSENT_KEY) !== null;
 };
 
 export function TrackingScripts({
@@ -132,8 +166,19 @@ export function TrackingScripts({
       scripts.push(linkedinPixelScript);
     }
 
+    // Listen for consent changes to reload scripts if needed
+    const handleConsentChange = (event: CustomEvent) => {
+      if (event.detail.accepted) {
+        // Reload the page to initialize tracking scripts with consent
+        window.location.reload();
+      }
+    };
+
+    window.addEventListener('consentChanged', handleConsentChange as EventListener);
+
     // Cleanup function
     return () => {
+      window.removeEventListener('consentChanged', handleConsentChange as EventListener);
       scripts.forEach(script => {
         if (script.parentNode) {
           script.parentNode.removeChild(script);
@@ -145,12 +190,36 @@ export function TrackingScripts({
   return null; // This component doesn't render anything
 }
 
-// Consent Banner Component (placeholder)
+// Consent Banner Component with working buttons
 export function ConsentBanner({ show = false }: { show?: boolean }) {
-  if (!show || !shouldLoadTracking()) return null;
+  const [isVisible, setIsVisible] = useState(true);
+  const [isAccepting, setIsAccepting] = useState(false);
+
+  // Hide banner if consent already given or shouldn't show
+  if (!show || !shouldLoadTracking() || hasConsentChoice() || !isVisible) {
+    return null;
+  }
+
+  const handleAcceptAll = async () => {
+    setIsAccepting(true);
+    
+    // Set consent and hide banner
+    setConsentStatus(true);
+    
+    // Small delay for UX feedback
+    setTimeout(() => {
+      setIsVisible(false);
+      setIsAccepting(false);
+    }, 200);
+  };
+
+  const handleManagePreferences = () => {
+    // For now, just accept all - can be enhanced later for granular control
+    handleAcceptAll();
+  };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 shadow-lg z-50">
+    <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 shadow-lg z-50 transition-transform duration-300">
       <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="text-sm text-muted-foreground">
           <p>
@@ -160,20 +229,16 @@ export function ConsentBanner({ show = false }: { show?: boolean }) {
         </div>
         <div className="flex gap-2">
           <button 
-            className="px-4 py-2 text-sm bg-primary text-primary-foreground rounded hover:bg-primary/90"
-            onClick={() => {
-              // TODO: Implement actual consent management
-              console.log('Consent accepted');
-            }}
+            className="px-4 py-2 text-sm bg-primary text-primary-foreground rounded hover:bg-primary/90 disabled:opacity-50 transition-opacity"
+            onClick={handleAcceptAll}
+            disabled={isAccepting}
           >
-            Accept All
+            {isAccepting ? 'Accepting...' : 'Accept All'}
           </button>
           <button 
-            className="px-4 py-2 text-sm border border-border rounded hover:bg-muted"
-            onClick={() => {
-              // TODO: Implement consent preferences
-              console.log('Manage preferences');
-            }}
+            className="px-4 py-2 text-sm border border-border rounded hover:bg-muted disabled:opacity-50 transition-colors"
+            onClick={handleManagePreferences}
+            disabled={isAccepting}
           >
             Manage Preferences
           </button>
