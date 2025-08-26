@@ -6,7 +6,15 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, ArrowRight, ArrowLeft, Tag } from 'lucide-react';
+import { Calendar, Clock, ArrowRight, ArrowLeft, Tag, Home } from 'lucide-react';
+import { 
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 
 const BlogCategory = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -86,13 +94,62 @@ const BlogCategory = () => {
         title={`${category.name} Articles - Agenko Digital Agency Blog`}
         description={category.description || `Read the latest ${category.name.toLowerCase()} articles from Agenko Digital Agency. Expert insights, tips, and knowledge to help grow your business.`}
         keywords={[category.name.toLowerCase(), 'blog', 'articles', 'insights']}
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          "name": `${category.name} Articles`,
+          "description": category.description || `${category.name} articles and insights`,
+          "url": typeof window !== 'undefined' ? window.location.href : '',
+          "mainEntity": {
+            "@type": "ItemList",
+            "numberOfItems": posts.length,
+            "itemListElement": posts.map((post, index) => ({
+              "@type": "ListItem",
+              "position": index + 1,
+              "item": {
+                "@type": "Article",
+                "headline": post.title,
+                "description": post.excerpt,
+                "url": `https://agenko.lovable.app/blog/${post.slug}`
+              }
+            }))
+          }
+        }}
       />
       
       <div className="min-h-screen bg-agenko-dark">
         <Navigation />
         
+        {/* Breadcrumbs */}
+        <div className="px-4 pt-24 pb-4">
+          <div className="max-w-6xl mx-auto">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/" className="flex items-center text-agenko-gray-light hover:text-agenko-green">
+                    <Home className="w-4 h-4 mr-1" />
+                    Home
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/blog" className="text-agenko-gray-light hover:text-agenko-green">
+                    Blog
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="text-agenko-white">
+                    {category.name}
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+        </div>
+
         {/* Hero Section */}
-        <section className="py-32 px-4 pt-24">
+        <section className="py-16 px-4">
           <div className="max-w-6xl mx-auto">
             <Link 
               to="/blog" 

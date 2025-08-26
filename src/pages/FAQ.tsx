@@ -6,10 +6,13 @@ import { SEOHead } from '@/lib/seo';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { HelpCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { HelpCircle, Search } from 'lucide-react';
+import { useState, useMemo } from 'react';
 import type { FAQ } from '@/types/content';
 
 export function FAQ() {
+  const [searchQuery, setSearchQuery] = useState('');
   const { data: faqs = [], isLoading, error } = useQuery({
     queryKey: ['faqs'],
     queryFn: async (): Promise<FAQ[]> => {
@@ -28,11 +31,21 @@ export function FAQ() {
     }
   });
 
+  // Filter FAQs based on search query
+  const filteredFaqs = useMemo(() => {
+    if (!searchQuery.trim()) return faqs;
+    
+    return faqs.filter(faq => 
+      faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [faqs, searchQuery]);
+
   // Generate FAQ structured data
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    "mainEntity": faqs.map(faq => ({
+    "mainEntity": filteredFaqs.map(faq => ({
       "@type": "Question",
       "name": faq.question,
       "acceptedAnswer": {
@@ -96,6 +109,7 @@ export function FAQ() {
         title="Frequently Asked Questions - Agenko"
         description="Find answers to common questions about our digital agency services, project process, pricing, and more."
         url="https://agenko.lovable.app/faq"
+        structuredData={structuredData}
       />
       
       <Navigation />
@@ -120,6 +134,27 @@ export function FAQ() {
         <section className="py-16">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
+              {/* Search Box */}
+              {faqs.length > 0 && (
+                <div className="mb-8">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                    <Input
+                      type="text"
+                      placeholder="Search FAQs..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                  {searchQuery && (
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {filteredFaqs.length} result{filteredFaqs.length !== 1 ? 's' : ''} found for "{searchQuery}"
+                    </p>
+                  )}
+                </div>
+              )}
+
               {faqs.length === 0 ? (
                 <Card>
                   <CardContent className="py-12 text-center">
@@ -130,9 +165,19 @@ export function FAQ() {
                     </p>
                   </CardContent>
                 </Card>
+              ) : filteredFaqs.length === 0 && searchQuery ? (
+                <Card>
+                  <CardContent className="py-12 text-center">
+                    <HelpCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold mb-2">No FAQs Found</h3>
+                    <p className="text-muted-foreground">
+                      No FAQs match your search. Try different keywords.
+                    </p>
+                  </CardContent>
+                </Card>
               ) : (
                 <Accordion type="single" collapsible className="space-y-4">
-                  {faqs.map((faq, index) => (
+                  {filteredFaqs.map((faq, index) => (
                     <AccordionItem 
                       key={faq.id} 
                       value={`item-${index}`}

@@ -16,9 +16,18 @@ import {
   Facebook, 
   Linkedin,
   ArrowRight,
-  Hash
+  Hash,
+  Home
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { 
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -28,6 +37,12 @@ const BlogPost = () => {
     queryKey: ['blog-post', slug],
     queryFn: () => cms.getBlogPostBySlug(slug!),
     enabled: !!slug,
+  });
+
+  const { data: postCategories = [] } = useQuery({
+    queryKey: ['blog-post-categories', post?.id],
+    queryFn: () => cms.getBlogPostCategories(post!.id),
+    enabled: !!post?.id,
   });
 
   const { data: allPosts = [] } = useQuery({
@@ -136,13 +151,102 @@ const BlogPost = () => {
         author="Agenko Digital Agency"
         tags={post.tags || []}
         keywords={post.tags || []}
+        image={post.feature_image_url}
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "Article",
+          "headline": post.title,
+          "description": contentText,
+          "author": {
+            "@type": "Organization",
+            "name": "Agenko Digital Agency"
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "Agenko Digital Agency",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://agenko.lovable.app/logo.png"
+            }
+          },
+          "datePublished": post.published_at || post.created_at,
+          "dateModified": post.updated_at,
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": typeof window !== 'undefined' ? window.location.href : ''
+          },
+          ...(post.feature_image_url && {
+            "image": {
+              "@type": "ImageObject",
+              "url": post.feature_image_url,
+              "width": 1200,
+              "height": 630
+            }
+          }),
+          "articleSection": postCategories.map(cat => cat.name).join(", ")
+        }}
       />
       
       <div className="min-h-screen bg-agenko-dark">
         <Navigation />
         
+        {/* Breadcrumbs */}
+        <div className="px-4 pt-24 pb-4">
+          <div className="max-w-4xl mx-auto">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/" className="flex items-center text-agenko-gray-light hover:text-agenko-green">
+                    <Home className="w-4 h-4 mr-1" />
+                    Home
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/blog" className="text-agenko-gray-light hover:text-agenko-green">
+                    Blog
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                {postCategories.length > 0 && (
+                  <>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbLink 
+                        href={`/blog/category/${postCategories[0].slug}`} 
+                        className="text-agenko-gray-light hover:text-agenko-green"
+                      >
+                        {postCategories[0].name}
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                  </>
+                )}
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="text-agenko-white">
+                    {post.title}
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+        </div>
+
+        {/* Feature Image */}
+        {post.feature_image_url && (
+          <div className="px-4 mb-8">
+            <div className="max-w-4xl mx-auto">
+              <img
+                src={post.feature_image_url}
+                alt={post.title}
+                className="w-full h-96 object-cover rounded-lg"
+                loading="eager"
+              />
+            </div>
+          </div>
+        )}
+
         {/* Hero Section */}
-        <article className="py-32 px-4 pt-24">
+        <article className="py-16 px-4">
           <div className="max-w-4xl mx-auto">
             <Link 
               to="/blog" 
@@ -153,6 +257,17 @@ const BlogPost = () => {
             </Link>
             
             <div className="flex flex-wrap gap-2 mb-6">
+              {postCategories.map((category) => (
+                <Link key={category.id} to={`/blog/category/${category.slug}`}>
+                  <Badge 
+                    variant="secondary" 
+                    style={{ backgroundColor: category.color + '20', color: category.color }}
+                    className="hover:opacity-80 transition-opacity"
+                  >
+                    {category.name}
+                  </Badge>
+                </Link>
+              ))}
               {post.tags?.map((tag) => (
                 <Badge key={tag} variant="secondary" className="bg-agenko-dark-lighter text-agenko-green">
                   {tag}

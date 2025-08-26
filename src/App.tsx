@@ -86,6 +86,7 @@ const App = () => (
         <Route path="/blog/category/:slug" element={<BlogCategory />} />
         <Route path="/blog/:slug" element={<BlogPost />} />
         <Route path="/faq" element={<FAQ />} />
+        <Route path="/sitemap.xml" element={<Sitemap />} />
         <Route path="/contact" element={<Contact />} />
               <Route path="/get-quote" element={<GetQuote />} />
               <Route path="/payment-success" element={<PaymentSuccess />} />

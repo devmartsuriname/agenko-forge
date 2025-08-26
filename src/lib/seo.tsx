@@ -12,6 +12,7 @@ interface SEOProps {
   author?: string;
   tags?: string[];
   gscVerificationCode?: string;
+  structuredData?: any;
 }
 
 export function SEOHead({
@@ -26,6 +27,7 @@ export function SEOHead({
   author,
   tags = [],
   gscVerificationCode,
+  structuredData,
 }: SEOProps) {
   const siteName = 'Agenko Digital Agency';
   const defaultDescription = 'Innovative marketing solutions for business growth. A leading digital agency specializing in creative solutions that drive business growth, enhance brand visibility, and increase customer engagement.';
@@ -167,6 +169,13 @@ export function SEOHead({
           {JSON.stringify(schema)}
         </script>
       ))}
+      
+      {/* Custom Structured Data */}
+      {structuredData && (
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      )}
     </Helmet>
   );
 }

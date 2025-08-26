@@ -333,6 +333,29 @@ export const cms = {
     }));
   },
 
+  async getBlogPostCategories(postId: string) {
+    const { data, error } = await supabase
+      .from('blog_post_categories')
+      .select(`
+        id,
+        blog_categories!inner(*)
+      `)
+      .eq('blog_post_id', postId);
+
+    if (error) throw error;
+    
+    return (data || []).map(item => ({
+      id: item.blog_categories.id,
+      name: item.blog_categories.name,
+      slug: item.blog_categories.slug,
+      color: item.blog_categories.color,
+      description: item.blog_categories.description,
+      status: item.blog_categories.status,
+      created_at: item.blog_categories.created_at,
+      updated_at: item.blog_categories.updated_at
+    }));
+  },
+
   // Get category by slug
   getBlogCategoryBySlug: async (slug: string): Promise<BlogCategory | null> => {
     const { data, error } = await supabase
