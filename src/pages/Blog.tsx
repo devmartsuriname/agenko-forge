@@ -15,7 +15,7 @@ const Blog = () => {
 
   const { data: blogPosts = [], isLoading } = useQuery({
     queryKey: ['blog-posts', page],
-    queryFn: () => cms.getPublishedBlogPosts(),
+    queryFn: () => cms.getPublishedBlogPostsWithCategories(),
   });
 
   // Simple pagination logic (in a real app, you'd implement server-side pagination)
@@ -120,7 +120,24 @@ const Blog = () => {
                         </div>
                         
                         <div className="flex flex-wrap gap-2 mb-3">
-                          {post.tags?.slice(0, 2).map((tag) => (
+                          {/* Display categories first as primary badges */}
+                          {post.categories?.slice(0, 2).map((category) => (
+                            <Link key={category.slug} to={`/blog/category/${category.slug}`}>
+                              <Badge 
+                                variant="secondary" 
+                                className="hover:opacity-80 transition-opacity cursor-pointer"
+                                style={{ 
+                                  backgroundColor: category.color + '20', 
+                                  color: category.color,
+                                  borderColor: category.color + '40'
+                                }}
+                              >
+                                {category.name}
+                              </Badge>
+                            </Link>
+                          ))}
+                          {/* Display tags as secondary badges if there's room */}
+                          {(!post.categories || post.categories.length === 0) && post.tags?.slice(0, 2).map((tag) => (
                             <Badge key={tag} variant="secondary" className="bg-agenko-dark text-agenko-green">
                               {tag}
                             </Badge>

@@ -227,6 +227,49 @@ export const cms = {
     return (data || []) as BlogPost[];
   },
 
+  async getPublishedBlogPostsWithCategories(limit?: number): Promise<(BlogPost & { categories?: BlogCategory[] })[]> {
+    // First get the blog posts
+    let query = supabase
+      .from('blog_posts')
+      .select('*')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false });
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    const { data: posts, error: postsError } = await query;
+    if (postsError) throw postsError;
+
+    if (!posts || posts.length === 0) return [];
+
+    // Get categories for each post
+    const postsWithCategories = await Promise.all(
+      posts.map(async (post) => {
+        const { data: postCategories, error: categoriesError } = await supabase
+          .from('blog_post_categories')
+          .select(`
+            blog_categories:blog_categories(*)
+          `)
+          .eq('blog_post_id', post.id);
+
+        if (categoriesError) {
+          console.warn('Error fetching categories for post:', post.id, categoriesError);
+          return { ...post, categories: [] };
+        }
+
+        const categories = (postCategories || [])
+          .map((pc: any) => pc.blog_categories)
+          .filter((cat: any) => cat && cat.status === 'published');
+
+        return { ...post, categories };
+      })
+    );
+
+    return postsWithCategories as (BlogPost & { categories?: BlogCategory[] })[];
+  },
+
   async getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
     const { data, error } = await supabase
       .from('blog_posts')
