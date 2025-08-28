@@ -116,6 +116,7 @@ export const adminCms = {
 
   // Blog Posts
   async getAllBlogPosts(): Promise<BlogPost[]> {
+    // First try with categories
     const { data, error } = await supabase
       .from('blog_posts')
       .select(`
@@ -126,7 +127,22 @@ export const adminCms = {
       `)
       .order('updated_at', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      console.warn('Blog posts with categories query failed, trying without categories:', error);
+      // Fallback to simple query without categories
+      const { data: simpleData, error: simpleError } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .order('updated_at', { ascending: false });
+      
+      if (simpleError) throw simpleError;
+      return (simpleData || []).map(item => ({
+        ...item,
+        status: item.status as 'draft' | 'published',
+        categories: []
+      }));
+    }
+
     return (data || []).map(item => {
       const blogPost = item as any;
       return {
