@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileText, Eye, Save, X, GripVertical } from 'lucide-react';
+import { FileText, Eye, Save, X } from 'lucide-react';
 import { ProposalTemplate, TemplateVariable } from '@/types/proposal';
 import { RichEditor } from './RichEditor';
 import { AttachmentPanel } from './AttachmentPanel';
@@ -51,7 +51,6 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
 
   const [attachments, setAttachments] = useState<any[]>([]);
   const [editorMode, setEditorMode] = useState<'rich' | 'html'>('rich');
-  const [previewWidth, setPreviewWidth] = useState(50); // Percentage
 
   const handleSave = async () => {
     const templateData = {
@@ -208,17 +207,12 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
         </Card>
       </div>
 
-      {/* Main Editor Section - Side by Side */}
-      <div 
-        className="grid gap-2 min-h-[calc(100vh-400px)]"
-        style={{ 
-          gridTemplateColumns: `${100 - previewWidth}% 1fr ${previewWidth}%`,
-        }}
-      >
-        {/* Editor Panel */}
-        <div className="space-y-4">
-          <Card className="h-full">
-            <CardHeader className="pb-3">
+      {/* Main Editor Section - Two Column Grid */}
+      <div className="grid grid-cols-2 gap-6 flex-1 overflow-hidden">
+        {/* Left: Proposal Content */}
+        <div className="flex flex-col overflow-y-auto">
+          <Card className="h-full flex flex-col">
+            <CardHeader className="pb-3 flex-shrink-0">
               <CardTitle className="flex items-center justify-between">
                 <span>Proposal Content</span>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -232,7 +226,7 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
                 }
               </CardDescription>
             </CardHeader>
-            <CardContent className="h-full">
+            <CardContent className="flex-1 overflow-hidden">
               <RichEditor
                 content={formData.content}
                 onChange={(content) => setFormData(prev => ({ ...prev, content }))}
@@ -244,58 +238,31 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
           </Card>
         </div>
 
-        {/* Resize Handle */}
-        <div className="flex items-center justify-center cursor-col-resize bg-border hover:bg-primary/20 transition-colors group">
-          <GripVertical className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
+        {/* Right: Live Preview */}
+        <div className="flex flex-col overflow-y-auto bg-card rounded-lg border">
+          <div className="p-4 border-b flex-shrink-0">
+            <h3 className="font-semibold">Live Preview</h3>
+            <p className="text-sm text-muted-foreground">
+              How this template will appear to clients
+            </p>
+          </div>
+          <div className="flex-1 p-4 overflow-auto">
+            <div 
+              className="prose prose-sm max-w-none"
+              dangerouslySetInnerHTML={{ __html: formData.content }}
+            />
+          </div>
         </div>
+      </div>
 
-        {/* Preview Panel */}
-        <div className="space-y-4">
-          <Card className="h-full">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center justify-between">
-                <span>Live Preview</span>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPreviewWidth(Math.max(30, previewWidth - 10))}
-                    disabled={previewWidth <= 30}
-                  >
-                    -
-                  </Button>
-                  <span className="text-xs text-muted-foreground min-w-[3rem] text-center">
-                    {previewWidth}%
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPreviewWidth(Math.min(70, previewWidth + 10))}
-                    disabled={previewWidth >= 70}
-                  >
-                    +
-                  </Button>
-                </div>
-              </CardTitle>
-              <CardDescription>
-                How this template will appear to clients
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="h-full overflow-auto">
-              <div 
-                className="prose prose-sm max-w-none"
-                dangerouslySetInnerHTML={{ __html: formData.content }}
-              />
-            </CardContent>
-          </Card>
-
-          <AttachmentPanel
-            proposalId={template?.id || null}
-            attachments={attachments}
-            onAttachmentsChange={setAttachments}
-            disabled={!template?.id}
-          />
-        </div>
+      {/* Bottom: Attachments / Media */}
+      <div className="mt-4 border-t border-border pt-4">
+        <AttachmentPanel
+          proposalId={template?.id || null}
+          attachments={attachments}
+          onAttachmentsChange={setAttachments}
+          disabled={!template?.id}
+        />
       </div>
     </div>
   );

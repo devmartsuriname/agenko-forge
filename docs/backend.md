@@ -11,6 +11,9 @@ Devmart uses a modern backend architecture built on Supabase with PostgreSQL, pr
 - **projects** - Portfolio projects with images
 - **services** - Service offerings
 - **project_images** - Image assets for projects
+- **proposals** - Client proposals with rich content and attachments
+- **proposal_templates** - Reusable proposal templates
+- **proposal_attachments** - File attachments linked to proposals
 
 ### User Management
 - **profiles** - Extended user data linked to auth.users

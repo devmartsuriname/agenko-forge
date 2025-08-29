@@ -11,6 +11,9 @@ This is a modern agency website with secure admin CMS, built with React, TypeScr
 - **pages**: Static pages (About, Privacy, etc.)
 - **contact_submissions**: Contact form submissions
 - **settings**: Site configuration (metadata, social links)
+- **proposals**: Client proposals with rich content and attachments
+- **proposal_templates**: Reusable proposal templates with responsive modal editor (90vw/90vh)
+- **proposal_attachments**: File attachments with signed URL access
 
 ## Security (RLS Policies)
 - Public users can only view published content
