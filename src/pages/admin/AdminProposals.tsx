@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from '@/hooks/use-toast';
 import { adminToast } from '@/lib/toast-utils';
@@ -29,7 +30,8 @@ import {
   Archive,
   Filter,
   Search,
-  FileDown
+  FileDown,
+  ChevronDown
 } from 'lucide-react';
 import { Proposal, ProposalTemplate, CreateProposalData, PROPOSAL_STATUS_LABELS, PROPOSAL_STATUS_COLORS } from '@/types/proposal';
 import { 
@@ -867,16 +869,21 @@ export default function AdminProposals() {
               </div>
               
               {selectedTemplate.variables && selectedTemplate.variables.length > 0 && (
-                <div>
-                  <Label>Variables</Label>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {selectedTemplate.variables.map(variable => (
-                      <Badge key={variable.name} variant="outline">
-                        {variable.label}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
+                <Collapsible>
+                  <CollapsibleTrigger className="flex items-center gap-2 hover:text-primary transition-colors">
+                    <Label className="cursor-pointer">Template Variables</Label>
+                    <ChevronDown className="h-4 w-4" />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="mt-2">
+                    <div className="flex flex-wrap gap-2">
+                      {selectedTemplate.variables.map(variable => (
+                        <Badge key={variable.name} variant="outline">
+                          {variable.label}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
               )}
             </div>
           </DialogContent>
