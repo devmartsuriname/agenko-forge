@@ -263,6 +263,64 @@ CREATE POLICY "Service role can insert app events" ON logs_app_events
 - Admin data: Role-based access control
 - Logs: Admin read-only, service write-only
 
+## Modal Layout Patterns
+
+For complex modals with scrollable content areas:
+
+### Independent Scrolling Pattern
+
+When creating modals with multiple scrollable columns (like the Template Editor), use this pattern:
+
+```tsx
+// Modal Container
+<DialogContent className="max-w-6xl w-[90vw] h-[90vh] overflow-hidden flex flex-col">
+  
+  {/* Header - Non-growing */}
+  <div className="shrink-0">
+    {/* Header content */}
+  </div>
+
+  {/* Main Grid - Takes remaining space */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 min-h-0 overflow-hidden">
+    
+    {/* Column 1 - Independent scrolling */}
+    <div className="flex flex-col min-h-0">
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        {/* Scrollable content */}
+      </div>
+    </div>
+
+    {/* Column 2 - Independent scrolling */}
+    <div className="flex flex-col min-h-0">
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        {/* Scrollable content */}
+      </div>
+    </div>
+  </div>
+
+  {/* Footer - Non-growing */}
+  <div className="shrink-0">
+    {/* Footer content */}
+  </div>
+</DialogContent>
+```
+
+**Critical CSS Properties:**
+- `min-h-0` on flex containers allows children to shrink below their content size
+- `overflow-y-auto` only on the actual scrollable content areas  
+- `shrink-0` prevents header/footer from competing for space
+- `flex-1` allows the main grid to consume remaining height
+
+### Sticky Toolbars in Scrollable Areas
+
+For toolbars that should remain visible while content scrolls:
+
+```tsx
+<CardHeader className="sticky top-0 z-10 bg-card">
+  {/* Toolbar content */}
+</CardHeader>
+```
+
 ## Development Workflow
 
 ### Testing RLS Policies
