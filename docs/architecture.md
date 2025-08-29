@@ -284,3 +284,61 @@ media/sections/home/hero/
 
 ## Style Isolation
 Admin styles use semantic tokens and can be scoped with `.admin-root` class to prevent conflicts with public frontend.
+
+## Modal Layout Patterns
+
+### 3-Column Independent Scrolling Layout
+
+For complex modals like the Template Editor that need to display multiple content areas simultaneously:
+
+```tsx
+// Modal Container - Updated to max-w-7xl for 3 columns
+<DialogContent className="max-w-7xl w-[90vw] h-[90vh] overflow-hidden flex flex-col">
+  
+  {/* Header - Non-growing */}
+  <div className="shrink-0">
+    {/* Template Details + Variables */}
+  </div>
+
+  {/* Main Grid - 3 columns with independent scrolling */}
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1 min-h-0 overflow-hidden">
+    
+    {/* Column 1: Editor - Independent scrolling */}
+    <div className="flex flex-col min-h-0">
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        {/* Rich Editor with sticky toolbar */}
+      </div>
+    </div>
+
+    {/* Column 2: Preview - Independent scrolling */}
+    <div className="flex flex-col min-h-0">
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        {/* Real-time preview content */}
+      </div>
+    </div>
+
+    {/* Column 3: Attachments - Independent scrolling */}
+    <div className="flex flex-col min-h-0">
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        {/* AttachmentPanel */}
+      </div>
+    </div>
+  </div>
+</DialogContent>
+```
+
+**Key CSS Properties for Independent Scrolling:**
+- `min-h-0` on flex containers allows children to shrink below their content size
+- `overflow-y-auto` only on the actual scrollable content areas  
+- `shrink-0` prevents header from competing for space
+- `flex-1` allows the main grid to consume remaining height
+- `grid-cols-1 md:grid-cols-3` provides responsive layout that stacks on mobile
+
+**Benefits:**
+- All three content areas visible simultaneously
+- Independent scrolling prevents interference between columns
+- Responsive design maintains usability on mobile devices
+- Eliminates need to scroll to bottom for attachments
+
+**Restore Points:**
+- `P7.2.1-Proposals-FixPack-Restore-Before-3Column-Layout`: State before 3-column implementation

@@ -210,9 +210,9 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
         </div>
       </div>
 
-      {/* Main Editor Section - Two Column Grid with Independent Scrolling */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 min-h-0 overflow-hidden">
-        {/* Left: Proposal Content */}
+      {/* Main Editor Section - Three Column Grid with Independent Scrolling */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1 min-h-0 overflow-hidden">
+        {/* Column 1: Proposal Content */}
         <div className="flex flex-col min-h-0">
           <Card className="flex flex-col h-full">
             <CardHeader className="sticky top-0 z-10 bg-card pb-3 shrink-0">
@@ -241,7 +241,7 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
           </Card>
         </div>
 
-        {/* Right: Live Preview */}
+        {/* Column 2: Live Preview */}
         <div className="flex flex-col min-h-0">
           <div className="flex flex-col h-full bg-card rounded-lg border">
             <div className="p-4 border-b shrink-0">
@@ -258,16 +258,26 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Bottom: Attachments / Media - Separated Section */}
-      <div className="mt-4 border-t border-border pt-4 shrink-0">
-        <AttachmentPanel
-          proposalId={template?.id || null}
-          attachments={attachments}
-          onAttachmentsChange={setAttachments}
-          disabled={!template?.id}
-        />
+        {/* Column 3: Attachments */}
+        <div className="flex flex-col min-h-0">
+          <div className="flex flex-col h-full bg-card rounded-lg border">
+            <div className="p-4 border-b shrink-0">
+              <h3 className="font-semibold">Attachments & Media</h3>
+              <p className="text-sm text-muted-foreground">
+                Files and documents for this proposal
+              </p>
+            </div>
+            <div className="flex-1 min-h-0 overflow-y-auto p-4">
+              <AttachmentPanel
+                proposalId={template?.id || null}
+                attachments={attachments}
+                onAttachmentsChange={setAttachments}
+                disabled={!template?.id}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

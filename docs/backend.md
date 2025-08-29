@@ -267,40 +267,42 @@ CREATE POLICY "Service role can insert app events" ON logs_app_events
 
 For complex modals with scrollable content areas:
 
-### Independent Scrolling Pattern
+### Independent Scrolling Pattern - 3-Column Layout
 
-When creating modals with multiple scrollable columns (like the Template Editor), use this pattern:
+The Template Editor implements a 3-column layout for maximum efficiency:
 
 ```tsx
-// Modal Container
-<DialogContent className="max-w-6xl w-[90vw] h-[90vh] overflow-hidden flex flex-col">
+// Modal Container - Updated to max-w-7xl for 3 columns
+<DialogContent className="max-w-7xl w-[90vw] h-[90vh] overflow-hidden flex flex-col">
   
   {/* Header - Non-growing */}
   <div className="shrink-0">
-    {/* Header content */}
+    {/* Template Details + Variables */}
   </div>
 
-  {/* Main Grid - Takes remaining space */}
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 min-h-0 overflow-hidden">
+  {/* Main Grid - 3 columns with independent scrolling */}
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1 min-h-0 overflow-hidden">
     
-    {/* Column 1 - Independent scrolling */}
+    {/* Column 1: Proposal Content - Independent scrolling */}
     <div className="flex flex-col min-h-0">
       <div className="flex-1 min-h-0 overflow-y-auto">
-        {/* Scrollable content */}
+        {/* Rich Editor with sticky toolbar */}
       </div>
     </div>
 
-    {/* Column 2 - Independent scrolling */}
+    {/* Column 2: Live Preview - Independent scrolling */}
     <div className="flex flex-col min-h-0">
       <div className="flex-1 min-h-0 overflow-y-auto">
-        {/* Scrollable content */}
+        {/* Real-time preview content */}
       </div>
     </div>
-  </div>
 
-  {/* Footer - Non-growing */}
-  <div className="shrink-0">
-    {/* Footer content */}
+    {/* Column 3: Attachments - Independent scrolling */}
+    <div className="flex flex-col min-h-0">
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        {/* AttachmentPanel */}
+      </div>
+    </div>
   </div>
 </DialogContent>
 ```
@@ -308,8 +310,12 @@ When creating modals with multiple scrollable columns (like the Template Editor)
 **Critical CSS Properties:**
 - `min-h-0` on flex containers allows children to shrink below their content size
 - `overflow-y-auto` only on the actual scrollable content areas  
-- `shrink-0` prevents header/footer from competing for space
+- `shrink-0` prevents header from competing for space
 - `flex-1` allows the main grid to consume remaining height
+- `grid-cols-1 md:grid-cols-3` provides responsive 3-column layout that stacks on mobile
+
+**Restore Points:**
+- `P7.2.1-Proposals-FixPack-Restore-Before-3Column-Layout`: State before 3-column implementation
 
 ### Sticky Toolbars in Scrollable Areas
 
