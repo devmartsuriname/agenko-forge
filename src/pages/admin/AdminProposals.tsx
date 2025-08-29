@@ -782,14 +782,20 @@ export default function AdminProposals() {
             <div>
               <Label>Template</Label>
               <Select
-                value={proposalForm.template_id || ''}
-                onValueChange={handleTemplateSelection}
+                value={proposalForm.template_id || 'none'}
+                onValueChange={(value) => {
+                  if (value === 'none') {
+                    setProposalForm(prev => ({ ...prev, template_id: undefined }));
+                  } else {
+                    handleTemplateSelection(value);
+                  }
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a template (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No template</SelectItem>
+                  <SelectItem value="none">No template</SelectItem>
                   {availableTemplates.map(template => (
                     <SelectItem key={template.id} value={template.id}>
                       {template.name}
@@ -803,14 +809,20 @@ export default function AdminProposals() {
             <div>
               <Label>Client</Label>
               <Select
-                value={proposalForm.client_id || ''}
-                onValueChange={handleClientSelection}
+                value={proposalForm.client_id || 'none'}
+                onValueChange={(value) => {
+                  if (value === 'none') {
+                    setProposalForm(prev => ({ ...prev, client_id: undefined }));
+                  } else {
+                    handleClientSelection(value);
+                  }
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a client (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No client</SelectItem>
+                  <SelectItem value="none">No client</SelectItem>
                   {clients.map(client => (
                     <SelectItem key={client.id} value={client.id}>
                       {client.name} {client.company && `(${client.company})`}
