@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { FileText, Eye, Save, X } from 'lucide-react';
 import { ProposalTemplate, TemplateVariable } from '@/types/proposal';
 import { RichEditor } from './RichEditor';
-import { AttachmentPanel } from './AttachmentPanel';
+
 
 interface TemplateEditorProps {
   template?: ProposalTemplate;
@@ -49,7 +49,7 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
     variables: template?.variables || DEFAULT_VARIABLES
   });
 
-  const [attachments, setAttachments] = useState<any[]>([]);
+  
   const [editorMode, setEditorMode] = useState<'rich' | 'html'>('rich');
 
   const handleSave = async () => {
@@ -189,8 +189,8 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
         </div>
       </div>
 
-      {/* Main Editor Section - Three Column Grid with Independent Scrolling */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1 min-h-0 overflow-hidden">
+      {/* Main Editor Section - Two Column Grid with Independent Scrolling */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0 overflow-hidden">
         {/* Column 1: Proposal Content */}
         <div className="flex flex-col min-h-0">
           <Card className="flex flex-col h-full">
@@ -237,26 +237,25 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Column 3: Attachments */}
-        <div className="flex flex-col min-h-0">
-          <div className="flex flex-col h-full bg-card rounded-lg border">
-            <div className="p-4 border-b shrink-0">
-              <h3 className="font-semibold">Attachments & Media</h3>
-              <p className="text-sm text-muted-foreground">
-                Files and documents for this proposal
-              </p>
-            </div>
-            <div className="flex-1 min-h-0 overflow-y-auto p-4">
-              <AttachmentPanel
-                proposalId={template?.id || null}
-                attachments={attachments}
-                onAttachmentsChange={setAttachments}
-                disabled={!template?.id}
-              />
-            </div>
-          </div>
-        </div>
+      {/* Footer Section - Save/Cancel Buttons */}
+      <div className="shrink-0 flex justify-end gap-3 pt-6 border-t">
+        <Button
+          variant="outline"
+          onClick={onCancel}
+          disabled={isLoading}
+        >
+          <X className="w-4 h-4 mr-2" />
+          Cancel
+        </Button>
+        <Button
+          onClick={handleSave}
+          disabled={isLoading}
+        >
+          <Save className="w-4 h-4 mr-2" />
+          {isLoading ? 'Saving...' : 'Save Template'}
+        </Button>
       </div>
     </div>
   );
