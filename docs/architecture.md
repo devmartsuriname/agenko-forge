@@ -292,8 +292,8 @@ Admin styles use semantic tokens and can be scoped with `.admin-root` class to p
 For complex modals like the Template Editor that need to display multiple content areas simultaneously:
 
 ```tsx
-// Modal Container - Updated to max-w-7xl for 3 columns
-<DialogContent className="max-w-7xl w-[90vw] h-[90vh] overflow-hidden flex flex-col">
+// Modal Container - Global scroll for smaller screens
+<DialogContent className="max-w-7xl w-[90vw] max-h-[90vh] overflow-y-auto flex flex-col">
   
   {/* Header - Non-growing */}
   <div className="shrink-0">
@@ -329,16 +329,20 @@ For complex modals like the Template Editor that need to display multiple conten
 
 **Key CSS Properties for Independent Scrolling:**
 - `min-h-0` on flex containers allows children to shrink below their content size
-- `overflow-y-auto` only on the actual scrollable content areas  
+- `overflow-y-auto` on modal enables global scrolling when content exceeds viewport
+- `overflow-y-auto` on individual columns for independent content scrolling  
 - `shrink-0` prevents header from competing for space
 - `flex-1` allows the main grid to consume remaining height
 - `grid-cols-1 md:grid-cols-3` provides responsive layout that stacks on mobile
+- `max-h-[90vh]` ensures modal respects viewport height limits
 
 **Benefits:**
 - All three content areas visible simultaneously
 - Independent scrolling prevents interference between columns
+- Global modal scrolling ensures accessibility on smaller screens
 - Responsive design maintains usability on mobile devices
 - Eliminates need to scroll to bottom for attachments
+- Clean UI with reduced header redundancy
 
 **Restore Points:**
 - `P7.2.1-Proposals-FixPack-Restore-Before-3Column-Layout`: State before 3-column implementation

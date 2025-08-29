@@ -683,7 +683,7 @@ export default function AdminProposals() {
       {/* Template Editor Dialog */}
       {showTemplateEditor && (
         <Dialog open={showTemplateEditor} onOpenChange={setShowTemplateEditor}>
-          <DialogContent className="max-w-7xl w-[90vw] h-[90vh] overflow-hidden flex flex-col">
+          <DialogContent className="max-w-7xl w-[90vw] max-h-[90vh] overflow-y-auto flex flex-col">
             <DialogHeader>
               <DialogTitle>
                 {editingTemplate ? 'Edit Template' : 'Create Template'}

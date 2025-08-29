@@ -272,8 +272,8 @@ For complex modals with scrollable content areas:
 The Template Editor implements a 3-column layout for maximum efficiency:
 
 ```tsx
-// Modal Container - Updated to max-w-7xl for 3 columns
-<DialogContent className="max-w-7xl w-[90vw] h-[90vh] overflow-hidden flex flex-col">
+// Modal Container - Updated for global scroll when needed
+<DialogContent className="max-w-7xl w-[90vw] max-h-[90vh] overflow-y-auto flex flex-col">
   
   {/* Header - Non-growing */}
   <div className="shrink-0">
@@ -309,10 +309,15 @@ The Template Editor implements a 3-column layout for maximum efficiency:
 
 **Critical CSS Properties:**
 - `min-h-0` on flex containers allows children to shrink below their content size
-- `overflow-y-auto` only on the actual scrollable content areas  
+- `overflow-y-auto` on modal allows global scrolling when columns don't fit viewport
+- `overflow-y-auto` on individual columns for independent content scrolling  
 - `shrink-0` prevents header from competing for space
 - `flex-1` allows the main grid to consume remaining height
 - `grid-cols-1 md:grid-cols-3` provides responsive 3-column layout that stacks on mobile
+- `max-h-[90vh]` ensures modal never exceeds viewport height
+
+**UI Improvements:**
+- Removed duplicate header section to reduce clutter and free vertical space
 
 **Restore Points:**
 - `P7.2.1-Proposals-FixPack-Restore-Before-3Column-Layout`: State before 3-column implementation

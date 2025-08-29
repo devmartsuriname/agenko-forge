@@ -80,26 +80,6 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
     <div className="flex flex-col h-full">
       {/* Header Section - Non-growing */}
       <div className="shrink-0">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-semibold">
-              {template ? 'Edit Template' : 'Create Template'}
-            </h2>
-            <p className="text-muted-foreground">
-              Create reusable proposal templates with variables and rich content
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={onCancel}>
-              <X className="h-4 w-4 mr-2" />
-              Cancel
-            </Button>
-            <Button onClick={handleSave} disabled={isLoading}>
-              <Save className="h-4 w-4 mr-2" />
-              Save Template
-            </Button>
-          </div>
-        </div>
 
         {/* Top Section - Template Details */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -184,7 +164,6 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
               </div>
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader>
               <CardTitle>Available Variables</CardTitle>
