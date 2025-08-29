@@ -11,9 +11,33 @@ This is a modern agency website with secure admin CMS, built with React, TypeScr
 - **pages**: Static pages (About, Privacy, etc.)
 - **contact_submissions**: Contact form submissions
 - **settings**: Site configuration (metadata, social links)
-- **proposals**: Client proposals with rich content and attachments
-- **proposal_templates**: Reusable proposal templates with responsive modal editor (90vw/90vh) featuring independent column scrolling
+- **clients**: Client management with contact information and company details
+- **proposals**: Client proposals with rich content, template integration, and client relationships
+- **proposal_templates**: Reusable proposal templates with variables for token replacement
 - **proposal_attachments**: File attachments with signed URL access
+
+## Proposal Creation Workflow
+```mermaid
+graph TD
+    A[Admin Opens Create Proposal] --> B[Select Template Optional]
+    B --> C[Select Client Optional]
+    C --> D[Auto-fill Fields from Template]
+    D --> E[Replace Tokens with Client Data]
+    E --> F[Review & Edit Content]
+    F --> G[Add Recipients]
+    G --> H[Save Proposal]
+    H --> I[Send to Recipients]
+    
+    B1[Template Selected] --> D1[Title, Subject, Content Auto-filled]
+    C1[Client Selected] --> E1[Tokens: {{client_name}}, {{client_company}}, {{client_email}}, {{client_phone}}]
+    C1 --> E2[First Recipient Auto-populated]
+```
+
+## RLS Security Model for Proposals
+- **Admins**: Full access to all proposals and can select any client
+- **Editors**: Can create/update proposals only for clients they own
+- **Client Ownership**: Enforced through `client_id` foreign key and RLS policies
+- **Token Security**: Tokens never leak cross-client data due to ownership validation
 
 ## Security (RLS Policies)
 - Public users can only view published content

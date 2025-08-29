@@ -11,8 +11,14 @@ Devmart uses a modern backend architecture built on Supabase with PostgreSQL, pr
 - **projects** - Portfolio projects with images
 - **services** - Service offerings
 - **project_images** - Image assets for projects
-- **proposals** - Client proposals with rich content and attachments
-- **proposal_templates** - Reusable proposal templates
+
+### Business Operations Tables
+- **clients** - Client management with contact information and company details
+- **quotes** - Quote requests from potential clients via public form
+- **proposals** - Client proposals with rich content, template integration, and client relationships
+- **proposal_templates** - Reusable proposal templates with variables for token replacement
+- **proposal_recipients** - Proposal delivery tracking with view timestamps
+- **proposal_events** - Proposal interaction audit trail (sent, viewed, accepted, rejected)
 - **proposal_attachments** - File attachments linked to proposals
 
 ### User Management

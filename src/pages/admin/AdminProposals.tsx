@@ -49,6 +49,7 @@ export default function AdminProposals() {
   
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [templates, setTemplates] = useState<ProposalTemplate[]>([]);
+  const [clients, setClients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<ProposalTemplate | null>(null);
@@ -76,6 +77,7 @@ export default function AdminProposals() {
   useEffect(() => {
     fetchProposals();
     fetchTemplates();
+    fetchClients();
     
     // Handle URL parameters from client navigation
     const clientName = searchParams.get('clientName');
@@ -145,6 +147,20 @@ export default function AdminProposals() {
     }
   };
 
+  const fetchClients = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('clients')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (error) throw error;
+      setClients(data || []);
+    } catch (error: any) {
+      console.error('Error fetching clients:', error);
+    }
+  };
+
   const createProposal = async () => {
     try {
       if (!proposalForm.title || !proposalForm.content || !proposalForm.recipients[0].email) {
@@ -159,6 +175,7 @@ export default function AdminProposals() {
           subject: proposalForm.subject,
           content: proposalForm.content,
           template_id: proposalForm.template_id,
+          client_id: proposalForm.client_id,
           quote_id: proposalForm.quote_id,
           total_amount: proposalForm.total_amount ? proposalForm.total_amount * 100 : null,
           currency: proposalForm.currency,
@@ -314,6 +331,52 @@ export default function AdminProposals() {
     exportTemplateAsJSON(template);
     adminToast.exported('template', `${template.name}.json`);
   };
+
+  // Template and Client selection handlers
+  const handleTemplateSelection = (templateId: string) => {
+    const template = templates.find(t => t.id === templateId);
+    if (template) {
+      setProposalForm(prev => ({
+        ...prev,
+        template_id: templateId,
+        title: template.name,
+        subject: template.subject,
+        content: template.content
+      }));
+    }
+  };
+
+  const handleClientSelection = (clientId: string) => {
+    const client = clients.find(c => c.id === clientId);
+    if (client) {
+      // Replace tokens in content
+      let updatedContent = proposalForm.content;
+      updatedContent = updatedContent.replace(/\{\{client_name\}\}/g, client.name || '');
+      updatedContent = updatedContent.replace(/\{\{client_company\}\}/g, client.company || '');
+      updatedContent = updatedContent.replace(/\{\{client_email\}\}/g, client.email || '');
+      updatedContent = updatedContent.replace(/\{\{client_phone\}\}/g, client.phone || '');
+
+      setProposalForm(prev => ({
+        ...prev,
+        client_id: clientId,
+        content: updatedContent,
+        recipients: [
+          {
+            email: client.email,
+            name: client.name,
+            role: 'primary'
+          },
+          ...prev.recipients.slice(1) // Keep any additional recipients
+        ]
+      }));
+    }
+  };
+
+  // Filter templates for active/draft status only
+  const availableTemplates = templates.filter(template => {
+    const status = template.status || (template.is_active ? 'active' : 'draft');
+    return status === 'active' || status === 'draft';
+  });
 
   // Filter templates
   const filteredTemplates = templates.filter(template => {
@@ -715,6 +778,48 @@ export default function AdminProposals() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
+            {/* Template Selection */}
+            <div>
+              <Label>Template</Label>
+              <Select
+                value={proposalForm.template_id || ''}
+                onValueChange={handleTemplateSelection}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a template (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">No template</SelectItem>
+                  {availableTemplates.map(template => (
+                    <SelectItem key={template.id} value={template.id}>
+                      {template.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Client Selection */}
+            <div>
+              <Label>Client</Label>
+              <Select
+                value={proposalForm.client_id || ''}
+                onValueChange={handleClientSelection}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a client (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">No client</SelectItem>
+                  {clients.map(client => (
+                    <SelectItem key={client.id} value={client.id}>
+                      {client.name} {client.company && `(${client.company})`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>Title *</Label>

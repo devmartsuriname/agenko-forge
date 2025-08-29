@@ -741,6 +741,7 @@ export type Database = {
       proposals: {
         Row: {
           accepted_at: string | null
+          client_id: string | null
           content: string
           created_at: string
           created_by: string | null
@@ -760,6 +761,7 @@ export type Database = {
         }
         Insert: {
           accepted_at?: string | null
+          client_id?: string | null
           content: string
           created_at?: string
           created_by?: string | null
@@ -779,6 +781,7 @@ export type Database = {
         }
         Update: {
           accepted_at?: string | null
+          client_id?: string | null
           content?: string
           created_at?: string
           created_by?: string | null
@@ -797,6 +800,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "proposals_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "proposals_quote_id_fkey"
             columns: ["quote_id"]
