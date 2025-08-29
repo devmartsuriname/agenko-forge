@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { adminCms } from '@/lib/admin-cms';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   Image as ImageIcon, 
   Upload, 
@@ -99,15 +100,47 @@ export function MediaPicker({ open, onOpenChange, onSelect, uploadPath = "propos
     }
   };
 
+  const validateFile = (file: File): string | null => {
+    const maxBytes = 10 * 1024 * 1024; // 10MB limit
+    if (file.size > maxBytes) {
+      return `File size exceeds 10MB limit`;
+    }
+    
+    // Only allow specific image types
+    const allowedTypes = ['image/webp', 'image/jpeg', 'image/png'];
+    if (!allowedTypes.includes(file.type)) {
+      return `Image type not supported. Please use WEBP, JPEG, or PNG format.`;
+    }
+    
+    return null;
+  };
+
   const handleUpload = async () => {
     if (!uploadFile) return;
 
+    const error = validateFile(uploadFile);
+    if (error) {
+      console.error('Validation error:', error);
+      return;
+    }
+
     setUploading(true);
     try {
-      // Simple file upload without progress - would need to be implemented in adminCms
-      console.log('Upload functionality needs to be implemented in adminCms');
+      // Generate unique storage key for inline images
+      const timestamp = Date.now();
+      const sanitizedName = uploadFile.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const storageKey = `${uploadPath}inline/${timestamp}-${sanitizedName}`;
+
+      // Upload to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('media')
+        .upload(storageKey, uploadFile);
+
+      if (uploadError) throw uploadError;
+
+      // Refresh the media files list
+      await fetchMediaFiles();
       
-      // For now, just show that it would work
       setUploadFile(null);
     } catch (error) {
       console.error('Error uploading file:', error);
@@ -211,12 +244,65 @@ export function MediaPicker({ open, onOpenChange, onSelect, uploadPath = "propos
           </TabsContent>
 
           <TabsContent value="upload" className="space-y-4">
-            <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
-              <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-lg font-medium">Upload Feature</p>
-              <p className="text-sm text-muted-foreground">
-                Upload functionality will be available in a future update
-              </p>
+            <div 
+              className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center"
+              onDrop={(e) => {
+                e.preventDefault();
+                const files = Array.from(e.dataTransfer.files);
+                if (files.length > 0 && files[0].type.startsWith('image/')) {
+                  setUploadFile(files[0]);
+                }
+              }}
+              onDragOver={(e) => e.preventDefault()}
+            >
+              <input
+                type="file"
+                accept="image/webp,image/jpeg,image/png"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) setUploadFile(file);
+                }}
+                className="hidden"
+                id="image-upload"
+              />
+              
+              {uploading ? (
+                <div className="space-y-4">
+                  <Loader2 className="h-8 w-8 mx-auto animate-spin" />
+                  <p>Uploading image...</p>
+                </div>
+              ) : uploadFile ? (
+                <div className="space-y-4">
+                  <FileImage className="h-12 w-12 text-primary mx-auto" />
+                  <div>
+                    <p className="font-medium">{uploadFile.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {(uploadFile.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
+                  </div>
+                  <div className="flex gap-2 justify-center">
+                    <Button variant="outline" onClick={() => setUploadFile(null)}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleUpload}>
+                      Upload
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-lg font-medium">Upload New Image</p>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Drag & drop or click to select (WEBP, JPEG, PNG only, max 10MB)
+                  </p>
+                  <label htmlFor="image-upload">
+                    <Button variant="outline" asChild>
+                      <span>Choose Image</span>
+                    </Button>
+                  </label>
+                </>
+              )}
             </div>
           </TabsContent>
         </Tabs>

@@ -15,7 +15,9 @@ import {
   Minus,
   Image,
   Paperclip,
-  Type
+  Type,
+  Eye,
+  FileCode
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -26,6 +28,8 @@ interface RichEditorProps {
   content: string;
   onChange: (content: string) => void;
   onInsertToken?: (token: string) => void;
+  mode?: 'rich' | 'html';
+  onModeChange?: (mode: 'rich' | 'html') => void;
 }
 
 const TOOLBAR_BUTTONS = [
@@ -48,7 +52,7 @@ const COMMON_TOKENS = [
   { name: 'proposal_link', label: 'Proposal Link' }
 ];
 
-export function RichEditor({ content, onChange, onInsertToken }: RichEditorProps) {
+export function RichEditor({ content, onChange, onInsertToken, mode = 'rich', onModeChange }: RichEditorProps) {
   const [showTokenDialog, setShowTokenDialog] = useState(false);
   const [showLinkDialog, setShowLinkDialog] = useState(false);
   const [linkText, setLinkText] = useState('');
@@ -112,40 +116,70 @@ export function RichEditor({ content, onChange, onInsertToken }: RichEditorProps
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex flex-wrap gap-1 p-2 border rounded-md bg-muted/50">
-        {TOOLBAR_BUTTONS.map(({ icon: Icon, label, tag }) => (
+        {/* Mode Toggle */}
+        <div className="flex items-center gap-1 mr-2">
           <Button
-            key={tag}
-            variant="ghost"
+            variant={mode === 'rich' ? 'default' : 'ghost'}
             size="sm"
-            onClick={() => insertFormatting(tag)}
-            title={label}
-            className="h-8 w-8 p-1"
+            onClick={() => onModeChange?.('rich')}
+            title="Rich Editor"
+            className="h-8 px-2"
           >
-            <Icon className="h-4 w-4" />
+            <Eye className="h-4 w-4 mr-1" />
+            Rich
           </Button>
-        ))}
+          <Button
+            variant={mode === 'html' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => onModeChange?.('html')}
+            title="HTML Editor"
+            className="h-8 px-2"
+          >
+            <FileCode className="h-4 w-4 mr-1" />
+            HTML
+          </Button>
+        </div>
         
         <div className="w-px h-6 bg-border mx-1" />
-        
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setShowLinkDialog(true)}
-          title="Insert Link"
-          className="h-8 w-8 p-1"
-        >
-          <Link className="h-4 w-4" />
-        </Button>
-        
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setShowMediaPicker(true)}
-          title="Insert Image"
-          className="h-8 w-8 p-1"
-        >
-          <Image className="h-4 w-4" />
-        </Button>
+
+        {mode === 'rich' && (
+          <>
+            {TOOLBAR_BUTTONS.map(({ icon: Icon, label, tag }) => (
+              <Button
+                key={tag}
+                variant="ghost"
+                size="sm"
+                onClick={() => insertFormatting(tag)}
+                title={label}
+                className="h-8 w-8 p-1"
+              >
+                <Icon className="h-4 w-4" />
+              </Button>
+            ))}
+            
+            <div className="w-px h-6 bg-border mx-1" />
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowLinkDialog(true)}
+              title="Insert Link"
+              className="h-8 w-8 p-1"
+            >
+              <Link className="h-4 w-4" />
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowMediaPicker(true)}
+              title="Insert Image"
+              className="h-8 w-8 p-1"
+            >
+              <Image className="h-4 w-4" />
+            </Button>
+          </>
+        )}
         
         <Button
           variant="ghost"
@@ -163,9 +197,16 @@ export function RichEditor({ content, onChange, onInsertToken }: RichEditorProps
       <Textarea
         value={content}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Start writing your proposal content..."
-        className="min-h-[400px] font-mono text-sm"
+        placeholder={mode === 'html' ? 'Enter HTML code...' : 'Start writing your proposal content...'}
+        className={`min-h-[400px] text-sm ${mode === 'html' ? 'font-mono' : ''}`}
       />
+      
+      {mode === 'html' && (
+        <div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded">
+          <strong>HTML Mode:</strong> Use standard HTML tags. Content will be sanitized on save.
+          Allowed: p, h1-h6, strong, em, u, ul, ol, li, a, img, hr, blockquote, code, pre, br, div, span
+        </div>
+      )}
 
       {/* Live Preview */}
       <Card className="p-4">

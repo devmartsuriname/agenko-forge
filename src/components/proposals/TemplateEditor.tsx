@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileText, Eye, Save, X } from 'lucide-react';
+import { FileText, Eye, Save, X, GripVertical } from 'lucide-react';
 import { ProposalTemplate, TemplateVariable } from '@/types/proposal';
 import { RichEditor } from './RichEditor';
 import { AttachmentPanel } from './AttachmentPanel';
@@ -49,8 +49,9 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
     variables: template?.variables || DEFAULT_VARIABLES
   });
 
-  const [showPreview, setShowPreview] = useState(false);
   const [attachments, setAttachments] = useState<any[]>([]);
+  const [editorMode, setEditorMode] = useState<'rich' | 'html'>('rich');
+  const [previewWidth, setPreviewWidth] = useState(50); // Percentage
 
   const handleSave = async () => {
     const templateData = {
@@ -88,10 +89,6 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setShowPreview(!showPreview)}>
-            <Eye className="h-4 w-4 mr-2" />
-            {showPreview ? 'Hide' : 'Show'} Preview
-          </Button>
           <Button variant="outline" onClick={onCancel}>
             <X className="h-4 w-4 mr-2" />
             Cancel
@@ -103,16 +100,17 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Template Details</CardTitle>
-              <CardDescription>
-                Basic information about your proposal template
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+      {/* Top Section - Template Details */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Template Details</CardTitle>
+            <CardDescription>
+              Basic information about your proposal template
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Template Name</Label>
                 <Input
@@ -141,17 +139,19 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
                   </SelectContent>
                 </Select>
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="subject">Email Subject</Label>
-                <Input
-                  id="subject"
-                  value={formData.subject}
-                  onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
-                  placeholder="Proposal for {{client_name}} - {{service_type}}"
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="subject">Email Subject</Label>
+              <Input
+                id="subject"
+                value={formData.subject}
+                onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
+                placeholder="Proposal for {{client_name}} - {{service_type}}"
+              />
+            </div>
 
+            <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Switch
                   id="active"
@@ -161,8 +161,8 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
                 <Label htmlFor="active">Active Template</Label>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
+              <div className="flex items-center space-x-2">
+                <Label htmlFor="status" className="text-sm">Status:</Label>
                 <Select
                   value={formData.status}
                   onValueChange={(value) => setFormData(prev => ({ 
@@ -170,8 +170,8 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
                     status: value as 'active' | 'draft' | 'archived'
                   }))}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="active">Active</SelectItem>
@@ -180,46 +180,111 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
                   </SelectContent>
                 </Select>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Available Variables</CardTitle>
+        <Card>
+          <CardHeader>
+            <CardTitle>Available Variables</CardTitle>
+            <CardDescription>
+              Click to insert variables into your content
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {formData.variables.map(variable => (
+                <Badge
+                  key={variable.name}
+                  variant="outline"
+                  className="cursor-pointer hover:bg-primary/10"
+                  onClick={() => insertToken(variable.name)}
+                >
+                  {variable.label}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Editor Section - Side by Side */}
+      <div 
+        className="grid gap-2 min-h-[calc(100vh-400px)]"
+        style={{ 
+          gridTemplateColumns: `${100 - previewWidth}% 1fr ${previewWidth}%`,
+        }}
+      >
+        {/* Editor Panel */}
+        <div className="space-y-4">
+          <Card className="h-full">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center justify-between">
+                <span>Proposal Content</span>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  {editorMode === 'html' ? 'HTML Editor' : 'Rich Editor'}
+                </div>
+              </CardTitle>
               <CardDescription>
-                Click to insert variables into your content
+                {editorMode === 'html' 
+                  ? 'Edit HTML source code directly'
+                  : 'Rich content with support for images, formatting, and variables'
+                }
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {formData.variables.map(variable => (
-                  <Badge
-                    key={variable.name}
-                    variant="outline"
-                    className="cursor-pointer hover:bg-primary/10"
-                    onClick={() => insertToken(variable.name)}
-                  >
-                    {variable.label}
-                  </Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Proposal Content</CardTitle>
-              <CardDescription>
-                Rich content with support for images, formatting, and variables
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+            <CardContent className="h-full">
               <RichEditor
                 content={formData.content}
                 onChange={(content) => setFormData(prev => ({ ...prev, content }))}
                 onInsertToken={insertToken}
+                mode={editorMode}
+                onModeChange={setEditorMode}
+              />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Resize Handle */}
+        <div className="flex items-center justify-center cursor-col-resize bg-border hover:bg-primary/20 transition-colors group">
+          <GripVertical className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
+        </div>
+
+        {/* Preview Panel */}
+        <div className="space-y-4">
+          <Card className="h-full">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center justify-between">
+                <span>Live Preview</span>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPreviewWidth(Math.max(30, previewWidth - 10))}
+                    disabled={previewWidth <= 30}
+                  >
+                    -
+                  </Button>
+                  <span className="text-xs text-muted-foreground min-w-[3rem] text-center">
+                    {previewWidth}%
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPreviewWidth(Math.min(70, previewWidth + 10))}
+                    disabled={previewWidth >= 70}
+                  >
+                    +
+                  </Button>
+                </div>
+              </CardTitle>
+              <CardDescription>
+                How this template will appear to clients
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="h-full overflow-auto">
+              <div 
+                className="prose prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ __html: formData.content }}
               />
             </CardContent>
           </Card>
@@ -230,23 +295,6 @@ export function TemplateEditor({ template, onSave, onCancel, isLoading }: Templa
             onAttachmentsChange={setAttachments}
             disabled={!template?.id}
           />
-
-          {showPreview && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Preview</CardTitle>
-                <CardDescription>
-                  How this template will appear to clients
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div 
-                  className="prose prose-sm max-w-none"
-                  dangerouslySetInnerHTML={{ __html: formData.content }}
-                />
-              </CardContent>
-            </Card>
-          )}
         </div>
       </div>
     </div>

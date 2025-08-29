@@ -1,7 +1,14 @@
 {
-  "version": "P7.2-CLOSEOUT-v1", 
-  "build_id": "20250828-P7.2-closeout",
+  "version": "P7.2.1-PROPOSALS-FIX", 
+  "build_id": "20250128-P7.2.1-proposals-fix",
   "features": [
+    "enhanced-attachment-panel-mime-validation",
+    "complete-mediapicker-upload-functionality", 
+    "rich-html-editor-toggle-sanitization",
+    "side-by-side-preview-adjustable-width",
+    "server-side-html-sanitization-edge-function",
+    "event-logging-proposals-attachments",
+    "improved-file-validation-error-handling",
     "templates-crud-system",
     "client-to-proposal-integration", 
     "pdf-branding-from-settings",

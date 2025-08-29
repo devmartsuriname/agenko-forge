@@ -57,6 +57,13 @@ export function AttachmentPanel({
     if (file.size > maxBytes) {
       return `File size exceeds ${maxSizeMB}MB limit`;
     }
+    
+    // For images, enforce specific MIME types
+    const allowedImageTypes = ['image/webp', 'image/jpeg', 'image/png'];
+    if (file.type.startsWith('image/') && !allowedImageTypes.includes(file.type)) {
+      return `Image type not supported. Please use WEBP, JPEG, or PNG format.`;
+    }
+    
     return null;
   };
 
@@ -114,9 +121,26 @@ export function AttachmentPanel({
       // Update attachments list
       onAttachmentsChange([...attachments, attachment]);
 
+      // Log the upload event
+      try {
+        await supabase.rpc('log_app_event', {
+          p_level: 'info',
+          p_area: 'proposals-attachments',
+          p_message: `Attachment uploaded to proposal ${proposalId}`,
+          p_meta: {
+            proposal_id: proposalId,
+            filename: file.name.substring(0, 20) + (file.name.length > 20 ? '...' : ''), // Masked filename
+            file_size: file.size,
+            mime_type: file.type
+          }
+        });
+      } catch (logError) {
+        console.warn('Failed to log attachment upload:', logError);
+      }
+
       toast({
         title: 'Success',
-        description: `${file.name} uploaded successfully`,
+        description: `${file.name.substring(0, 20) + (file.name.length > 20 ? '...' : '')} uploaded successfully`,
       });
     } catch (error: any) {
       console.error('Upload error:', error);
@@ -151,9 +175,25 @@ export function AttachmentPanel({
       // Update attachments list
       onAttachmentsChange(attachments.filter(a => a.id !== attachment.id));
 
+      // Log the deletion event
+      try {
+        await supabase.rpc('log_app_event', {
+          p_level: 'info',
+          p_area: 'proposals-attachments',
+          p_message: `Attachment deleted from proposal`,
+          p_meta: {
+            proposal_id: proposalId,
+            filename: attachment.filename.substring(0, 20) + (attachment.filename.length > 20 ? '...' : ''), // Masked filename
+            attachment_id: attachment.id
+          }
+        });
+      } catch (logError) {
+        console.warn('Failed to log attachment deletion:', logError);
+      }
+
       toast({
         title: 'Success',
-        description: `${attachment.filename} removed successfully`,
+        description: `${attachment.filename.substring(0, 20) + (attachment.filename.length > 20 ? '...' : '')} removed successfully`,
       });
     } catch (error: any) {
       console.error('Delete error:', error);
