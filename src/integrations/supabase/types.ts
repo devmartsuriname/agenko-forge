@@ -748,7 +748,7 @@ export type Database = {
           currency: string | null
           expires_at: string | null
           id: string
-          public_id: string
+          public_id: string | null
           quote_id: string | null
           rejected_at: string | null
           rejection_reason: string | null
@@ -769,7 +769,7 @@ export type Database = {
           currency?: string | null
           expires_at?: string | null
           id?: string
-          public_id: string
+          public_id?: string | null
           quote_id?: string | null
           rejected_at?: string | null
           rejection_reason?: string | null
@@ -790,7 +790,7 @@ export type Database = {
           currency?: string | null
           expires_at?: string | null
           id?: string
-          public_id?: string
+          public_id?: string | null
           quote_id?: string | null
           rejected_at?: string | null
           rejection_reason?: string | null
