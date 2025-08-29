@@ -23,6 +23,7 @@ export interface TemplateVariable {
 
 export interface Proposal {
   id: string;
+  public_id: string;
   template_id?: string;
   client_id?: string;
   title: string;

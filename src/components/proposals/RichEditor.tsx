@@ -46,7 +46,7 @@ const TOOLBAR_BUTTONS = [
 const COMMON_TOKENS = [
   { name: 'client_name', label: 'Client Name' },
   { name: 'client_company', label: 'Company' },
-  { name: 'total_amount', label: 'Total Amount' },
+  { name: 'proposal_id', label: 'Proposal ID' },
   { name: 'expires_at', label: 'Expires At' },
   { name: 'sender_name', label: 'Sender Name' },
   { name: 'proposal_link', label: 'Proposal Link' }

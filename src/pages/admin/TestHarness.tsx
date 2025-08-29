@@ -240,7 +240,6 @@ export default function TestHarness() {
             <p>Thank you for considering our services.</p>
             <p>Best regards,<br>The Agenko Team</p>
           `,
-          total_amount: 750000,
           currency: 'usd',
           expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days
           status: 'draft'

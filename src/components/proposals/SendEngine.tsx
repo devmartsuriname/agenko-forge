@@ -85,7 +85,7 @@ export function SendEngine({ proposals, onSent, onCancel }: SendEngineProps) {
     { name: 'client_company', label: 'Company' },
     { name: 'sender_name', label: 'Sender Name' },
     { name: 'proposal_link', label: 'Proposal Link' },
-    { name: 'total_amount', label: 'Total Amount' }
+    { name: 'proposal_id', label: 'Proposal ID' }
   ];
 
   return (

@@ -61,11 +61,11 @@ serve(async (req: Request) => {
     // Get proposal settings
     const proposalSettings = await getProposalSettings();
 
-    // Get proposal with recipients and attachments
+    // Get proposal with recipients, attachments, and client info
     const { data: proposal, error: proposalError } = await supabase
       .from('proposals')
       .select(`
-        id, title, subject, content, total_amount, currency, expires_at,
+        id, title, subject, content, public_id, currency, expires_at, client_id,
         proposal_recipients (
           id, email, name, role, token
         ),
@@ -83,6 +83,29 @@ serve(async (req: Request) => {
     if (proposal.proposal_recipients.length === 0) {
       throw new Error('No recipients found for proposal');
     }
+
+    // Get client info if exists
+    let clientData = null;
+    if (proposal.client_id) {
+      const { data: client } = await supabase
+        .from('clients')
+        .select('name, company, email')
+        .eq('id', proposal.client_id)
+        .single();
+      clientData = client;
+    }
+
+    // Sanitize content through sanitize-html function
+    const { data: sanitizedResult, error: sanitizeError } = await supabase.functions.invoke('sanitize-html', {
+      body: { html: proposal.content }
+    });
+
+    if (sanitizeError) {
+      console.error('Error sanitizing content:', sanitizeError);
+      throw new Error('Failed to sanitize content');
+    }
+
+    const sanitizedContent = sanitizedResult?.sanitized_html || proposal.content;
 
     const baseUrl = Deno.env.get('SUPABASE_URL')?.replace('/v1', '') || 'https://your-app.com';
     
@@ -118,13 +141,34 @@ serve(async (req: Request) => {
       const rejectUrl = `${baseUrl}/proposal/${proposal.id}/reject?token=${recipient.token}`;
       const viewUrl = `${baseUrl}/proposal/${proposal.id}/view?token=${recipient.token}`;
 
+      // Replace tokens in content
+      let processedContent = sanitizedContent;
+      processedContent = processedContent.replace(/\{\{proposal_id\}\}/g, proposal.public_id);
+      processedContent = processedContent.replace(/\{\{client_name\}\}/g, clientData?.name || recipient.name || recipient.email);
+      processedContent = processedContent.replace(/\{\{client_company\}\}/g, clientData?.company || '');
+      processedContent = processedContent.replace(/\{\{proposal_link\}\}/g, viewUrl);
+      processedContent = processedContent.replace(/\{\{sender_name\}\}/g, proposalSettings.email.from_name);
+      if (proposal.expires_at) {
+        processedContent = processedContent.replace(/\{\{expires_at\}\}/g, new Date(proposal.expires_at).toLocaleDateString());
+      }
+
+      // Replace tokens in subject
+      let processedSubject = proposal.subject;
+      processedSubject = processedSubject.replace(/\{\{proposal_id\}\}/g, proposal.public_id);
+      processedSubject = processedSubject.replace(/\{\{client_name\}\}/g, clientData?.name || recipient.name || recipient.email);
+      
+      // Add proposal ID to subject if not already included
+      if (!processedSubject.includes(proposal.public_id)) {
+        processedSubject = `[${proposal.public_id}] ${processedSubject}`;
+      }
+
       const emailHtml = `
         <!DOCTYPE html>
         <html>
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>${proposal.subject}</title>
+          <title>${processedSubject}</title>
           <style>
             body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; }
             .container { max-width: 600px; margin: 0 auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden; }
@@ -137,13 +181,14 @@ serve(async (req: Request) => {
             .btn-reject { background: #ef4444; color: white; }
             .btn-view { background: #6366f1; color: white; }
             .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 14px; color: #666; }
-            .amount { font-size: 24px; font-weight: bold; color: #10b981; text-align: center; margin: 20px 0; }
+            .proposal-id { font-family: monospace; font-size: 14px; color: #666; margin: 10px 0; }
           </style>
         </head>
         <body>
           <div class="container">
             <div class="header">
               <h1>${proposal.title}</h1>
+              <div class="proposal-id">Proposal ID: ${proposal.public_id}</div>
             </div>
             <div class="content">
               <p>Hello ${recipient.name || recipient.email},</p>
@@ -151,14 +196,8 @@ serve(async (req: Request) => {
               <p>We're pleased to present you with our proposal for your project.</p>
               
               <div class="proposal-content">
-                ${proposal.content}
+                ${processedContent}
               </div>
-              
-              ${proposal.total_amount ? `
-                <div class="amount">
-                  Total: $${(proposal.total_amount / 100).toLocaleString('en-US', { minimumFractionDigits: 2 })} ${proposal.currency.toUpperCase()}
-                </div>
-              ` : ''}
               
               ${proposal.expires_at ? `
                 <p><strong>This proposal expires on:</strong> ${new Date(proposal.expires_at).toLocaleDateString()}</p>
@@ -183,6 +222,7 @@ serve(async (req: Request) => {
             </div>
             <div class="footer">
               <p>This proposal was sent securely. The action links above are unique to you.</p>
+              <p>Proposal ID: ${proposal.public_id}</p>
             </div>
           </div>
         </body>
@@ -192,7 +232,7 @@ serve(async (req: Request) => {
       return resend.emails.send({
         from: `${proposalSettings.email.from_name} <${proposalSettings.email.from_email}>`,
         to: [recipient.email],
-        subject: proposal.subject,
+        subject: processedSubject,
         html: emailHtml,
         ...(proposalSettings.email.reply_to ? { reply_to: proposalSettings.email.reply_to } : {}),
         ...(proposalSettings.email.bcc_me ? { bcc: [proposalSettings.email.from_email] } : {})
@@ -229,6 +269,8 @@ serve(async (req: Request) => {
           recipients_count: proposal.proposal_recipients.length,
           success_count: successCount,
           error_count: errorCount,
+          proposal_id: proposal.public_id,
+          content_sanitized: sanitizedResult?.was_modified || false,
           email_results: emailResults.map((result, index) => ({
             recipient: proposal.proposal_recipients[index].email,
             success: result.status === 'fulfilled',
@@ -240,9 +282,10 @@ serve(async (req: Request) => {
     return new Response(
       JSON.stringify({
         success: true,
-        message: `Proposal sent to ${successCount} recipients${errorCount > 0 ? ` (${errorCount} failed)` : ''}`,
+        message: `Proposal ${proposal.public_id} sent to ${successCount} recipients${errorCount > 0 ? ` (${errorCount} failed)` : ''}`,
         sent_count: successCount,
-        error_count: errorCount
+        error_count: errorCount,
+        proposal_id: proposal.public_id
       }),
       {
         status: 200,

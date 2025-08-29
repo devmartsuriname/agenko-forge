@@ -177,7 +177,6 @@ export default function AdminProposals() {
           template_id: proposalForm.template_id,
           client_id: proposalForm.client_id,
           quote_id: proposalForm.quote_id,
-          total_amount: proposalForm.total_amount ? proposalForm.total_amount * 100 : null,
           currency: proposalForm.currency,
           expires_at: proposalForm.expires_at
         })
