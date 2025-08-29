@@ -287,12 +287,12 @@ Admin styles use semantic tokens and can be scoped with `.admin-root` class to p
 
 ## Modal Layout Patterns
 
-### 3-Column Independent Scrolling Layout
+### 2-Column Independent Scrolling Layout (Template Editor)
 
-For complex modals like the Template Editor that need to display multiple content areas simultaneously:
+The Template Editor uses a clean 2-column layout optimized for template editing:
 
 ```tsx
-// Modal Container - Global scroll for smaller screens
+// Modal Container - Global scroll for accessibility
 <DialogContent className="max-w-7xl w-[90vw] max-h-[90vh] overflow-y-auto flex flex-col">
   
   {/* Header - Non-growing */}
@@ -300,29 +300,27 @@ For complex modals like the Template Editor that need to display multiple conten
     {/* Template Details + Variables */}
   </div>
 
-  {/* Main Grid - 3 columns with independent scrolling */}
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1 min-h-0 overflow-hidden">
+  {/* Main Grid - 2 columns with independent scrolling */}
+  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0 overflow-hidden">
     
     {/* Column 1: Editor - Independent scrolling */}
     <div className="flex flex-col min-h-0">
       <div className="flex-1 min-h-0 overflow-y-auto">
-        {/* Rich Editor with sticky toolbar */}
+        {/* Rich Editor (no internal preview) */}
       </div>
     </div>
 
-    {/* Column 2: Preview - Independent scrolling */}
+    {/* Column 2: Live Preview - Independent scrolling */}
     <div className="flex flex-col min-h-0">
       <div className="flex-1 min-h-0 overflow-y-auto">
-        {/* Real-time preview content */}
+        {/* Single preview panel - real-time rendering */}
       </div>
     </div>
+  </div>
 
-    {/* Column 3: Attachments - Independent scrolling */}
-    <div className="flex flex-col min-h-0">
-      <div className="flex-1 min-h-0 overflow-y-auto">
-        {/* AttachmentPanel */}
-      </div>
-    </div>
+  {/* Footer - Always visible */}
+  <div className="shrink-0 flex justify-end gap-3 pt-6 border-t">
+    {/* Save/Cancel buttons */}
   </div>
 </DialogContent>
 ```
@@ -331,18 +329,24 @@ For complex modals like the Template Editor that need to display multiple conten
 - `min-h-0` on flex containers allows children to shrink below their content size
 - `overflow-y-auto` on modal enables global scrolling when content exceeds viewport
 - `overflow-y-auto` on individual columns for independent content scrolling  
-- `shrink-0` prevents header from competing for space
+- `shrink-0` prevents header/footer from competing for space
 - `flex-1` allows the main grid to consume remaining height
-- `grid-cols-1 md:grid-cols-3` provides responsive layout that stacks on mobile
+- `grid-cols-1 lg:grid-cols-2` provides responsive layout that stacks on mobile
 - `max-h-[90vh]` ensures modal respects viewport height limits
 
 **Benefits:**
-- All three content areas visible simultaneously
-- Independent scrolling prevents interference between columns
-- Global modal scrolling ensures accessibility on smaller screens
-- Responsive design maintains usability on mobile devices
-- Eliminates need to scroll to bottom for attachments
-- Clean UI with reduced header redundancy
+- **Single Preview**: Eliminated duplicate preview sections - only the Live Preview column remains
+- **Clean Layout**: Balanced 2-column design with proper space allocation
+- **Always Accessible Actions**: Save/Cancel buttons in sticky footer
+- **No Feature Creep**: Removed attachments section (belongs in proposal send stage, not template editing)
+- **Independent Scrolling**: Editor and preview scroll independently without interference
+- **Responsive Design**: Mobile-friendly with proper stacking behavior
+
+**UI Improvements Made:**
+- Removed duplicate "Preview" section from RichEditor component  
+- Removed attachments column (not relevant for template editing)
+- Added sticky footer with Save/Cancel buttons
+- Optimized for template editing workflow specifically
 
 **Restore Points:**
-- `P7.2.1-Proposals-FixPack-Restore-Before-3Column-Layout`: State before 3-column implementation
+- `P7.2.1-Proposals-FixPack-Restore-Before-3Column-Layout`: State before layout changes

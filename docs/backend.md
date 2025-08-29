@@ -267,12 +267,12 @@ CREATE POLICY "Service role can insert app events" ON logs_app_events
 
 For complex modals with scrollable content areas:
 
-### Independent Scrolling Pattern - 3-Column Layout
+### Independent Scrolling Pattern - 2-Column Layout
 
-The Template Editor implements a 3-column layout for maximum efficiency:
+The Template Editor implements a clean 2-column layout after duplicate preview removal:
 
 ```tsx
-// Modal Container - Updated for global scroll when needed
+// Modal Container - Global scroll for accessibility
 <DialogContent className="max-w-7xl w-[90vw] max-h-[90vh] overflow-y-auto flex flex-col">
   
   {/* Header - Non-growing */}
@@ -280,47 +280,48 @@ The Template Editor implements a 3-column layout for maximum efficiency:
     {/* Template Details + Variables */}
   </div>
 
-  {/* Main Grid - 3 columns with independent scrolling */}
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1 min-h-0 overflow-hidden">
+  {/* Main Grid - 2 columns with independent scrolling */}
+  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0 overflow-hidden">
     
     {/* Column 1: Proposal Content - Independent scrolling */}
     <div className="flex flex-col min-h-0">
       <div className="flex-1 min-h-0 overflow-y-auto">
-        {/* Rich Editor with sticky toolbar */}
+        {/* Rich Editor (no internal preview) */}
       </div>
     </div>
 
     {/* Column 2: Live Preview - Independent scrolling */}
     <div className="flex flex-col min-h-0">
       <div className="flex-1 min-h-0 overflow-y-auto">
-        {/* Real-time preview content */}
+        {/* Single preview panel - real-time rendering */}
       </div>
     </div>
+  </div>
 
-    {/* Column 3: Attachments - Independent scrolling */}
-    <div className="flex flex-col min-h-0">
-      <div className="flex-1 min-h-0 overflow-y-auto">
-        {/* AttachmentPanel */}
-      </div>
-    </div>
+  {/* Footer - Always visible */}
+  <div className="shrink-0 flex justify-end gap-3 pt-6 border-t">
+    {/* Save/Cancel buttons */}
   </div>
 </DialogContent>
 ```
 
 **Critical CSS Properties:**
 - `min-h-0` on flex containers allows children to shrink below their content size
-- `overflow-y-auto` on modal allows global scrolling when columns don't fit viewport
+- `overflow-y-auto` on modal allows global scrolling when content exceeds viewport
 - `overflow-y-auto` on individual columns for independent content scrolling  
-- `shrink-0` prevents header from competing for space
+- `shrink-0` prevents header/footer from competing for space
 - `flex-1` allows the main grid to consume remaining height
-- `grid-cols-1 md:grid-cols-3` provides responsive 3-column layout that stacks on mobile
-- `max-h-[90vh]` ensures modal never exceeds viewport height
+- `grid-cols-1 lg:grid-cols-2` provides responsive 2-column layout that stacks on mobile
+- `max-h-[90vh]` ensures modal respects viewport height limits
 
 **UI Improvements:**
-- Removed duplicate header section to reduce clutter and free vertical space
+- **Single Preview**: Removed duplicate preview from RichEditor, kept only Live Preview column
+- **Clean Layout**: 2-column design with balanced space allocation
+- **Sticky Footer**: Save/Cancel buttons always visible at bottom
+- **No Attachments**: Removed attachments section (belongs in proposal send stage)
 
 **Restore Points:**
-- `P7.2.1-Proposals-FixPack-Restore-Before-3Column-Layout`: State before 3-column implementation
+- `P7.2.1-Proposals-FixPack-Restore-Before-3Column-Layout`: State before layout changes
 
 ### Sticky Toolbars in Scrollable Areas
 

@@ -208,15 +208,6 @@ export function RichEditor({ content, onChange, onInsertToken, mode = 'rich', on
         </div>
       )}
 
-      {/* Live Preview */}
-      <Card className="p-4">
-        <h4 className="font-medium mb-2">Preview:</h4>
-        <div 
-          className="prose prose-sm max-w-none"
-          dangerouslySetInnerHTML={{ __html: content }}
-        />
-      </Card>
-
       {/* Token Dialog */}
       <Dialog open={showTokenDialog} onOpenChange={setShowTokenDialog}>
         <DialogContent>
