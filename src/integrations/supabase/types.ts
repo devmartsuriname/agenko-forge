@@ -748,6 +748,7 @@ export type Database = {
           currency: string | null
           expires_at: string | null
           id: string
+          public_id: string
           quote_id: string | null
           rejected_at: string | null
           rejection_reason: string | null
@@ -768,6 +769,7 @@ export type Database = {
           currency?: string | null
           expires_at?: string | null
           id?: string
+          public_id: string
           quote_id?: string | null
           rejected_at?: string | null
           rejection_reason?: string | null
@@ -788,6 +790,7 @@ export type Database = {
           currency?: string | null
           expires_at?: string | null
           id?: string
+          public_id?: string
           quote_id?: string | null
           rejected_at?: string | null
           rejection_reason?: string | null
@@ -1034,6 +1037,10 @@ export type Database = {
       cleanup_old_logs: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      generate_proposal_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       generate_proposal_token: {
         Args: Record<PropertyKey, never>
