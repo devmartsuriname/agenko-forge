@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from '@/hooks/use-toast';
 import { adminToast } from '@/lib/toast-utils';
@@ -688,6 +688,9 @@ export default function AdminProposals() {
               <DialogTitle>
                 {editingTemplate ? 'Edit Template' : 'Create Template'}
               </DialogTitle>
+              <DialogDescription>
+                Create reusable proposal templates with variables and rich content
+              </DialogDescription>
             </DialogHeader>
             <div className="flex-1 overflow-hidden">
               <TemplateEditor
@@ -705,6 +708,9 @@ export default function AdminProposals() {
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Create New Proposal</DialogTitle>
+            <DialogDescription>
+              Create a new proposal for your clients
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -843,6 +849,9 @@ export default function AdminProposals() {
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{selectedTemplate.name}</DialogTitle>
+              <DialogDescription>
+                Template preview and details
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div>
@@ -880,6 +889,9 @@ export default function AdminProposals() {
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{selectedProposal.title}</DialogTitle>
+              <DialogDescription>
+                Proposal details and recipient information
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
