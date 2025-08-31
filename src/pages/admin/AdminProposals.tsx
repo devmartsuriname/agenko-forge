@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RichEditor } from '@/components/proposals/RichEditor';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -73,6 +74,7 @@ export default function AdminProposals() {
     recipients: [{ email: '', name: '', role: 'primary' }],
     currency: 'usd'
   });
+  const [editorMode, setEditorMode] = useState<'rich' | 'html'>('rich');
 
   useEffect(() => {
     fetchProposals();
@@ -510,12 +512,12 @@ export default function AdminProposals() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Recipients</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead>Actions</TableHead>
+                     <TableHead>Title</TableHead>
+                     <TableHead>Status</TableHead>
+                     <TableHead>Recipients</TableHead>
+                     <TableHead>Public ID</TableHead>
+                     <TableHead>Created</TableHead>
+                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -532,12 +534,14 @@ export default function AdminProposals() {
                           {PROPOSAL_STATUS_LABELS[proposal.status]}
                         </Badge>
                       </TableCell>
-                      <TableCell>
-                        {proposal.proposal_recipients?.length || 0} recipients
-                      </TableCell>
-                      <TableCell>
-                        {proposal.total_amount ? formatCurrency(proposal.total_amount, proposal.currency) : '-'}
-                      </TableCell>
+                       <TableCell>
+                         {proposal.proposal_recipients?.length || 0} recipients
+                       </TableCell>
+                       <TableCell>
+                         <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                           {proposal.public_id || 'Generating...'}
+                         </code>
+                       </TableCell>
                       <TableCell>
                         {new Date(proposal.created_at).toLocaleDateString()}
                       </TableCell>
@@ -832,56 +836,48 @@ export default function AdminProposals() {
               </Select>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Title *</Label>
-                <Input
-                  value={proposalForm.title}
-                  onChange={(e) => setProposalForm(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder="Website Development Proposal"
-                />
-              </div>
-              <div>
-                <Label>Subject *</Label>
-                <Input
-                  value={proposalForm.subject}
-                  onChange={(e) => setProposalForm(prev => ({ ...prev, subject: e.target.value }))}
-                  placeholder="Your Website Development Proposal"
-                />
-              </div>
+            <div>
+              <Label>Title *</Label>
+              <Input
+                value={proposalForm.title}
+                onChange={(e) => setProposalForm(prev => ({ ...prev, title: e.target.value }))}
+                placeholder="Website Development Proposal"
+              />
+            </div>
+
+            <div>
+              <Label>Subject *</Label>
+              <Input
+                value={proposalForm.subject}
+                onChange={(e) => setProposalForm(prev => ({ ...prev, subject: e.target.value }))}
+                placeholder="Your Website Development Proposal"
+              />
             </div>
 
             <div>
               <Label>Content *</Label>
-              <Textarea
-                value={proposalForm.content}
-                onChange={(e) => setProposalForm(prev => ({ ...prev, content: e.target.value }))}
-                placeholder="Enter the proposal content..."
-                rows={10}
+              <RichEditor
+                content={proposalForm.content}
+                onChange={(content) => setProposalForm(prev => ({ ...prev, content }))}
+                onInsertToken={(token) => {
+                  const tokenPlaceholder = `{{${token}}}`;
+                  setProposalForm(prev => ({ 
+                    ...prev, 
+                    content: prev.content + tokenPlaceholder 
+                  }));
+                }}
+                mode={editorMode}
+                onModeChange={setEditorMode}
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Total Amount</Label>
-                <Input
-                  type="number"
-                  value={proposalForm.total_amount || ''}
-                  onChange={(e) => setProposalForm(prev => ({ 
-                    ...prev, 
-                    total_amount: e.target.value ? parseFloat(e.target.value) : undefined 
-                  }))}
-                  placeholder="5000"
-                />
-              </div>
-              <div>
-                <Label>Expires At</Label>
-                <Input
-                  type="date"
-                  value={proposalForm.expires_at || ''}
-                  onChange={(e) => setProposalForm(prev => ({ ...prev, expires_at: e.target.value }))}
-                />
-              </div>
+            <div>
+              <Label>Expiration Date</Label>
+              <Input
+                type="date"
+                value={proposalForm.expires_at || ''}
+                onChange={(e) => setProposalForm(prev => ({ ...prev, expires_at: e.target.value }))}
+              />
             </div>
 
             <div>
