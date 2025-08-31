@@ -266,11 +266,10 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, 
-      rgba(0, 0, 0, 0.45) 0%, 
-      transparent 30%, 
-      transparent 70%, 
-      rgba(0, 0, 0, 0.4) 100%);
+    background: linear-gradient(135deg, 
+      hsl(var(--agenko-green) / 0.1) 0%, 
+      transparent 50%, 
+      hsl(var(--agenko-green) / 0.05) 100%);
     pointer-events: none;
     z-index: 1;
   }
