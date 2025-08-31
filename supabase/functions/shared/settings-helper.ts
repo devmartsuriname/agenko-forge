@@ -57,8 +57,8 @@ const defaultProposalSettings: ProposalSettings = {
     footer_note_md: ""
   },
   email: {
-    from_name: "Agenko",
-    from_email: "proposals@agenko.com"
+    from_name: "Devmart",
+    from_email: "proposals@devmart.sr"
   },
   tokens: {
     ttl_hours: 168, // 7 days

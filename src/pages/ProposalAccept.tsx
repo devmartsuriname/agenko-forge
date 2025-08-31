@@ -74,8 +74,8 @@ export default function ProposalAccept() {
                 </Button>
                 <p className="text-sm text-muted-foreground">
                   Questions? Contact us at{' '}
-                  <a href="mailto:proposals@agenko.com" className="text-primary hover:underline">
-                    proposals@agenko.com
+                  <a href="mailto:proposals@devmart.sr" className="text-primary hover:underline">
+                    proposals@devmart.sr
                   </a>
                 </p>
               </div>

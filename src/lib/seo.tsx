@@ -52,7 +52,7 @@ export function SEOHead({
       '@type': 'ContactPoint',
       telephone: '+555-759-9854',
       contactType: 'customer service',
-      email: 'info@agenko.com'
+      email: 'info@devmart.sr'
     },
     address: {
       '@type': 'PostalAddress',
@@ -63,9 +63,9 @@ export function SEOHead({
       addressCountry: 'US'
     },
     sameAs: [
-      'https://twitter.com/agenko',
-      'https://linkedin.com/company/agenko',
-      'https://facebook.com/agenko'
+      'https://twitter.com/devmart',
+      'https://linkedin.com/company/devmart',
+      'https://facebook.com/devmart'
     ]
   };
 
@@ -140,7 +140,7 @@ export function SEOHead({
       
       {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:site" content="@agenko" />
+      <meta name="twitter:site" content="@devmart" />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={seoDescription} />
       <meta name="twitter:image" content={seoImage} />

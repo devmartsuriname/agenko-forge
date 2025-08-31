@@ -144,7 +144,7 @@ export function PaymentsTab({ settings, onChange, errors, onClearError }: Paymen
               id="statement_descriptor"
               value={settings.stripe.statement_descriptor || ''}
               onChange={(e) => handleStripeChange('statement_descriptor', e.target.value)}
-              placeholder="AGENKO DEV"
+              placeholder="DEVMART"
               maxLength={22}
               className={errors['stripe.statement_descriptor'] ? 'border-destructive' : ''}
             />
@@ -210,7 +210,7 @@ export function PaymentsTab({ settings, onChange, errors, onClearError }: Paymen
                     id="beneficiary_name"
                     value={settings.bank_transfer.beneficiary_name || ''}
                     onChange={(e) => handleBankTransferChange('beneficiary_name', e.target.value)}
-                    placeholder="Agenko Development Ltd"
+                    placeholder="Devmart Development Ltd"
                   />
                 </div>
                 

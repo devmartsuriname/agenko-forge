@@ -165,7 +165,7 @@ export function AdminSidebar() {
     >
       <span className="sr-only" data-sidebar-stamp="P7-RBAC-FIX" />
       <div className="p-6 border-b border-border">
-        <h2 className="text-xl font-bold text-foreground">Agenko Admin</h2>
+        <h2 className="text-xl font-bold text-foreground">Devmart Admin</h2>
       </div>
       
       <nav className="flex-1 p-4 space-y-2">

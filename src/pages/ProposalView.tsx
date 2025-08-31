@@ -305,8 +305,8 @@ export default function ProposalView() {
                 <div className="mt-6 text-center text-sm text-muted-foreground">
                   <p>
                     Questions about this proposal? Contact us at{' '}
-                    <a href="mailto:proposals@agenko.com" className="text-primary hover:underline">
-                      proposals@agenko.com
+                    <a href="mailto:proposals@devmart.sr" className="text-primary hover:underline">
+                      proposals@devmart.sr
                     </a>
                   </p>
                 </div>

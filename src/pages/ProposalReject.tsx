@@ -62,8 +62,8 @@ export default function ProposalReject() {
               </Button>
               <p className="text-sm text-muted-foreground">
                 Changed your mind? Contact us at{' '}
-                <a href="mailto:proposals@agenko.com" className="text-primary hover:underline">
-                  proposals@agenko.com
+                <a href="mailto:proposals@devmart.sr" className="text-primary hover:underline">
+                  proposals@devmart.sr
                 </a>
               </p>
             </div>
@@ -153,8 +153,8 @@ export default function ProposalReject() {
               <div className="text-center pt-4">
                 <p className="text-sm text-muted-foreground">
                   Questions? Contact us at{' '}
-                  <a href="mailto:proposals@agenko.com" className="text-primary hover:underline">
-                    proposals@agenko.com
+                  <a href="mailto:proposals@devmart.sr" className="text-primary hover:underline">
+                    proposals@devmart.sr
                   </a>
                 </p>
               </div>

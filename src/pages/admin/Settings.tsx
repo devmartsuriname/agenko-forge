@@ -424,7 +424,7 @@ export default function Settings() {
                         type="email"
                         value={settings.contact_email}
                         onChange={(e) => handleInputChange('contact_email', e.target.value)}
-                        placeholder="hello@agenko.com"
+                        placeholder="hello@devmart.sr"
                         className={errors.contact_email ? 'border-destructive' : ''}
                       />
                       {errors.contact_email && (
@@ -471,7 +471,7 @@ export default function Settings() {
                           type="url"
                           value={settings.facebook_url}
                           onChange={(e) => handleInputChange('facebook_url', e.target.value)}
-                          placeholder="https://facebook.com/agenkoteam"
+                          placeholder="https://facebook.com/devmartteam"
                           className={errors.facebook_url ? 'border-destructive' : ''}
                         />
                         {errors.facebook_url && (
@@ -501,7 +501,7 @@ export default function Settings() {
                           type="url"
                           value={settings.twitter_url}
                           onChange={(e) => handleInputChange('twitter_url', e.target.value)}
-                          placeholder="https://twitter.com/agenkoteam"
+                          placeholder="https://twitter.com/devmartteam"
                           className={errors.twitter_url ? 'border-destructive' : ''}
                         />
                         {errors.twitter_url && (
@@ -516,7 +516,7 @@ export default function Settings() {
                           type="url"
                           value={settings.instagram_url}
                           onChange={(e) => handleInputChange('instagram_url', e.target.value)}
-                          placeholder="https://instagram.com/agenkoteam"
+                          placeholder="https://instagram.com/devmartteam"
                           className={errors.instagram_url ? 'border-destructive' : ''}
                         />
                         {errors.instagram_url && (

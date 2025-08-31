@@ -145,7 +145,7 @@ export function ProposalsTab({ settings, onChange, errors, onClearError }: Propo
               id="footer_note"
               value={settings.branding.footer_note_md || ''}
               onChange={(e) => handleBrandingChange('footer_note_md', e.target.value)}
-              placeholder="Thank you for your business! | www.agenko.com"
+              placeholder="Thank you for your business! | www.devmart.sr"
               rows={2}
               className={errors['branding.footer_note_md'] ? 'border-destructive' : ''}
             />
@@ -178,7 +178,7 @@ export function ProposalsTab({ settings, onChange, errors, onClearError }: Propo
                 id="from_name"
                 value={settings.email.from_name}
                 onChange={(e) => handleEmailChange('from_name', e.target.value)}
-                placeholder="Agenko Team"
+                placeholder="Devmart Team"
                 className={errors['email.from_name'] ? 'border-destructive' : ''}
               />
               {errors['email.from_name'] && (
@@ -192,7 +192,7 @@ export function ProposalsTab({ settings, onChange, errors, onClearError }: Propo
                 id="from_email"
                 value={settings.email.from_email}
                 onChange={(e) => handleEmailChange('from_email', e.target.value)}
-                placeholder="proposals@agenko.com"
+                placeholder="proposals@devmart.sr"
                 className={errors['email.from_email'] ? 'border-destructive' : ''}
               />
               {errors['email.from_email'] && (
@@ -210,7 +210,7 @@ export function ProposalsTab({ settings, onChange, errors, onClearError }: Propo
               id="reply_to"
               value={settings.email.reply_to || ''}
               onChange={(e) => handleEmailChange('reply_to', e.target.value)}
-              placeholder="contact@agenko.com"
+              placeholder="contact@devmart.sr"
               className={errors['email.reply_to'] ? 'border-destructive' : ''}
             />
             {errors['email.reply_to'] && (
@@ -237,7 +237,7 @@ export function ProposalsTab({ settings, onChange, errors, onClearError }: Propo
               id="signature"
               value={settings.email.signature_html || ''}
               onChange={(e) => handleEmailChange('signature_html', e.target.value)}
-              placeholder="Best regards,<br>The Agenko Team<br><a href='https://agenko.com'>agenko.com</a>"
+              placeholder="Best regards,<br>The Devmart Team<br><a href='https://devmart.sr'>devmart.sr</a>"
               rows={3}
               className={errors['email.signature_html'] ? 'border-destructive' : ''}
             />
