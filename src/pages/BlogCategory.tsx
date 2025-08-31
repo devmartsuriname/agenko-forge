@@ -91,8 +91,8 @@ const BlogCategory = () => {
   return (
     <>
       <SEOHead 
-        title={`${category.name} Articles - Agenko Digital Agency Blog`}
-        description={category.description || `Read the latest ${category.name.toLowerCase()} articles from Agenko Digital Agency. Expert insights, tips, and knowledge to help grow your business.`}
+        title={`${category.name} Articles - Devmart Blog`}
+        description={category.description || `Read the latest ${category.name.toLowerCase()} articles from Devmart. Expert insights, tips, and knowledge to help drive technology innovation.`}
         keywords={[category.name.toLowerCase(), 'blog', 'articles', 'insights']}
         structuredData={{
           "@context": "https://schema.org",

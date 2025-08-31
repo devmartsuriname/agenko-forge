@@ -48,9 +48,9 @@ const Blog = () => {
   return (
     <>
       <SEOHead 
-        title="Blog - Agenko Digital Agency"
-        description="Read the latest insights, trends, and tips from Agenko Digital Agency. Stay ahead with expert knowledge in digital marketing, web design, and business growth."
-        keywords={['digital marketing blog', 'web design tips', 'business growth', 'marketing insights']}
+        title="Blog - Devmart"
+        description="Read the latest insights, trends, and tips from Devmart. Stay ahead with expert knowledge in technology, innovation, and digital transformation."
+        keywords={['technology blog', 'innovation insights', 'digital transformation', 'devmart insights']}
       />
       
       <div className="min-h-screen bg-agenko-dark">

@@ -143,12 +143,12 @@ const BlogPost = () => {
   return (
     <>
       <SEOHead 
-        title={`${post.title} - Agenko Digital Agency Blog`}
+        title={`${post.title} - Devmart Blog`}
         description={contentText}
         type="article"
         publishedAt={post.published_at || post.created_at}
         modifiedAt={post.updated_at}
-        author="Agenko Digital Agency"
+        author="Devmart"
         tags={post.tags || []}
         keywords={post.tags || []}
         image={post.feature_image_url}
@@ -159,11 +159,11 @@ const BlogPost = () => {
           "description": contentText,
           "author": {
             "@type": "Organization",
-            "name": "Agenko Digital Agency"
+            "name": "Devmart"
           },
           "publisher": {
             "@type": "Organization",
-            "name": "Agenko Digital Agency",
+            "name": "Devmart",
             "logo": {
               "@type": "ImageObject",
               "url": "https://agenko.lovable.app/logo.png"

@@ -115,9 +115,9 @@ const Pricing = () => {
   return (
     <>
       <SEOHead 
-        title="Pricing - Agenko Digital Agency"
-        description="Choose the perfect digital marketing package for your business. From starter websites to enterprise solutions, we have plans to fit every budget and requirement."
-        keywords={['pricing', 'digital marketing packages', 'web design cost', 'marketing plans']}
+        title="Pricing - Devmart"
+        description="Choose the perfect technology solution package for your business. From startup innovation to enterprise transformation, we have plans to fit every budget and requirement."
+        keywords={['pricing', 'technology packages', 'innovation cost', 'solution plans']}
       />
       
       <div className="min-h-screen bg-agenko-dark">

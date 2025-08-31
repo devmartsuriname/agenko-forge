@@ -48,9 +48,9 @@ const About = () => {
   return (
     <>
       <SEOHead 
-        title="About Us - Agenko Digital Agency"
-        description="Learn about Agenko Digital Agency, a leading innovative marketing agency specializing in creative solutions that drive business growth with over 25 years of experience."
-        keywords={['about agenko', 'digital agency team', 'marketing experience', 'creative solutions']}
+        title="About Us - Devmart"
+        description="Learn about Devmart, a leading innovative technology company specializing in cutting-edge solutions that drive business growth with expertise in Caribbean and global markets."
+        keywords={['about devmart', 'technology company', 'caribbean tech', 'innovation solutions']}
       />
       
       <div className="min-h-screen bg-agenko-dark">

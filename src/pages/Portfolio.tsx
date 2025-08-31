@@ -15,9 +15,9 @@ const Portfolio = () => {
   return (
     <>
       <SEOHead 
-        title="Our Portfolio - Agenko Digital Agency"
-        description="Explore our portfolio of successful digital marketing projects, web designs, and branding solutions that have helped businesses achieve their goals."
-        keywords={['portfolio', 'web design projects', 'digital marketing cases', 'agenko work']}
+        title="Our Portfolio - Devmart"
+        description="Explore our portfolio of successful technology projects, innovative solutions, and digital transformations that have helped businesses achieve their goals."
+        keywords={['portfolio', 'technology projects', 'innovation cases', 'devmart work']}
       />
       
       <div className="min-h-screen bg-agenko-dark">

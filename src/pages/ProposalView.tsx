@@ -359,7 +359,7 @@ export default function ProposalView() {
 
         {/* Footer */}
         <div className="text-center mt-16 text-sm text-muted-foreground">
-          <p>© 2024 Agenko Digital Agency. All rights reserved.</p>
+          <p>© 2024 Devmart. All rights reserved.</p>
         </div>
       </div>
     </div>

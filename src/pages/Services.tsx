@@ -19,9 +19,9 @@ const Services = () => {
   return (
     <>
       <SEOHead 
-        title="Our Services - Agenko Digital Agency"
-        description="Explore our comprehensive digital marketing services including web design, branding, SEO, and strategic consulting to grow your business."
-        keywords={['digital marketing services', 'web design', 'branding', 'SEO', 'consulting']}
+        title="Our Services - Devmart"
+        description="Explore our comprehensive technology services including software development, digital innovation, AI solutions, and strategic technology consulting."
+        keywords={['technology services', 'software development', 'digital innovation', 'AI solutions', 'consulting']}
       />
       
       <div className="min-h-screen bg-agenko-dark">

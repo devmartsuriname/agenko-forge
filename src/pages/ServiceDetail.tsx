@@ -60,10 +60,10 @@ const ServiceDetail = () => {
   return (
     <>
       <SEOHead 
-        title={`${service.title} - Agenko Digital Agency`}
+        title={`${service.title} - Devmart`}
         description={contentText}
         type="service"
-        keywords={['digital marketing', service.title.toLowerCase(), 'agenko services']}
+        keywords={['technology solutions', service.title.toLowerCase(), 'devmart services']}
       />
       
       <div className="min-h-screen bg-agenko-dark">

@@ -29,9 +29,9 @@ export function SEOHead({
   gscVerificationCode,
   structuredData,
 }: SEOProps) {
-  const siteName = 'Agenko Digital Agency';
-  const defaultDescription = 'Innovative marketing solutions for business growth. A leading digital agency specializing in creative solutions that drive business growth, enhance brand visibility, and increase customer engagement.';
-  const defaultKeywords = ['digital marketing', 'web design', 'branding', 'business growth', 'marketing agency'];
+  const siteName = 'Devmart';
+  const defaultDescription = 'Innovative technology solutions for Caribbean and global markets. A leading tech company specializing in cutting-edge digital solutions, AI innovation, and reliable technology services.';
+  const defaultKeywords = ['technology solutions', 'digital innovation', 'caribbean tech', 'software development', 'devmart'];
   
   const fullTitle = title ? `${title} | ${siteName}` : siteName;
   const seoDescription = description || defaultDescription;

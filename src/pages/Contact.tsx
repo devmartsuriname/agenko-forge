@@ -132,9 +132,9 @@ const Contact = () => {
   return (
     <>
       <SEOHead 
-        title="Contact Us - Agenko Digital Agency"
-        description="Get in touch with Agenko Digital Agency. Let's discuss your next digital marketing project and how we can help grow your business."
-        keywords={['contact agenko', 'digital marketing consultation', 'get quote', 'business inquiry']}
+        title="Contact Us - Devmart"
+        description="Get in touch with Devmart. Let's discuss your next technology project and how we can help drive your digital transformation."
+        keywords={['contact devmart', 'technology consultation', 'get quote', 'business inquiry']}
       />
       
       <div className="min-h-screen bg-agenko-dark">
