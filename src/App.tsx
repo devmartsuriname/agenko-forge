@@ -22,8 +22,11 @@ import BlogCategory from "./pages/BlogCategory";
 import BlogPost from "./pages/BlogPost";
 import Insights from "./pages/Insights";
 import CaseStudies from "./pages/CaseStudies";
+import CaseStudyDetail from "./pages/CaseStudyDetail";
 import Careers from "./pages/Careers";
+import JobDetail from "./pages/JobDetail";
 import InnovationLab from "./pages/InnovationLab";
+import LabProjectDetail from "./pages/LabProjectDetail";
 import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
@@ -64,6 +67,9 @@ const AdminProposals = lazy(() => import("./pages/admin/AdminProposals"));
 const AdminClients = lazy(() => import("./pages/admin/AdminClients"));
 const AdminBlogCategories = lazy(() => import("./pages/admin/AdminBlogCategories"));
 const AdminFAQ = lazy(() => import("./pages/admin/AdminFAQ"));
+const AdminCaseStudies = lazy(() => import("./pages/admin/AdminCaseStudies"));
+const AdminInnovationLab = lazy(() => import("./pages/admin/AdminInnovationLab"));
+const AdminCareers = lazy(() => import("./pages/admin/AdminCareers"));
 const AdminTestHarness = lazy(() => import("./pages/admin/TestHarness"));
 
 const queryClient = new QueryClient();
@@ -96,11 +102,11 @@ const App = () => (
               <Route path="/insights" element={<Insights />} />
               <Route path="/insights/:slug" element={<BlogPost />} />
               <Route path="/case-studies" element={<CaseStudies />} />
-              <Route path="/case-studies/:slug" element={<ProjectDetail />} />
+              <Route path="/case-studies/:slug" element={<CaseStudyDetail />} />
               <Route path="/careers" element={<Careers />} />
-              <Route path="/careers/:slug" element={<ProjectDetail />} />
+              <Route path="/careers/:slug" element={<JobDetail />} />
               <Route path="/innovation-lab" element={<InnovationLab />} />
-              <Route path="/innovation-lab/:slug" element={<ProjectDetail />} />
+              <Route path="/innovation-lab/:slug" element={<LabProjectDetail />} />
               
               <Route path="/faq" element={<FAQ />} />
         <Route path="/sitemap.xml" element={<Sitemap />} />
@@ -205,6 +211,21 @@ const App = () => (
                 <Route path="faq" element={
                   <Suspense fallback={<Spinner />}>
                     <AdminFAQ />
+                  </Suspense>
+                } />
+                <Route path="case-studies" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminCaseStudies />
+                  </Suspense>
+                } />
+                <Route path="innovation-lab" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminInnovationLab />
+                  </Suspense>
+                } />
+                <Route path="careers" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminCareers />
                   </Suspense>
                 } />
                 <Route path="clients" element={
