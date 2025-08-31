@@ -51,7 +51,7 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
               />
             )}
           </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-black/80" />
+          
         </div>
       )}
       
@@ -66,7 +66,7 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
           )}
           
           <ScrollReveal direction="up" delay={0.4}>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight max-w-[70ch] md:max-w-3xl mx-auto drop-shadow-[0_1px_8px_rgba(0,0,0,0.35)]">
               {data.title}
             </h1>
           </ScrollReveal>
@@ -101,11 +101,11 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
           <ScrollReveal direction="up" delay={1.0} stagger>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
               {data.stats.map((stat, index) => (
-                <div key={index} className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-primary mb-2 glow-green">
+                <div key={index} className="text-center rounded-xl border border-white/15 bg-transparent px-4 py-3 md:px-5 hover:scale-[1.02] transition-transform">
+                  <div className="text-white font-semibold text-2xl md:text-3xl mb-2">
                     {stat.number}
                   </div>
-                  <div className="text-white/80 text-sm md:text-base">
+                  <div className="text-white/80 text-xs md:text-sm">
                     {stat.label}
                   </div>
                 </div>
