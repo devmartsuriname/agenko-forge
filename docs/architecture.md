@@ -16,22 +16,58 @@ This is a modern agency website with secure admin CMS, built with React, TypeScr
 - **proposal_templates**: Reusable proposal templates with variables for token replacement
 - **proposal_attachments**: File attachments with signed URL access
 
-## Proposal Creation Workflow
+## Delivery-Safe Proposal Workflow
+
 ```mermaid
 graph TD
-    A[Admin Opens Create Proposal] --> B[Select Template Optional]
-    B --> C[Select Client Optional]
-    C --> D[Auto-fill Fields from Template]
-    D --> E[Replace Tokens with Client Data]
-    E --> F[Review & Edit Content]
-    F --> G[Add Recipients]
-    G --> H[Save Proposal]
-    H --> I[Send to Recipients]
+    A[Admin Opens Create Proposal] --> B[Select Template]
+    B --> C[Template Auto-fills Content]
+    C --> D[Select Client]
+    D --> E[Client Data Available for Tokens]
+    E --> F[Edit Content with Live Preview]
+    F --> G[Configure Recipients & Expiration]
+    G --> H[Save Proposal - Gets public_id]
+    H --> I[Send Proposal]
     
-    B1[Template Selected] --> D1[Title, Subject, Content Auto-filled]
-    C1[Client Selected] --> E1[Tokens: {{client_name}}, {{client_company}}, {{client_email}}, {{client_phone}}]
-    C1 --> E2[First Recipient Auto-populated]
+    I --> J[Token Replacement Pipeline]
+    J --> K[HTML Sanitization]
+    K --> L[Secure Email Delivery]
+    L --> M[Audit Trail Logging]
+    
+    subgraph "Authoring Phase"
+        B --> C
+        C --> D
+        D --> E
+        E --> F
+        F --> G
+        G --> H
+    end
+    
+    subgraph "Delivery Phase"
+        I --> J
+        J --> K
+        K --> L
+        L --> M
+    end
+    
+    subgraph "Security Boundaries"
+        N[Template: Raw tokens {{client_name}}]
+        O[Preview: Mock client data]
+        P[Delivery: Real client data - sanitized]
+        Q[Email: Pure HTML - no tokens]
+    end
 ```
+
+## Public ID & Immutability
+
+Every proposal receives a unique, immutable `public_id` generated at creation:
+
+- **Format**: `PR-YYYY-XXXX` (e.g., `PR-2024-0001`)
+- **Generation**: Auto-generated via database trigger on INSERT
+- **Uniqueness**: Database constraint prevents duplicates
+- **Immutability**: Never changes after creation - stable for references
+- **Year-Based**: Sequence resets annually for manageable numbering
+- **Token Support**: Available as `{{proposal_id}}` in content and email subjects
 
 ## RLS Security Model for Proposals
 - **Admins**: Full access to all proposals and can select any client

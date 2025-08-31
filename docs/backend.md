@@ -405,6 +405,124 @@ supabase db benchmark
 - ✅ Last admin protection active
 - ✅ Function search paths secured
 
+## Delivery-Safe Proposals Architecture
+
+### Authoring vs Delivery Pipeline Separation
+
+The proposal system implements a strict separation between content authoring and email delivery to prevent data leaks and ensure security:
+
+**Authoring Pipeline (Admin Interface):**
+- Templates created with token placeholders: `{{client_name}}`, `{{client_company}}`, etc.
+- Content editing with live preview showing mock token values
+- Attachment management and recipient configuration
+- No client data mixed until send-time
+
+**Delivery Pipeline (Email Send):**
+1. **Token Replacement**: Client-specific data replaces tokens based on selected client
+2. **HTML Sanitization**: Content passed through `sanitize-html` edge function
+3. **Secure Delivery**: Only rendered HTML sent via email - no raw tokens or sensitive metadata
+4. **Audit Trail**: All send events logged with recipient tracking
+
+### Public ID Generation Strategy
+
+Every proposal receives an auto-generated, immutable `public_id` for tracking and reference:
+
+```sql
+-- Format: PR-YYYY-XXXX (e.g., PR-2024-0001)
+-- Generated on INSERT via database trigger:
+CREATE OR REPLACE FUNCTION generate_proposal_public_id()
+RETURNS TRIGGER AS $$
+DECLARE
+  year_str TEXT := EXTRACT(year FROM NOW())::TEXT;
+  seq_num INTEGER;
+BEGIN
+  -- Get next sequence number for current year
+  SELECT COALESCE(MAX(CAST(SUBSTRING(public_id FROM 9) AS INTEGER)), 0) + 1
+  INTO seq_num
+  FROM proposals 
+  WHERE public_id LIKE 'PR-' || year_str || '-%';
+  
+  -- Generate public_id with zero-padded sequence
+  NEW.public_id := 'PR-' || year_str || '-' || LPAD(seq_num::TEXT, 4, '0');
+  
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+```
+
+**Key Properties:**
+- **Immutable**: Once assigned, never changes
+- **Unique**: Database constraint ensures no duplicates
+- **Human-Readable**: Easy to reference in communications
+- **Year-Based**: Resets sequence annually for manageable numbers
+- **Token Support**: `{{proposal_id}}` available in content and email subjects
+
+### Token Replacement Security Model
+
+Client data replacement follows strict ownership validation:
+
+```typescript
+// Token replacement with RLS enforcement
+const replaceTokens = (content: string, client: Client, proposal: Proposal) => {
+  // Only replace tokens if user owns the client (enforced by RLS)
+  return content
+    .replace(/\{\{client_name\}\}/g, client.name || '')
+    .replace(/\{\{client_company\}\}/g, client.company || '')
+    .replace(/\{\{client_email\}\}/g, client.email || '')
+    .replace(/\{\{client_phone\}\}/g, client.phone || '')
+    .replace(/\{\{proposal_id\}\}/g, proposal.public_id || '');
+};
+```
+
+**Security Guarantees:**
+- **No Cross-Client Leaks**: RLS policies prevent accessing other users' clients
+- **Sanitized Output**: All token-replaced content sanitized before delivery
+- **Audit Trail**: Token replacement events logged with client and proposal IDs
+- **Fallback Safety**: Invalid tokens render as empty strings, never error
+
+### HTML Sanitization Process
+
+All proposal content passes through sanitization before email delivery:
+
+```typescript
+// sanitize-html edge function configuration
+const sanitizeConfig = {
+  allowedTags: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'ul', 'ol', 'li'],
+  allowedAttributes: {
+    '*': ['style'], // Limited inline styles only
+  },
+  allowedStyles: {
+    '*': {
+      'color': [/^#[0-9a-fA-F]{6}$/], // Only hex colors
+      'background-color': [/^#[0-9a-fA-F]{6}$/],
+      'text-align': [/^(left|center|right)$/],
+    }
+  },
+  transformTags: {
+    // Remove potentially dangerous elements
+    'script': () => '',
+    'style': () => '',
+    'iframe': () => '',
+  }
+};
+```
+
+**Sanitization Benefits:**
+- **XSS Prevention**: Removes dangerous scripts and event handlers
+- **Email Compatibility**: Only email-safe HTML elements allowed
+- **Style Constraints**: Limited CSS properties prevent layout breaking
+- **Token Security**: No raw template syntax reaches email recipients
+
+### Data Exclusion Policy
+
+Sensitive data never included in outgoing emails:
+
+- **total_amount**: Excluded from all email content and metadata
+- **Internal IDs**: Only public_id exposed, never database UUIDs
+- **Edit URLs**: No admin interface links in client communications
+- **User Data**: No editor/admin information in proposal emails
+- **Raw Tokens**: All tokens replaced or stripped before delivery
+
 ## Phase 6 – Payments & Proposals
 
 ### Required Environment Variables
