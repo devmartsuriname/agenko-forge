@@ -212,7 +212,7 @@ export default function TestHarness() {
             <h3>Timeline</h3>
             <p>{{timeline}}</p>
             <p>Thank you for considering our services.</p>
-            <p>Best regards,<br>The Agenko Team</p>
+            <p>Best regards,<br>The Devmart Team</p>
           `,
           variables: ['project_name', 'client_name', 'service_type', 'project_scope', 'timeline']
         })
@@ -238,7 +238,7 @@ export default function TestHarness() {
             <h3>Timeline</h3>
             <p>2-3 months</p>
             <p>Thank you for considering our services.</p>
-            <p>Best regards,<br>The Agenko Team</p>
+            <p>Best regards,<br>The Devmart Team</p>
           `,
           currency: 'usd',
           expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days

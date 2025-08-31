@@ -547,7 +547,7 @@ export default function Settings() {
                       aria-describedby="title-template-help"
                     />
                     <p id="title-template-help" className="text-sm text-muted-foreground">
-                      Use %s for page title and %site_title% for site name. Example: "About Us | Agenko Agency"
+                      Use %s for page title and %site_title% for site name. Example: "About Us | Devmart Agency"
                     </p>
                   </div>
                   
@@ -772,7 +772,7 @@ export default function Settings() {
                       id="footer_legal_text"
                       value={settings.footer_legal_text}
                       onChange={(e) => handleInputChange('footer_legal_text', e.target.value)}
-                      placeholder="© 2024 Agenko Agency. All rights reserved."
+                      placeholder="© 2024 Devmart Agency. All rights reserved."
                       aria-describedby="footer-legal-help"
                     />
                     <p id="footer-legal-help" className="text-sm text-muted-foreground">

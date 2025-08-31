@@ -106,9 +106,9 @@ export function FAQ() {
   return (
     <>
       <SEOHead
-        title="Frequently Asked Questions - Agenko"
+        title="Frequently Asked Questions - Devmart"
         description="Find answers to common questions about our digital agency services, project process, pricing, and more."
-        url="https://agenko.lovable.app/faq"
+        url="https://devmart.sr/faq"
         structuredData={structuredData}
       />
       

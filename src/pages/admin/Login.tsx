@@ -52,8 +52,8 @@ export default function AdminLogin() {
   return (
     <>
       <SEOHead 
-        title="Admin Login - Agenko Agency"
-        description="Admin access to the Agenko Agency content management system"
+        title="Admin Login - Devmart Agency"
+        description="Admin access to the Devmart Agency content management system"
       />
       
       <div className="min-h-screen flex items-center justify-center bg-background p-4">

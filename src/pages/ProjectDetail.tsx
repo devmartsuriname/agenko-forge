@@ -65,7 +65,7 @@ const ProjectDetail = () => {
   return (
     <>
       <SEOHead 
-        title={`${project.title} - Agenko Portfolio`}
+        title={`${project.title} - Devmart Portfolio`}
         description={contentText}
         type="article"
         keywords={[project.title.toLowerCase(), 'portfolio', 'web design']}

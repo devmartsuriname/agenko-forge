@@ -211,7 +211,7 @@ const Pricing = () => {
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold text-agenko-white mb-6">
-                Why Choose Agenko?
+                Why Choose Devmart?
               </h2>
               <p className="text-agenko-gray-light max-w-3xl mx-auto">
                 Every package includes our commitment to excellence and proven results

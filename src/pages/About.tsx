@@ -82,7 +82,7 @@ const About = () => {
                 <div className="bg-agenko-dark-lighter rounded-2xl p-8">
                   <img 
                     src={heroImage} 
-                    alt="About Agenko Agency" 
+                    alt="About Devmart Agency" 
                     className="w-full h-96 object-cover rounded-xl"
                     loading="eager"
                   />

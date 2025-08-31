@@ -2,11 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Agenko Design System - Based on the Agenko Home 3 design - P7-DIAG-RLS-v1 */ 
+/* Devmart Design System - Based on the Devmart Home 3 design - P7-DIAG-RLS-v1 */ 
 
 @layer base {
   :root {
-    /* Agenko Brand Colors */
+    /* Devmart Brand Colors */
     --agenko-green: 90 100% 63%; /* #A1FF4C */
     --agenko-green-hover: 88 100% 58%; /* #94F83D */
     --agenko-dark: 220 13% 9%; /* #161A1E */

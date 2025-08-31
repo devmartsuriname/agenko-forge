@@ -246,7 +246,7 @@ export default function AdminDashboard() {
     <>
       <SEOHead 
         title="Dashboard - Admin Panel"
-        description="Admin dashboard for Agenko Agency"
+        description="Admin dashboard for Devmart Agency"
       />
       
       <div className="space-y-6">
