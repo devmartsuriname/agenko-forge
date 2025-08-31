@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import logo from '@/assets/logo.png';
 
 const Navigation = () => {
@@ -14,11 +15,14 @@ const Navigation = () => {
     { name: 'Services', href: '/services' },
     { name: 'Portfolio', href: '/portfolio' },
     { name: 'Pricing', href: '/pricing' },
+    { name: 'Contact', href: '/contact' },
+  ];
+
+  const otherItems = [
     { name: 'Insights', href: '/insights' },
     { name: 'Case Studies', href: '/case-studies' },
     { name: 'Careers', href: '/careers' },
     { name: 'Innovation Lab', href: '/innovation-lab' },
-    { name: 'Contact', href: '/contact' },
   ];
 
   const isActive = (href: string) => {
@@ -27,6 +31,8 @@ const Navigation = () => {
     }
     return location.pathname.startsWith(href);
   };
+
+  const isOtherActive = otherItems.some(item => isActive(item.href));
 
   return (
     <>
@@ -71,6 +77,37 @@ const Navigation = () => {
                   {item.name}
                 </Link>
               ))}
+              
+              {/* Other Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  className={`text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm px-2 py-1 flex items-center gap-1 ${
+                    isOtherActive
+                      ? 'text-agenko-green'
+                      : 'text-agenko-gray-light hover:text-agenko-white'
+                  }`}
+                  role="menuitem"
+                >
+                  Other
+                  <ChevronDown className="h-3 w-3" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-agenko-dark-lighter border-agenko-gray/20">
+                  {otherItems.map((item) => (
+                    <DropdownMenuItem key={item.name} asChild>
+                      <Link
+                        to={item.href}
+                        className={`text-sm font-medium transition-colors duration-200 w-full ${
+                          isActive(item.href)
+                            ? 'text-agenko-green bg-agenko-dark'
+                            : 'text-agenko-gray-light hover:text-agenko-white hover:bg-agenko-dark'
+                        }`}
+                      >
+                        {item.name}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             {/* CTA Button */}
@@ -121,7 +158,31 @@ const Navigation = () => {
                     {item.name}
                   </Link>
                 ))}
-                <div className="px-3 py-2">
+                
+                {/* Other Items in Mobile */}
+                <div className="border-t border-agenko-gray/20 mt-2 pt-2">
+                  <div className="px-3 py-2">
+                    <span className="text-xs text-agenko-gray uppercase tracking-wider">Other</span>
+                  </div>
+                  {otherItems.map((item) => (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      className={`block px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+                        isActive(item.href)
+                          ? 'text-agenko-green bg-agenko-dark'
+                          : 'text-agenko-gray-light hover:text-agenko-white hover:bg-agenko-dark'
+                      }`}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      role="menuitem"
+                      aria-current={isActive(item.href) ? 'page' : undefined}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                </div>
+                
+                <div className="px-3 py-2 mt-4">
                   <Button variant="hero" size="sm" className="w-full" asChild>
                     <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)}>
                       LET'S TALK
