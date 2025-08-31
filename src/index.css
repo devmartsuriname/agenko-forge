@@ -313,7 +313,6 @@
   .card:hover {
     @apply shadow-glow -translate-y-1;
   }
-}
 
   /* Focus indicators */
   .focus\:outline-none:focus {
