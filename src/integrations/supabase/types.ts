@@ -149,6 +149,66 @@ export type Database = {
         }
         Relationships: []
       }
+      case_studies: {
+        Row: {
+          body: string | null
+          client: string | null
+          created_at: string
+          created_by: string | null
+          gallery: string[] | null
+          hero_image: string | null
+          id: string
+          industry: string | null
+          metrics: Json | null
+          published_at: string | null
+          services: string[] | null
+          slug: string
+          status: string
+          summary: string | null
+          tech_stack: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          client?: string | null
+          created_at?: string
+          created_by?: string | null
+          gallery?: string[] | null
+          hero_image?: string | null
+          id?: string
+          industry?: string | null
+          metrics?: Json | null
+          published_at?: string | null
+          services?: string[] | null
+          slug: string
+          status?: string
+          summary?: string | null
+          tech_stack?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          client?: string | null
+          created_at?: string
+          created_by?: string | null
+          gallery?: string[] | null
+          hero_image?: string | null
+          id?: string
+          industry?: string | null
+          metrics?: Json | null
+          published_at?: string | null
+          services?: string[] | null
+          slug?: string
+          status?: string
+          summary?: string | null
+          tech_stack?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           company: string | null
@@ -241,6 +301,120 @@ export type Database = {
           question?: string
           sort_order?: number | null
           status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      jobs: {
+        Row: {
+          apply_url: string | null
+          benefits: string[] | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          email: string | null
+          id: string
+          location: string | null
+          published_at: string | null
+          requirements: string[] | null
+          responsibilities: string[] | null
+          slug: string
+          status: string
+          team: string | null
+          title: string
+          type: string | null
+          updated_at: string
+          work_mode: string | null
+        }
+        Insert: {
+          apply_url?: string | null
+          benefits?: string[] | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          email?: string | null
+          id?: string
+          location?: string | null
+          published_at?: string | null
+          requirements?: string[] | null
+          responsibilities?: string[] | null
+          slug: string
+          status?: string
+          team?: string | null
+          title: string
+          type?: string | null
+          updated_at?: string
+          work_mode?: string | null
+        }
+        Update: {
+          apply_url?: string | null
+          benefits?: string[] | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          email?: string | null
+          id?: string
+          location?: string | null
+          published_at?: string | null
+          requirements?: string[] | null
+          responsibilities?: string[] | null
+          slug?: string
+          status?: string
+          team?: string | null
+          title?: string
+          type?: string | null
+          updated_at?: string
+          work_mode?: string | null
+        }
+        Relationships: []
+      }
+      lab_projects: {
+        Row: {
+          body: string | null
+          created_at: string
+          created_by: string | null
+          demo_url: string | null
+          hero_image: string | null
+          id: string
+          published_at: string | null
+          repo_url: string | null
+          slug: string
+          status: string
+          summary: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          demo_url?: string | null
+          hero_image?: string | null
+          id?: string
+          published_at?: string | null
+          repo_url?: string | null
+          slug: string
+          status?: string
+          summary?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          demo_url?: string | null
+          hero_image?: string | null
+          id?: string
+          published_at?: string | null
+          repo_url?: string | null
+          slug?: string
+          status?: string
+          summary?: string | null
+          tags?: string[] | null
+          title?: string
           updated_at?: string
         }
         Relationships: []

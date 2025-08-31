@@ -19,7 +19,14 @@ import {
   Tags,
   MessageCircle,
   ChevronRight,
-  ChevronDown
+  ChevronDown,
+  TrendingUp,
+  Beaker,
+  BookOpen,
+  HelpCircle,
+  Building,
+  Mail,
+  Calculator
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -27,23 +34,26 @@ const navItems = [
   { href: '/admin', icon: LayoutDashboard, label: 'Dashboard', exact: true },
   { href: '/admin/pages', icon: FileText, label: 'Pages' },
   { href: '/admin/services', icon: Briefcase, label: 'Services' },
-  { href: '/admin/projects', icon: FolderOpen, label: 'Projects' },
+  { href: '/admin/projects', icon: FolderOpen, label: 'Portfolio' },
   { 
     href: '/admin/blog', 
-    icon: PenTool, 
-    label: 'Blog',
+    icon: BookOpen, 
+    label: 'Insights (Blog)',
     subItems: [
       { href: '/admin/blog/categories', icon: Tags, label: 'Categories', editorOnly: true }
     ]
   },
-  { href: '/admin/faq', icon: FileQuestion, label: 'FAQ', editorOnly: true },
-  { href: '/admin/quotes', icon: MessageCircle, label: 'Quotes', editorOnly: true },
-  { href: '/admin/payments', icon: CreditCard, label: 'Payments', editorOnly: true },
-  { href: '/admin/proposals', icon: ProposalIcon, label: 'Proposals', editorOnly: true },
-  { href: '/admin/clients', icon: Users, label: 'Clients', editorOnly: true },
+  { href: '/admin/case-studies', icon: TrendingUp, label: 'Case Studies', editorOnly: true },
+  { href: '/admin/careers', icon: Users, label: 'Careers', editorOnly: true },
+  { href: '/admin/innovation-lab', icon: Beaker, label: 'Innovation Lab', editorOnly: true },
+  { href: '/admin/faq', icon: HelpCircle, label: 'FAQ', editorOnly: true },
+  { href: '/admin/clients', icon: Building, label: 'Clients', editorOnly: true },
   { href: '/admin/media', icon: Image, label: 'Media' },
-  { href: '/admin/contact', icon: MessageSquare, label: 'Contact Submissions' },
-  { href: '/admin/settings', icon: Settings, label: 'Settings' },
+  { href: '/admin/contact', icon: Mail, label: 'Contact Submissions' },
+  { href: '/admin/quotes', icon: Calculator, label: 'Quotes', adminOnly: true },
+  { href: '/admin/proposals', icon: ProposalIcon, label: 'Proposals', editorOnly: true },
+  { href: '/admin/payments', icon: CreditCard, label: 'Payments', adminOnly: true },
+  { href: '/admin/settings', icon: Settings, label: 'Settings', adminOnly: true },
   { href: '/admin/users', icon: Users, label: 'Users', adminOnly: true },
   // E2E Test Harness - only show if explicitly enabled via env var
   ...(import.meta.env.VITE_E2E_SIDEBAR === 'true' ? [

@@ -20,6 +20,10 @@ import Pricing from "./pages/Pricing";
 import Blog from "./pages/Blog";
 import BlogCategory from "./pages/BlogCategory";
 import BlogPost from "./pages/BlogPost";
+import Insights from "./pages/Insights";
+import CaseStudies from "./pages/CaseStudies";
+import Careers from "./pages/Careers";
+import InnovationLab from "./pages/InnovationLab";
 import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
@@ -82,10 +86,23 @@ const App = () => (
               <Route path="/portfolio" element={<Portfolio />} />
               <Route path="/portfolio/:slug" element={<ProjectDetail />} />
               <Route path="/pricing" element={<Pricing />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/blog/category/:slug" element={<BlogCategory />} />
-        <Route path="/blog/:slug" element={<BlogPost />} />
-        <Route path="/faq" element={<FAQ />} />
+              
+              {/* Blog Routes (legacy) */}
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/category/:slug" element={<BlogCategory />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
+              
+              {/* New Content Routes */}
+              <Route path="/insights" element={<Insights />} />
+              <Route path="/insights/:slug" element={<BlogPost />} />
+              <Route path="/case-studies" element={<CaseStudies />} />
+              <Route path="/case-studies/:slug" element={<ProjectDetail />} />
+              <Route path="/careers" element={<Careers />} />
+              <Route path="/careers/:slug" element={<ProjectDetail />} />
+              <Route path="/innovation-lab" element={<InnovationLab />} />
+              <Route path="/innovation-lab/:slug" element={<ProjectDetail />} />
+              
+              <Route path="/faq" element={<FAQ />} />
         <Route path="/sitemap.xml" element={<Sitemap />} />
         <Route path="/contact" element={<Contact />} />
               <Route path="/get-quote" element={<GetQuote />} />
