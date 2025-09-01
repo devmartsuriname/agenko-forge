@@ -5,6 +5,9 @@ import type { HeroSection } from '@/lib/sections/schema';
 import { ResponsiveImage } from '@/components/ui/responsive-image';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { FloatingElement } from '@/components/ui/FloatingElement';
+import { useScrollProgress } from '@/hooks/useScrollProgress';
+import { ProgressScrubbing } from '@/components/ui/ProgressScrubbing';
+import { cn } from '@/lib/utils';
 
 interface HeroSectionProps {
   section: HeroSection;
@@ -12,10 +15,11 @@ interface HeroSectionProps {
 
 export function HeroSectionComponent({ section }: HeroSectionProps) {
   const { data } = section;
+  const { progress, getParallaxTransform } = useScrollProgress();
 
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 pt-16 gradient-overlay animated-bg overflow-hidden">
-      {/* Floating background elements */}
+      {/* Enhanced floating background elements */}
       <FloatingElement className="absolute top-20 left-10 w-16 h-16 bg-primary/10 rounded-full blur-xl">
         <div />
       </FloatingElement>
@@ -23,8 +27,14 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
         <div />
       </FloatingElement>
       
+      {/* Enhanced parallax background */}
       {data.backgroundImage && (
-        <div className="absolute inset-0 parallax-bg">
+        <div 
+          className="absolute inset-0 parallax-bg"
+          style={{
+            transform: getParallaxTransform('background'),
+          }}
+        >
           <div className="w-full h-full aspect-[16/9] sm:aspect-[21/9] lg:aspect-[32/9]">
             {typeof data.backgroundImage === 'string' ? (
               <ResponsiveImage
@@ -59,23 +69,30 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
         <div className="max-w-4xl mx-auto">
           {data.subtitle && (
             <ScrollReveal direction="down" delay={0.2}>
-              <p className="text-primary text-lg mb-4 font-medium tracking-wide glow-green">
-                {data.subtitle}
-              </p>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+                <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+                <span className="text-primary text-sm font-medium">
+                  {data.subtitle}
+                </span>
+              </div>
             </ScrollReveal>
           )}
           
           <ScrollReveal direction="up" delay={0.4}>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-              {data.title}
-            </h1>
+            <ProgressScrubbing intensity={0.3} direction="up">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+                {data.title}
+              </h1>
+            </ProgressScrubbing>
           </ScrollReveal>
           
           {data.description && (
             <ScrollReveal direction="up" delay={0.6}>
-              <p className="text-xl md:text-2xl text-white/90 mb-8 leading-relaxed max-w-3xl mx-auto">
-                {data.description}
-              </p>
+              <ProgressScrubbing intensity={0.2} direction="up">
+                <p className="text-xl md:text-2xl text-white/90 mb-8 leading-relaxed max-w-3xl mx-auto">
+                  {data.description}
+                </p>
+              </ProgressScrubbing>
             </ScrollReveal>
           )}
           
@@ -85,7 +102,12 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
                 <Button 
                   asChild 
                   size="lg" 
-                  className="bg-primary hover:bg-primary/90 text-white px-8 py-4 text-lg rounded-full micro-interact hover-morph shadow-glow"
+                  className={cn(
+                    "bg-primary hover:bg-primary/90 text-primary-foreground",
+                    "px-8 py-4 text-lg rounded-full",
+                    "transform hover:scale-105 transition-all duration-300",
+                    "shadow-lg hover:shadow-xl shadow-primary/25"
+                  )}
                 >
                   <Link to={data.ctaLink}>
                     {data.ctaText}
@@ -101,7 +123,7 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
           <ScrollReveal direction="up" delay={1.0} stagger>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
               {data.stats.map((stat, index) => (
-                <div key={index} className="text-center">
+                <div key={index} className="text-center transform hover:scale-105 transition-transform duration-300">
                   <div className="text-3xl md:text-4xl font-bold text-primary mb-2 glow-green">
                     {stat.number}
                   </div>

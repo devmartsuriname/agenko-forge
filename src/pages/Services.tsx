@@ -1,11 +1,15 @@
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { SEOHead } from '@/lib/seo';
 import { cms } from '@/lib/cms';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Building, Zap, Palette, Target, Globe, Smartphone } from 'lucide-react';
+import { InteractiveServiceCard } from '@/components/ui/InteractiveServiceCard';
+import { ServiceFilters } from '@/components/ui/ServiceFilters';
+import { AnimatedHero } from '@/components/ui/AnimatedHero';
+import { ScrollReveal } from '@/components/ui/ScrollReveal';
+import { Building, Zap, Palette, Target, Globe, Smartphone, Code, Cpu, Rocket } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Services = () => {
@@ -14,7 +18,62 @@ const Services = () => {
     queryFn: cms.getPublishedServices,
   });
 
-  const serviceIcons = [Building, Zap, Palette, Target, Globe, Smartphone];
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const serviceIcons = [Building, Zap, Palette, Target, Globe, Smartphone, Code, Cpu, Rocket];
+  
+  // Mock service categories and metrics (would come from CMS in real app)
+  const serviceCategories = ['Strategy', 'Development', 'Design', 'Analytics', 'Consulting'];
+  
+  const serviceMetrics = {
+    'web-development': [
+      { value: 40, label: 'Faster Load Times', suffix: '%', color: 'green' as const },
+      { value: 95, label: 'Performance Score', color: 'blue' as const },
+    ],
+    'digital-marketing': [
+      { value: 150, label: 'ROI Increase', suffix: '%', color: 'green' as const },
+      { value: 60, label: 'Lead Growth', suffix: '%', color: 'purple' as const },
+    ],
+    'ui-ux-design': [
+      { value: 25, label: 'User Engagement', suffix: '%', color: 'blue' as const },
+      { value: 35, label: 'Conversion Rate', suffix: '%', color: 'green' as const },
+    ],
+  };
+
+  // Enhanced services with categories and outcomes
+  const enhancedServices = useMemo(() => 
+    services.map((service, index) => ({
+      ...service,
+      category: serviceCategories[index % serviceCategories.length],
+      metrics: serviceMetrics[service.slug as keyof typeof serviceMetrics] || [],
+      outcomeText: getOutcomeText(service.slug),
+    })), [services]
+  );
+
+  function getOutcomeText(slug: string): string {
+    const outcomes: Record<string, string> = {
+      'web-development': '40% faster page loads',
+      'digital-marketing': '150% average ROI increase', 
+      'ui-ux-design': '35% conversion improvement',
+      'seo-optimization': '200% organic traffic growth',
+      'brand-strategy': '3x brand recognition increase',
+      'analytics-reporting': '50% faster decision making',
+    };
+    return outcomes[slug] || 'Proven results delivered';
+  }
+
+  // Filter services
+  const filteredServices = useMemo(() => {
+    return enhancedServices.filter(service => {
+      const matchesCategory = !selectedCategory || service.category === selectedCategory;
+      const matchesSearch = !searchQuery || 
+        service.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        service.excerpt?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      return matchesCategory && matchesSearch;
+    });
+  }, [enhancedServices, selectedCategory, searchQuery]);
 
   return (
     <>
@@ -28,45 +87,88 @@ const Services = () => {
         <Navigation />
         
         {/* Hero Section */}
-        <section className="py-32 px-4 pt-24">
-          <div className="max-w-6xl mx-auto text-center">
-            <div className="inline-block px-4 py-2 bg-agenko-dark-lighter rounded-full text-agenko-green text-sm font-medium mb-6">
-              Our Services
-            </div>
-            <h1 className="text-4xl md:text-6xl font-bold text-agenko-white leading-tight mb-6">
-              Comprehensive <span className="text-gradient">Digital Solutions</span>
-            </h1>
-            <p className="text-xl text-agenko-gray-light max-w-3xl mx-auto mb-12">
-              We offer a full range of digital marketing and design services to help your business thrive in the digital landscape. From strategy to execution, we've got you covered.
-            </p>
-          </div>
-        </section>
+        <AnimatedHero
+          headline="Comprehensive •Digital• Solutions"
+          subhead="Our Services"
+          description="We offer a full range of digital marketing and design services to help your business thrive in the digital landscape. From strategy to execution, we've got you covered."
+          ctaText="View All Services"
+          ctaLink="#services"
+          stats={[
+            { number: '25+', label: 'Years Experience' },
+            { number: '500+', label: 'Projects Delivered' },
+            { number: '98%', label: 'Client Satisfaction' },
+            { number: '24/7', label: 'Support Available' },
+          ]}
+          className="pt-16 px-4"
+        />
 
-        {/* Services Grid */}
-        <section className="py-12 px-4">
+        {/* Services Section */}
+        <section id="services" className="py-16 px-4">
           <div className="max-w-6xl mx-auto">
+            <ScrollReveal direction="up">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                  Our Services
+                </h2>
+                <p className="text-muted-foreground max-w-2xl mx-auto">
+                  Discover our comprehensive range of digital solutions designed to accelerate your business growth.
+                </p>
+              </div>
+            </ScrollReveal>
+
+            {/* Filters */}
+            <ScrollReveal direction="up" delay={0.2}>
+              <ServiceFilters
+                categories={serviceCategories}
+                selectedCategory={selectedCategory}
+                onCategoryChange={setSelectedCategory}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                className="mb-12"
+              />
+            </ScrollReveal>
+
+            {/* Services Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {services.map((service, index) => {
+              {filteredServices.map((service, index) => {
                 const IconComponent = serviceIcons[index % serviceIcons.length];
                 
                 return (
-                  <Card key={service.id} className="bg-agenko-dark-lighter border-agenko-gray/20 hover:border-agenko-green/20 transition-all duration-300 group">
-                    <CardContent className="p-8">
-                      <div className="w-16 h-16 bg-agenko-dark rounded-xl flex items-center justify-center mb-6 group-hover:bg-agenko-green transition-colors duration-300">
-                        <IconComponent className="w-8 h-8 text-agenko-green group-hover:text-agenko-dark" />
-                      </div>
-                      <h3 className="text-xl font-bold text-agenko-white mb-4">{service.title}</h3>
-                      <p className="text-agenko-gray-light mb-6 line-clamp-3">{service.excerpt}</p>
-                      <Link to={`/services/${service.slug}`}>
-                        <Button variant="outline-green" size="sm">
-                          Learn More
-                        </Button>
-                      </Link>
-                    </CardContent>
-                  </Card>
+                  <InteractiveServiceCard
+                    key={service.id}
+                    title={service.title}
+                    excerpt={service.excerpt || ''}
+                    slug={service.slug}
+                    icon={IconComponent}
+                    category={service.category}
+                    metrics={service.metrics}
+                    outcomeText={service.outcomeText}
+                    delay={index * 0.1}
+                  />
                 );
               })}
             </div>
+
+            {/* No results */}
+            {filteredServices.length === 0 && (
+              <ScrollReveal direction="up" delay={0.4}>
+                <div className="text-center py-12">
+                  <h3 className="text-xl font-semibold text-foreground mb-2">No services found</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Try adjusting your filters or search query.
+                  </p>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setSelectedCategory(null);
+                      setSearchQuery('');
+                    }}
+                  >
+                    Clear Filters
+                  </Button>
+                </div>
+              </ScrollReveal>
+            )}
           </div>
         </section>
 

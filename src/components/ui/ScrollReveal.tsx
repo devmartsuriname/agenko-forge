@@ -1,6 +1,8 @@
 import { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
+import { useReducedMotionSafe } from '@/hooks/useReducedMotionSafe';
+import { motionConfig } from '@/lib/motion.config';
 
 interface ScrollRevealProps {
   children: ReactNode;
@@ -20,6 +22,11 @@ export function ScrollReveal({
   stagger = false,
 }: ScrollRevealProps) {
   const { elementRef, isVisible } = useScrollReveal<HTMLDivElement>();
+  const { getSafeDuration, getSafeTransform } = useReducedMotionSafe();
+
+  // Get safe values for reduced motion
+  const safeDuration = getSafeDuration('normal');
+  const safeTransform = getSafeTransform('translateY(0)');
 
   return (
     <div
@@ -34,8 +41,9 @@ export function ScrollReveal({
         className
       )}
       style={{
-        transitionDuration: `${duration}s`,
+        transitionDuration: `${safeDuration}s`,
         transitionDelay: `${delay}s`,
+        transitionTimingFunction: motionConfig.easing.smooth,
       }}
     >
       {children}
