@@ -114,7 +114,7 @@ export function AdminSidebar() {
 
     if (hasSubItems) {
       return (
-        <div key={itemKey}>
+        <div>
           <div className="flex items-center">
             {item.href ? (
               <NavLink
@@ -153,7 +153,11 @@ export function AdminSidebar() {
           
           {isExpanded && (
             <div className="ml-4 mt-2 space-y-1">
-              {item.subItems.map((subItem: any) => renderNavItem(subItem, true))}
+              {item.subItems.map((subItem: any, subIndex: number) => (
+                <div key={subItem.href || `subitem-${subIndex}`}>
+                  {renderNavItem(subItem, true)}
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -162,7 +166,6 @@ export function AdminSidebar() {
 
     return (
       <NavLink
-        key={item.href}
         to={item.href}
         end={item.exact}
         className={({ isActive }) =>
@@ -195,7 +198,11 @@ export function AdminSidebar() {
       </div>
       
       <nav className="flex-1 p-4 space-y-2">
-        {navItems.map((item) => renderNavItem(item))}
+        {navItems.map((item, index) => (
+          <div key={item.href || item.label || `item-${index}`}>
+            {renderNavItem(item)}
+          </div>
+        ))}
       </nav>
       
       <div className="p-4 border-t border-border">
