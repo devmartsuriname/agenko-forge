@@ -6,25 +6,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from '@/lib/auth';
 import { Suspense, lazy } from 'react';
+import { SuspenseWithTimeout } from "@/components/ui/SuspenseWithTimeout";
 import { Spinner } from "@/components/ui/spinner";
 import { TrackingScripts } from '@/components/TrackingScripts';
 import { GlobalIntegrations } from '@/components/GlobalIntegrations';
 import { PWAInstallPrompt } from '@/components/ui/PWAInstallPrompt';
 import { CTAProvider } from "@/components/cta/CTAProvider";
-import { PerformanceMonitor } from '@/lib/performance-optimization';
-import { initializeProductionOptimizations } from '@/lib/production-optimizations';
-
-// Initialize performance monitoring and optimizations
-// Only run production optimizations in actual production builds
-if (process.env.NODE_ENV === 'production') {
-  PerformanceMonitor.startMeasure('app-init');
-  // Initialize with error handling
-  try {
-    initializeProductionOptimizations();
-  } catch (error) {
-    console.error('Failed to initialize production optimizations:', error);
-  }
-}
 
 // Public pages
 import Index from "./pages/Index";
@@ -60,7 +47,7 @@ import PaymentCanceled from "./pages/PaymentCanceled";
 
 // Admin layout and error boundary
 import { AdminLayout } from "./components/admin/AdminLayout";
-import { AdminErrorBoundary } from "./components/admin/ErrorBoundary";
+import { AdminErrorBoundary } from "./components/admin/AdminErrorBoundary";
 
 // Admin pages - lazy loaded
 const AdminLogin = lazy(() => import("./pages/admin/Login"));
@@ -186,14 +173,14 @@ const App = () => (
                   </Suspense>
                 } />
                 <Route path="services/new" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminServiceEditor />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="services/:id/edit" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminServiceEditor />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="projects" element={
                   <Suspense fallback={<Spinner />}>
@@ -241,14 +228,14 @@ const App = () => (
                   </Suspense>
                 } />
                 <Route path="case-studies/new" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminCaseStudyEditor />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="case-studies/:id/edit" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminCaseStudyEditor />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="innovation-lab" element={
                   <Suspense fallback={<Spinner />}>
