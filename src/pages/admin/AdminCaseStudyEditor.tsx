@@ -48,23 +48,11 @@ export default function AdminCaseStudyEditor() {
   const isEditing = id !== 'new';
 
   useEffect(() => {
-    console.log('AdminCaseStudyEditor useEffect:', { 
-      authLoading, 
-      isEditing, 
-      userId: user?.id,
-      isEditor 
-    });
+    if (authLoading) return; // Wait for auth to load
     
-    if (authLoading) {
-      console.log('Still loading auth, waiting...');
-      return; // Wait for auth to load
-    }
-    
-    if (isEditing) {
-      console.log('Editing mode - fetching case study');
+    if (isEditing && id && id !== 'new') {
       fetchCaseStudy();
-    } else {
-      console.log('New mode - initializing empty case study');
+    } else if (!isEditing) {
       setCaseStudy({
         id: '',
         slug: '',
@@ -184,16 +172,7 @@ export default function AdminCaseStudyEditor() {
     );
   }
 
-  console.log('AdminCaseStudyEditor render:', {
-    loading,
-    authLoading,
-    caseStudy: !!caseStudy,
-    isEditor,
-    user: !!user
-  });
-
   if (loading || authLoading) {
-    console.log('Showing loading skeleton');
     return (
       <div className="container mx-auto px-4 py-8">
         <LoadingListSkeleton />
@@ -202,7 +181,6 @@ export default function AdminCaseStudyEditor() {
   }
 
   if (!caseStudy) {
-    console.log('Case study not found - showing error');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">

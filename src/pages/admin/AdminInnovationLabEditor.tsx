@@ -44,9 +44,9 @@ export default function AdminInnovationLabEditor() {
   useEffect(() => {
     if (authLoading) return; // Wait for auth to load
     
-    if (isEditing) {
+    if (isEditing && id && id !== 'new') {
       fetchProject();
-    } else {
+    } else if (!isEditing) {
       setProject({
         id: '',
         slug: '',

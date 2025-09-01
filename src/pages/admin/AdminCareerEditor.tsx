@@ -47,9 +47,9 @@ export default function AdminCareerEditor() {
   useEffect(() => {
     if (authLoading) return; // Wait for auth to load
     
-    if (isEditing) {
+    if (isEditing && id && id !== 'new') {
       fetchJob();
-    } else {
+    } else if (!isEditing) {
       setJob({
         id: '',
         slug: '',
