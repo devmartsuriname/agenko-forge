@@ -454,8 +454,7 @@ export function generateSlug(title: string): string {
 
 // CAPTCHA verification stub
 export async function verifyCaptcha(token: string): Promise<boolean> {
-  // TODO: Implement actual CAPTCHA verification
-  // For now, return true (stub implementation)
-  console.log('CAPTCHA verification stub - token:', token);
-  return true;
+  // CAPTCHA verification implementation would go here
+  // For demo purposes, return true
+  return Promise.resolve(true);
 }

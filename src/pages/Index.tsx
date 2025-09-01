@@ -28,7 +28,7 @@ const Index = () => {
     if (homePage?.body?.sections) {
       const parsedBody = PageBodySchema.parse(homePage.body);
       sections = parsedBody.sections;
-      console.log('Successfully parsed sections:', sections.length);
+      // Successfully parsed sections: ${sections.length}
     } else if (homePage?.body?.content !== undefined) {
       // Handle case where body has 'content' instead of 'sections' - likely from wrong editor
       console.warn('Home page has content instead of sections - needs to be re-edited with sections editor');
@@ -36,7 +36,7 @@ const Index = () => {
       
       // Provide a basic fallback hero section if content exists but no sections
       if (homePage.body.content === "") {
-        console.log('Creating fallback hero section since content is empty');
+        // Creating fallback hero section since content is empty
         sections = [{
           id: 'fallback-hero',
           type: 'hero',

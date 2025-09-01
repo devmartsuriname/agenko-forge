@@ -1,14 +1,13 @@
 import { cn } from "@/lib/utils";
+import { ImgHTMLAttributes } from "react";
 
-interface ResponsiveImageProps {
+interface ResponsiveImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'alt' | 'sizes' | 'loading'> {
   src: string;
   alt: string;
-  className?: string;
   sizes?: string;
   priority?: boolean;
   aspectRatio?: string;
   loading?: "eager" | "lazy";
-  fetchPriority?: "high" | "low" | "auto";
 }
 
 export function ResponsiveImage({
@@ -19,7 +18,7 @@ export function ResponsiveImage({
   priority = false,
   aspectRatio = "16/9",
   loading = "lazy",
-  fetchPriority = "auto"
+  ...rest
 }: ResponsiveImageProps) {
   
   // Generate srcset from the main URL if it's a Supabase Storage WebP
@@ -43,7 +42,7 @@ export function ResponsiveImage({
       sizes={sizes}
       alt={alt}
       loading={priority ? "eager" : loading}
-      fetchPriority={priority ? "high" : fetchPriority}
+      fetchPriority={priority ? "high" : "auto"}
       className={cn(
         "w-full h-full object-cover",
         className
@@ -52,6 +51,7 @@ export function ResponsiveImage({
         aspectRatio: aspectRatio,
         objectFit: 'cover'
       }}
+      {...rest}
     />
   );
 }

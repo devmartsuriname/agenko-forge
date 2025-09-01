@@ -11,6 +11,14 @@ import { TrackingScripts } from '@/components/TrackingScripts';
 import { GlobalIntegrations } from '@/components/GlobalIntegrations';
 import { PWAInstallPrompt } from '@/components/ui/PWAInstallPrompt';
 import { CTAProvider } from "@/components/cta/CTAProvider";
+import { PerformanceMonitor } from '@/lib/performance-optimization';
+import { initializeProductionOptimizations } from '@/lib/production-optimizations';
+
+// Initialize performance monitoring in production
+if (process.env.NODE_ENV === 'production') {
+  PerformanceMonitor.startMeasure('app-init');
+  initializeProductionOptimizations();
+}
 
 // Public pages
 import Index from "./pages/Index";

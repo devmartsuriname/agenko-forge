@@ -44,7 +44,7 @@ async function updateHomepageAboutImage() {
           body: { sections: updatedSections }
         });
         
-        console.log('Successfully updated about section with image!');
+        // Successfully updated about section with image!
       } else {
         console.error('About section not found in homepage');
       }

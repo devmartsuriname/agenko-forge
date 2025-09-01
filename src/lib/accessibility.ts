@@ -5,8 +5,7 @@
 // Configure axe-core for runtime accessibility testing
 export function setupAxeRuntime() {
   if (process.env.NODE_ENV === 'development') {
-    // Note: Full axe-core setup would require additional configuration
-    console.log('Accessibility runtime monitoring enabled');
+    // Accessibility runtime monitoring enabled
   }
 }
 
@@ -18,8 +17,7 @@ export async function auditRoute(routeName: string): Promise<any[]> {
 
   try {
     // Placeholder for axe-core integration
-    // Would require proper axe-core setup for full implementation
-    console.log(`Auditing accessibility for route: ${routeName}`);
+    // Accessibility audit for route: ${routeName}
     return [];
   } catch (error) {
     console.error('Axe audit failed:', error);

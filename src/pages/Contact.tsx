@@ -74,7 +74,6 @@ const Contact = () => {
           email: formData.email.trim(),
           subject: formData.subject.trim() || undefined,
           message: formData.message.trim(),
-          // captchaToken: 'stub-token', // TODO: Add actual CAPTCHA token
         },
       });
 

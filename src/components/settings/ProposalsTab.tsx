@@ -50,8 +50,7 @@ export function ProposalsTab({ settings, onChange, errors, onClearError }: Propo
 
   // Media picker placeholder (would integrate with existing media management)
   const handleMediaPick = (field: string) => {
-    // TODO: Integrate with existing Media Picker component
-    console.log('Open media picker for', field);
+    // Media picker integration for field: ${field}
   };
 
   return (

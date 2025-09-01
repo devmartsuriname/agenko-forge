@@ -12,6 +12,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Area
 import { useNavigate } from 'react-router-dom';
 import { PerformanceMonitor } from '@/components/admin/PerformanceMonitor';
 import { CTAAnalytics } from '@/components/admin/analytics/CTAAnalytics';
+import { SystemHealthWidget } from '@/components/admin/SystemHealthWidget';
 
 interface DashboardStats {
   services: number;

@@ -19,11 +19,11 @@ export async function updateHomepageAboutImage() {
     );
 
     if (!homepage) {
-      console.log('Available pages:', pages?.map(p => ({ title: p.title, slug: p.slug })));
+      // Homepage not found - available pages: ${pages?.length || 0}
       throw new Error('Homepage not found');
     }
 
-    console.log('Found homepage:', homepage.title);
+    // Found homepage: ${homepage.title}
 
     // Check if homepage has sections
     const pageBody = homepage.body as any;
@@ -50,7 +50,7 @@ export async function updateHomepageAboutImage() {
 
         if (updateError) throw updateError;
 
-        console.log('✅ Successfully updated about section with image!');
+        // ✅ Successfully updated about section with image!
         return true;
       } else {
         throw new Error('About section not found in homepage');
