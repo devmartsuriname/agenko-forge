@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LoadingListSkeleton } from '@/components/admin/LoadingSkeleton';
-import { generateSlug, ensureUniqueSlug, formatDate, getStatusBadgeVariant } from '@/lib/admin-utils';
+import { generateSlug, ensureUniqueSlug, formatDate, getStatusBadgeVariant, isValidUUID } from '@/lib/admin-utils';
 import { adminToast } from '@/lib/toast-utils';
 import { SEOHead } from '@/lib/seo';
 import { ArrowLeft, ExternalLink, Save, Eye, Plus, X } from 'lucide-react';
@@ -47,7 +47,7 @@ export default function AdminCareerEditor() {
   useEffect(() => {
     if (authLoading) return; // Wait for auth to load
     
-    if (isEditing && id && id !== 'new') {
+    if (isEditing && id && isValidUUID(id)) {
       fetchJob();
     } else if (!isEditing) {
       setJob({

@@ -9,7 +9,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LoadingListSkeleton } from '@/components/admin/LoadingSkeleton';
 import { TagInput } from '@/components/admin/TagInput';
-import { generateSlug, ensureUniqueSlug, formatDate, getStatusBadgeVariant } from '@/lib/admin-utils';
+import { generateSlug, ensureUniqueSlug, formatDate, getStatusBadgeVariant, isValidUUID } from '@/lib/admin-utils';
 import { adminToast } from '@/lib/toast-utils';
 import { SEOHead } from '@/lib/seo';
 import { ArrowLeft, ExternalLink, Save, Eye, Github } from 'lucide-react';
@@ -39,12 +39,12 @@ export default function AdminInnovationLabEditor() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const isEditing = id !== 'new';
+  const isEditing = id !== 'new' && isValidUUID(id || '');
 
   useEffect(() => {
     if (authLoading) return; // Wait for auth to load
     
-    if (isEditing && id && id !== 'new') {
+    if (isEditing && id && isValidUUID(id)) {
       fetchProject();
     } else if (!isEditing) {
       setProject({

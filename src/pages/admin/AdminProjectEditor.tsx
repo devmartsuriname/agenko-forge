@@ -11,7 +11,7 @@ import { SEOHead } from '@/lib/seo';
 import { adminCms } from '@/lib/admin-cms';
 import { Project, ProjectImage } from '@/types/content';
 import { useAuth } from '@/lib/auth';
-import { generateSlug, ensureUniqueSlug } from '@/lib/admin-utils';
+import { generateSlug, ensureUniqueSlug, isValidUUID } from '@/lib/admin-utils';
 import { adminToast } from '@/lib/toast-utils';
 import { LoadingCardSkeleton } from '@/components/admin/LoadingSkeleton';
 import { GalleryManager } from '@/components/admin/GalleryManager';
@@ -23,7 +23,7 @@ function AdminProjectEditor() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isEditor } = useAuth();
-  const isEditing = Boolean(id);
+  const isEditing = id !== 'new' && isValidUUID(id || '');
 
   const [project, setProject] = useState<Partial<Project>>({
     title: '',
@@ -37,10 +37,10 @@ function AdminProjectEditor() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (isEditing && id) {
+    if (isEditing && id && isValidUUID(id)) {
       fetchProject(id);
     }
-  }, [id]);
+  }, [id, isEditing]);
 
   const fetchProject = async (projectId: string) => {
     try {

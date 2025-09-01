@@ -16,6 +16,7 @@ import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 import { SEOEditor, SEOData } from '@/components/admin/SEOEditor';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { adminToast } from '@/lib/toast-utils';
+import { isValidUUID } from '@/lib/admin-utils';
 import { Helmet } from 'react-helmet-async';
 import type { Service } from '@/types/content';
 
@@ -36,8 +37,10 @@ function AdminServiceEditorContent() {
   });
 
   useEffect(() => {
-    if (id) {
+    if (id && id !== 'new' && isValidUUID(id)) {
       fetchService();
+    } else if (id === 'new') {
+      setLoading(false);
     }
   }, [id]);
 
