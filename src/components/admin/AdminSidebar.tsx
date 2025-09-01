@@ -197,7 +197,7 @@ export function AdminSidebar() {
         <h2 className="text-xl font-bold text-foreground">Devmart Admin</h2>
       </div>
       
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
         {navItems.map((item, index) => (
           <div key={item.href || item.label || `item-${index}`}>
             {renderNavItem(item)}
