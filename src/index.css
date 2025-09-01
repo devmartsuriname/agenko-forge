@@ -40,6 +40,15 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: var(--agenko-white);
 
+    --success: 142 76% 36%;
+    --success-foreground: 138 76% 97%;
+    
+    --warning: 32 95% 44%;
+    --warning-foreground: 34 100% 92%;
+    
+    --info: 217 91% 60%;
+    --info-foreground: 210 20% 98%;
+
     --border: 217 32% 17%;
     --input: 217 32% 17%;
     --ring: var(--agenko-green);
@@ -110,6 +119,15 @@
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
+
+    --success: 142 69% 45%;
+    --success-foreground: 138 76% 97%;
+    
+    --warning: 32 95% 44%;
+    --warning-foreground: 34 100% 92%;
+    
+    --info: 217 91% 60%;
+    --info-foreground: 210 20% 98%;
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
