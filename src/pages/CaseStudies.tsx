@@ -75,19 +75,29 @@ const CaseStudies = () => {
       <div className="min-h-screen bg-agenko-dark">
         <Navigation />
 
+        {/* Breadcrumb */}
+        <div className="container mx-auto px-4 pt-8">
+          <AutoBreadcrumb />
+        </div>
+
         <main id="main-content">
           {/* Hero Section */}
-          <section className="py-32 px-4 pt-24">
+          <section className="py-32 px-4 pt-16">
             <div className="max-w-6xl mx-auto text-center">
-              <AutoBreadcrumb />
-              <div className="inline-block px-4 py-2 bg-agenko-dark-lighter rounded-full text-agenko-green text-sm font-medium mb-6">
-                Our Work
+              <div className="flex items-center justify-center mb-6">
+                <Badge variant="outline" className="mb-4 px-4 py-2 text-sm font-medium border-agenko-green/20 bg-agenko-green/5 text-agenko-green">
+                  Our Work
+                </Badge>
               </div>
               <h1 className="text-4xl md:text-6xl font-bold text-agenko-white leading-tight mb-6">
-                Case <span className="text-gradient">Studies</span>
+                Case{' '}
+                <span className="bg-gradient-to-r from-agenko-green to-agenko-green-hover bg-clip-text text-transparent">
+                  Studies
+                </span>
               </h1>
-              <p className="text-xl text-agenko-gray-light max-w-3xl mx-auto mb-12">
-                Explore our successful digital transformation projects. Real results, proven strategies, and measurable impact for businesses worldwide.
+              <p className="text-xl text-agenko-gray-light max-w-3xl mx-auto mb-12 leading-relaxed">
+                Explore our successful digital transformation projects. Real results, proven strategies, 
+                and measurable impact for businesses worldwide.
               </p>
             </div>
           </section>

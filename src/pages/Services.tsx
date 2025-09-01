@@ -5,6 +5,8 @@ import { cms } from '@/lib/cms';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { AutoBreadcrumb } from '@/components/ui/breadcrumb';
 import { InteractiveServiceCard } from '@/components/ui/InteractiveServiceCard';
 import { ServiceFilters } from '@/components/ui/ServiceFilters';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
@@ -85,17 +87,29 @@ const Services = () => {
       <div className="min-h-screen bg-agenko-dark">
         <Navigation />
         
+        {/* Breadcrumb */}
+        <div className="container mx-auto px-4 pt-8">
+          <AutoBreadcrumb />
+        </div>
+        
         {/* Hero Section */}
-        <section className="py-32 px-4 pt-24">
+        <section className="py-32 px-4 pt-16">
           <div className="max-w-6xl mx-auto text-center">
-            <div className="inline-block px-4 py-2 bg-agenko-dark-lighter rounded-full text-agenko-green text-sm font-medium mb-6">
-              Our Services
+            <div className="flex items-center justify-center mb-6">
+              <Badge variant="outline" className="mb-4 px-4 py-2 text-sm font-medium border-agenko-green/20 bg-agenko-green/5 text-agenko-green">
+                Our Services
+              </Badge>
             </div>
             <h1 className="text-4xl md:text-6xl font-bold text-agenko-white leading-tight mb-6">
-              Comprehensive <span className="text-gradient">Digital</span> Solutions
+              Comprehensive{' '}
+              <span className="bg-gradient-to-r from-agenko-green to-agenko-green-hover bg-clip-text text-transparent">
+                Digital
+              </span>{' '}
+              Solutions
             </h1>
-            <p className="text-xl text-agenko-gray-light max-w-3xl mx-auto mb-12">
-              We offer a full range of digital marketing and design services to help your business thrive in the digital landscape. From strategy to execution, we've got you covered.
+            <p className="text-xl text-agenko-gray-light max-w-3xl mx-auto mb-12 leading-relaxed">
+              We offer a full range of digital marketing and design services to help your business thrive in the digital landscape. 
+              From strategy to execution, we've got you covered.
             </p>
             
             {/* Stats */}

@@ -3,6 +3,8 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { AutoBreadcrumb } from '@/components/ui/breadcrumb';
 import { Check, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -123,17 +125,28 @@ const Pricing = () => {
       <div className="min-h-screen bg-agenko-dark">
         <Navigation />
         
+        {/* Breadcrumb */}
+        <div className="container mx-auto px-4 pt-8">
+          <AutoBreadcrumb />
+        </div>
+        
         {/* Hero Section */}
-        <section className="py-32 px-4 pt-24">
+        <section className="py-32 px-4 pt-16">
           <div className="max-w-6xl mx-auto text-center">
-            <div className="inline-block px-4 py-2 bg-agenko-dark-lighter rounded-full text-agenko-green text-sm font-medium mb-6">
-              Pricing Plans
+            <div className="flex items-center justify-center mb-6">
+              <Badge variant="outline" className="mb-4 px-4 py-2 text-sm font-medium border-agenko-green/20 bg-agenko-green/5 text-agenko-green">
+                Pricing Plans
+              </Badge>
             </div>
             <h1 className="text-4xl md:text-6xl font-bold text-agenko-white leading-tight mb-6">
-              Choose Your <span className="text-gradient">Perfect Plan</span>
+              Choose Your{' '}
+              <span className="bg-gradient-to-r from-agenko-green to-agenko-green-hover bg-clip-text text-transparent">
+                Perfect Plan
+              </span>
             </h1>
-            <p className="text-xl text-agenko-gray-light max-w-3xl mx-auto mb-12">
-              We offer transparent, value-driven pricing for businesses of all sizes. No hidden fees, no surprises – just exceptional digital solutions that deliver results.
+            <p className="text-xl text-agenko-gray-light max-w-3xl mx-auto mb-12 leading-relaxed">
+              We offer transparent, value-driven pricing for businesses of all sizes. No hidden fees, 
+              no surprises – just exceptional digital solutions that deliver results.
             </p>
           </div>
         </section>

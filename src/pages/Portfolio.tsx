@@ -5,6 +5,8 @@ import { cms } from '@/lib/cms';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { AutoBreadcrumb } from '@/components/ui/breadcrumb';
 import { PortfolioFilters } from '@/components/ui/PortfolioFilters';
 import { Link } from 'react-router-dom';
 
@@ -81,17 +83,28 @@ const Portfolio = () => {
       <div className="min-h-screen bg-agenko-dark">
         <Navigation />
         
+        {/* Breadcrumb */}
+        <div className="container mx-auto px-4 pt-8">
+          <AutoBreadcrumb />
+        </div>
+        
         {/* Hero Section */}
-        <section className="py-32 px-4 pt-24">
+        <section className="py-32 px-4 pt-16">
           <div className="max-w-6xl mx-auto text-center">
-            <div className="inline-block px-4 py-2 bg-agenko-dark-lighter rounded-full text-agenko-green text-sm font-medium mb-6">
-              Our Portfolio
+            <div className="flex items-center justify-center mb-6">
+              <Badge variant="outline" className="mb-4 px-4 py-2 text-sm font-medium border-agenko-green/20 bg-agenko-green/5 text-agenko-green">
+                Our Portfolio
+              </Badge>
             </div>
             <h1 className="text-4xl md:text-6xl font-bold text-agenko-white leading-tight mb-6">
-              Our <span className="text-gradient">Creative Work</span>
+              Our{' '}
+              <span className="bg-gradient-to-r from-agenko-green to-agenko-green-hover bg-clip-text text-transparent">
+                Creative Work
+              </span>
             </h1>
-            <p className="text-xl text-agenko-gray-light max-w-3xl mx-auto mb-12">
-              Discover our portfolio of innovative digital solutions that have helped businesses across various industries achieve remarkable growth and success.
+            <p className="text-xl text-agenko-gray-light max-w-3xl mx-auto mb-12 leading-relaxed">
+              Discover our portfolio of innovative digital solutions that have helped businesses across various industries 
+              achieve remarkable growth and success.
             </p>
           </div>
         </section>
