@@ -62,7 +62,17 @@ export class PerformanceMonitor {
   }
 }
 
-// Legacy export to fix build error
-export const injectHeroPreload = () => {
-  // Placeholder function for backwards compatibility
+// Hero preloading function
+export const injectHeroPreload = (sections: any[]) => {
+  if (typeof window === 'undefined' || !sections.length) return;
+  
+  // Find hero section and preload its image
+  const heroSection = sections.find(section => section.type === 'hero');
+  if (heroSection?.data?.backgroundImage) {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.href = heroSection.data.backgroundImage;
+    link.as = 'image';
+    document.head.appendChild(link);
+  }
 };
