@@ -7,6 +7,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { AutoBreadcrumb } from '@/components/ui/breadcrumb';
 import { HelpCircle, Search } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import type { FAQ } from '@/types/content';
@@ -115,17 +117,32 @@ export function FAQ() {
       <Navigation />
       
       <main className="min-h-screen bg-background">
+        {/* Breadcrumb */}
+        <div className="container mx-auto px-4 pt-8">
+          <AutoBreadcrumb />
+        </div>
+        
         {/* Hero Section */}
-        <section className="py-24 bg-gradient-to-br from-primary/5 to-secondary/5">
-          <div className="container mx-auto px-4 text-center">
+        <section className="py-24 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10" />
+          <div className="container mx-auto px-4 text-center relative z-10">
             <div className="flex items-center justify-center mb-6">
-              <HelpCircle className="h-12 w-12 text-primary mr-4" />
-              <h1 className="text-4xl md:text-6xl font-bold text-foreground">
-                Frequently Asked Questions
+              <Badge variant="outline" className="mb-4 px-4 py-2 text-sm font-medium border-primary/20 bg-primary/5 text-primary">
+                Help Center
+              </Badge>
+            </div>
+            <div className="flex items-center justify-center mb-6">
+              <HelpCircle className="h-8 w-8 text-primary mr-3" />
+              <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+                Frequently Asked{' '}
+                <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                  Questions
+                </span>
               </h1>
             </div>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-              Find answers to common questions about our services, process, and how we can help your business grow.
+            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              Find answers to common questions about our services, development process, pricing, 
+              and how we can help transform your business with cutting-edge solutions.
             </p>
           </div>
         </section>
@@ -176,21 +193,21 @@ export function FAQ() {
                   </CardContent>
                 </Card>
               ) : (
-                <Accordion type="single" collapsible className="space-y-4">
+                <Accordion type="single" collapsible className="space-y-6">
                   {filteredFaqs.map((faq, index) => (
                     <AccordionItem 
                       key={faq.id} 
                       value={`item-${index}`}
-                      className="border rounded-lg px-6 data-[state=open]:bg-accent/5"
+                      className="border border-border/50 rounded-lg px-6 bg-card/50 backdrop-blur-sm data-[state=open]:bg-accent/10 data-[state=open]:border-primary/20 transition-all duration-200 hover:border-primary/30"
                     >
-                      <AccordionTrigger className="text-left hover:no-underline py-6">
-                        <span className="text-lg font-semibold pr-4">
+                      <AccordionTrigger className="text-left hover:no-underline py-6 group">
+                        <span className="text-lg font-semibold pr-4 group-hover:text-primary transition-colors">
                           {faq.question}
                         </span>
                       </AccordionTrigger>
                       <AccordionContent className="pb-6 text-muted-foreground">
                         <div 
-                          className="prose prose-sm max-w-none"
+                          className="prose prose-sm max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground"
                           dangerouslySetInnerHTML={{ 
                             __html: faq.answer.replace(/\n/g, '<br />') 
                           }} 
@@ -205,23 +222,29 @@ export function FAQ() {
         </section>
 
         {/* Contact CTA */}
-        <section className="py-16 bg-primary/5">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold mb-4">Still Have Questions?</h2>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+        <section className="py-24 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10" />
+          <div className="container mx-auto px-4 text-center relative z-10">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+              Still Have{' '}
+              <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                Questions?
+              </span>
+            </h2>
+            <p className="text-lg text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
               Can't find the answer you're looking for? We're here to help. 
-              Get in touch with our team for personalized assistance.
+              Get in touch with our team for personalized assistance and expert guidance.
             </p>
-            <div className="space-x-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href="/contact"
-                className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                className="inline-flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all duration-200 font-semibold hover:scale-105"
               >
                 Contact Us
               </a>
               <a
                 href="/get-quote"
-                className="inline-flex items-center justify-center px-6 py-3 border border-primary text-primary rounded-lg hover:bg-primary/10 transition-colors"
+                className="inline-flex items-center justify-center px-8 py-4 border border-primary text-primary rounded-lg hover:bg-primary/10 transition-all duration-200 font-semibold hover:scale-105"
               >
                 Get a Quote
               </a>
