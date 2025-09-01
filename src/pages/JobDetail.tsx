@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import { StickyApplyCTA } from '@/components/ui/StickyApplyCTA';
 import { ExternalLink, MapPin, Clock, Users, Mail, CheckCircle } from 'lucide-react';
 
 interface Job {
@@ -132,6 +133,16 @@ export default function JobDetail() {
       </Helmet>
 
       <Navigation />
+      
+      {/* Sticky Apply CTA */}
+      {!isJobClosed && (job.apply_url || job.email) && (
+        <StickyApplyCTA
+          title={`Apply for ${job.title}`}
+          ctaText="Apply Now"
+          ctaLink={job.apply_url || `mailto:${job.email}`}
+          showThreshold={300}
+        />
+      )}
       
       <main className="pt-20">
         {/* Hero Section */}

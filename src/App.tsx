@@ -8,6 +8,7 @@ import { AuthProvider } from '@/lib/auth';
 import { Suspense, lazy } from 'react';
 import { Spinner } from "@/components/ui/spinner";
 import { GlobalIntegrations } from "@/components/GlobalIntegrations";
+import { RouteTransition } from "@/components/ui/RouteTransition";
 
 // Public pages
 import Index from "./pages/Index";
@@ -86,7 +87,8 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
+            <RouteTransition>
+              <Routes>
               {/* Public Routes */}
               <Route path="/" element={<Index />} />
               <Route path="/about" element={<About />} />
@@ -316,6 +318,7 @@ const App = () => (
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </RouteTransition>
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>

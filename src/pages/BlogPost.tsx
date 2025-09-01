@@ -19,6 +19,7 @@ import {
   Hash,
   Home
 } from 'lucide-react';
+import { ReadingProgress } from '@/components/ui/ReadingProgress';
 import { useState, useEffect } from 'react';
 import { 
   Breadcrumb,
@@ -186,6 +187,7 @@ const BlogPost = () => {
           "articleSection": postCategories.map(cat => cat.name).join(", ")
         }}
       />
+      <ReadingProgress target="article" />
       
       <div className="min-h-screen bg-agenko-dark">
         <Navigation />

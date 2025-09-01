@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import { DemoShowcase } from '@/components/ui/DemoShowcase';
 import { ExternalLink, Github, Play, Star } from 'lucide-react';
 
 interface LabProject {
@@ -193,56 +194,20 @@ export default function LabProjectDetail() {
           </section>
         )}
 
-        {/* Project Links */}
+        {/* Interactive Demo Showcase */}
         <section className="py-16 bg-muted/30">
           <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl font-bold text-center mb-12">Project Resources</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {project.demo_url && (
-                  <Card className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <CardTitle className="flex items-center space-x-2">
-                        <Play className="h-5 w-5 text-primary" />
-                        <span>Live Demo</span>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground mb-4">
-                        Experience the project in action with our interactive demo.
-                      </p>
-                      <Button asChild>
-                        <a href={project.demo_url} target="_blank" rel="noopener noreferrer">
-                          Open Demo
-                          <ExternalLink className="ml-2 h-4 w-4" />
-                        </a>
-                      </Button>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {project.repo_url && (
-                  <Card className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <CardTitle className="flex items-center space-x-2">
-                        <Github className="h-5 w-5 text-primary" />
-                        <span>Source Code</span>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground mb-4">
-                        Explore the code, contribute, or use it in your own projects.
-                      </p>
-                      <Button variant="outline" asChild>
-                        <a href={project.repo_url} target="_blank" rel="noopener noreferrer">
-                          View Repository
-                          <ExternalLink className="ml-2 h-4 w-4" />
-                        </a>
-                      </Button>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
+            <div className="max-w-6xl mx-auto">
+              <DemoShowcase
+                title={project.title}
+                description="Experience our innovation in action through this interactive demonstration."
+                demoUrl={project.demo_url}
+                repoUrl={project.repo_url}
+                posterImage={project.hero_image}
+                embedType="iframe"
+                embedUrl={project.demo_url}
+                tags={project.tags || []}
+              />
             </div>
           </div>
         </section>

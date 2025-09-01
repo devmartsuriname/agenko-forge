@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import { CaseStudyStory } from '@/components/ui/CaseStudyStory';
 import { ExternalLink, ArrowRight } from 'lucide-react';
 
 interface CaseStudyMetric {
@@ -199,58 +200,21 @@ export default function CaseStudyDetail() {
           </section>
         )}
 
-        {/* Services & Tech Stack */}
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                {caseStudy.services && caseStudy.services.length > 0 && (
-                  <div>
-                    <h3 className="text-2xl font-bold mb-6">Services Provided</h3>
-                    <div className="space-y-3">
-                      {caseStudy.services.map((service, index) => (
-                        <div key={index} className="flex items-center space-x-3">
-                          <ArrowRight className="h-5 w-5 text-primary flex-shrink-0" />
-                          <span>{service}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {caseStudy.tech_stack && caseStudy.tech_stack.length > 0 && (
-                  <div>
-                    <h3 className="text-2xl font-bold mb-6">Technology Stack</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {caseStudy.tech_stack.map((tech, index) => (
-                        <Badge key={index} variant="outline">
-                          {tech}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Case Study Content */}
-        {caseStudy.body && (
-          <section className="py-16 bg-muted/30">
-            <div className="container mx-auto px-4">
-              <div className="max-w-4xl mx-auto">
-                <div className="prose prose-lg dark:prose-invert max-w-none">
-                  {caseStudy.body.split('\n\n').map((paragraph, index) => (
-                    <p key={index} className="mb-6 text-muted-foreground leading-relaxed">
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
+        {/* Enhanced Case Study Story */}
+        <CaseStudyStory
+          title={caseStudy.title}
+          client={caseStudy.client}
+          industry={caseStudy.industry}
+          summary={caseStudy.summary}
+          challenge={<p>{caseStudy.body ? caseStudy.body.split('\n\n')[0] : 'Challenge details coming soon.'}</p>}
+          approach={<p>{caseStudy.body ? caseStudy.body.split('\n\n')[1] : 'Approach details coming soon.'}</p>}
+          outcome={<p>{caseStudy.body ? caseStudy.body.split('\n\n')[2] : 'Outcome details coming soon.'}</p>}
+          metrics={caseStudy.metrics?.map(m => ({ ...m, value: parseFloat(m.value) || 0 })) || []}
+          techStack={caseStudy.tech_stack?.map(tech => ({ name: tech, category: 'tool' as const })) || []}
+          heroImage={caseStudy.hero_image}
+          ctaText="Get Your Quote"
+          ctaLink="/get-quote"
+        />
 
         {/* CTA Section */}
         <section className="py-16">
