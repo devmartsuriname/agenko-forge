@@ -14,10 +14,16 @@ import { CTAProvider } from "@/components/cta/CTAProvider";
 import { PerformanceMonitor } from '@/lib/performance-optimization';
 import { initializeProductionOptimizations } from '@/lib/production-optimizations';
 
-// Initialize performance monitoring in production
+// Initialize performance monitoring and optimizations
+// Only run production optimizations in actual production builds
 if (process.env.NODE_ENV === 'production') {
   PerformanceMonitor.startMeasure('app-init');
-  initializeProductionOptimizations();
+  // Initialize with error handling
+  try {
+    initializeProductionOptimizations();
+  } catch (error) {
+    console.error('Failed to initialize production optimizations:', error);
+  }
 }
 
 // Public pages
