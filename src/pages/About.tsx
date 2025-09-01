@@ -9,7 +9,6 @@ import { Building, Zap, Palette, Target } from 'lucide-react';
 import heroImage from '@/assets/hero-image.jpg';
 import { Link } from 'react-router-dom';
 import { TimelineShowcase } from '@/components/ui/TimelineShowcase';
-import { TeamShowcase } from '@/components/about/TeamShowcase';
 import { AutoBreadcrumb } from '@/components/ui/breadcrumb';
 
 const About = () => {
@@ -264,6 +263,13 @@ const About = () => {
           </div>
         </section>
 
+        {/* Company Timeline */}
+        <TimelineShowcase 
+          items={companyTimeline}
+          title="Our Journey"
+          subtitle="From startup to industry leader - the milestones that shaped Devmart"
+        />
+
         {/* CTA Section */}
         <section className="py-24 px-4">
           <div className="max-w-4xl mx-auto text-center">
@@ -280,16 +286,6 @@ const About = () => {
             </Link>
           </div>
         </section>
-
-        {/* Team Showcase */}
-        <TeamShowcase />
-
-        {/* Company Timeline */}
-        <TimelineShowcase 
-          items={companyTimeline}
-          title="Our Journey"
-          subtitle="From startup to industry leader - the milestones that shaped Devmart"
-        />
 
         <Footer />
       </div>
