@@ -87,7 +87,22 @@ export type Database = {
           created_at?: string
           id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_blog_post_categories_category_id"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "blog_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_blog_post_categories_post_id"
+            columns: ["blog_post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       blog_posts: {
         Row: {
@@ -1306,6 +1321,16 @@ export type Database = {
       generate_proposal_token: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_blog_post_categories: {
+        Args: { post_id: string }
+        Returns: {
+          color: string
+          description: string
+          id: string
+          name: string
+          slug: string
+        }[]
       }
       get_current_user_role: {
         Args: Record<PropertyKey, never>

@@ -244,26 +244,23 @@ export const cms = {
 
     if (!posts || posts.length === 0) return [];
 
-    // Get categories for each post
+    // Get categories for each post using the new helper function
     const postsWithCategories = await Promise.all(
       posts.map(async (post) => {
-        const { data: postCategories, error: categoriesError } = await supabase
-          .from('blog_post_categories')
-          .select(`
-            blog_categories:blog_categories(*)
-          `)
-          .eq('blog_post_id', post.id);
+        try {
+          const { data: categories, error: categoriesError } = await supabase
+            .rpc('get_blog_post_categories', { post_id: post.id });
 
-        if (categoriesError) {
-          console.warn('Error fetching categories for post:', post.id, categoriesError);
+          if (categoriesError) {
+            console.warn('Error fetching categories for post:', post.id, categoriesError);
+            return { ...post, categories: [] };
+          }
+
+          return { ...post, categories: categories || [] };
+        } catch (error) {
+          console.warn('Error fetching categories for post:', post.id, error);
           return { ...post, categories: [] };
         }
-
-        const categories = (postCategories || [])
-          .map((pc: any) => pc.blog_categories)
-          .filter((cat: any) => cat && cat.status === 'published');
-
-        return { ...post, categories };
       })
     );
 
