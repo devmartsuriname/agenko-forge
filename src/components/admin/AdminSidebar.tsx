@@ -26,7 +26,8 @@ import {
   HelpCircle,
   Building,
   Mail,
-  Calculator
+  Calculator,
+  Layers
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -43,9 +44,16 @@ const navItems = [
       { href: '/admin/blog/categories', icon: Tags, label: 'Categories', editorOnly: true }
     ]
   },
-  { href: '/admin/case-studies', icon: TrendingUp, label: 'Case Studies', editorOnly: true },
-  { href: '/admin/careers', icon: Users, label: 'Careers', editorOnly: true },
-  { href: '/admin/innovation-lab', icon: Beaker, label: 'Innovation Lab', editorOnly: true },
+  {
+    label: 'Core Modules',
+    icon: Layers,
+    editorOnly: true,
+    subItems: [
+      { href: '/admin/case-studies', icon: TrendingUp, label: 'Case Studies', editorOnly: true },
+      { href: '/admin/careers', icon: Users, label: 'Careers', editorOnly: true },
+      { href: '/admin/innovation-lab', icon: Beaker, label: 'Innovation Lab', editorOnly: true }
+    ]
+  },
   { href: '/admin/faq', icon: HelpCircle, label: 'FAQ', editorOnly: true },
   { href: '/admin/clients', icon: Building, label: 'Clients', editorOnly: true },
   { href: '/admin/media', icon: Image, label: 'Media' },
@@ -63,7 +71,7 @@ const navItems = [
 
 export function AdminSidebar() {
   const { signOut, isAdmin, userRole, loading } = useAuth();
-  const [expandedItems, setExpandedItems] = useState<string[]>(['/admin/blog']);
+  const [expandedItems, setExpandedItems] = useState<string[]>(['/admin/blog', 'Core Modules']);
   
   // Use userRole from auth context (fetched from profiles table)
   // Fix: Don't use user?.role as it's always undefined
@@ -85,7 +93,7 @@ export function AdminSidebar() {
     // Show loading skeleton while role is being fetched
     if (loading && (item.adminOnly || item.editorOnly)) {
       return (
-        <div key={item.href} className={cn(
+        <div key={item.href || item.label} className={cn(
           "flex items-center space-x-3 px-3 py-2",
           isSubItem && "ml-6"
         )}>
@@ -101,30 +109,38 @@ export function AdminSidebar() {
     if (item.editorOnly && !isEditor) return null;
 
     const hasSubItems = item.subItems && item.subItems.length > 0;
-    const isExpanded = expandedItems.includes(item.href);
+    const itemKey = item.href || item.label;
+    const isExpanded = expandedItems.includes(itemKey);
 
     if (hasSubItems) {
       return (
-        <div key={item.href}>
+        <div key={itemKey}>
           <div className="flex items-center">
-            <NavLink
-              to={item.href}
-              end={item.exact}
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center space-x-3 px-3 py-2 rounded-md transition-colors flex-1',
-                  'hover:bg-accent hover:text-accent-foreground',
-                  isActive
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground'
-                )
-              }
-            >
-              <item.icon className="h-5 w-5" />
-              <span className="font-medium">{item.label}</span>
-            </NavLink>
+            {item.href ? (
+              <NavLink
+                to={item.href}
+                end={item.exact}
+                className={({ isActive }) =>
+                  cn(
+                    'flex items-center space-x-3 px-3 py-2 rounded-md transition-colors flex-1',
+                    'hover:bg-accent hover:text-accent-foreground',
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground'
+                  )
+                }
+              >
+                <item.icon className="h-5 w-5" />
+                <span className="font-medium">{item.label}</span>
+              </NavLink>
+            ) : (
+              <div className="flex items-center space-x-3 px-3 py-2 flex-1 text-muted-foreground">
+                <item.icon className="h-5 w-5" />
+                <span className="font-medium">{item.label}</span>
+              </div>
+            )}
             <button
-              onClick={() => toggleExpanded(item.href)}
+              onClick={() => toggleExpanded(itemKey)}
               className="p-1 rounded-md hover:bg-accent mr-2"
             >
               {isExpanded ? (
