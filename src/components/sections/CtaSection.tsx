@@ -38,12 +38,12 @@ export function CtaSectionComponent({ section }: CtaSectionProps) {
       )}
       
       <div className="relative z-10 max-w-4xl mx-auto text-center">
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground mb-6">
           {data.title}
         </h2>
         
         {data.description && (
-          <p className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-primary-foreground/90 mb-8 max-w-2xl mx-auto leading-relaxed">
             {data.description}
           </p>
         )}
@@ -52,7 +52,7 @@ export function CtaSectionComponent({ section }: CtaSectionProps) {
           <Button 
             asChild 
             size="lg" 
-            className="bg-primary hover:bg-primary/90 text-white px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105"
           >
             <Link to={data.primaryCta.link}>
               {data.primaryCta.text}
