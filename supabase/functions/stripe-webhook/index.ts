@@ -1,166 +1,229 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { 
+  createHandler, 
+  createSupabaseClient, 
+  ResponseHelper, 
+  ErrorType
+} from "../shared/api-framework.ts";
 
-const logStep = (step: string, details?: any) => {
-  console.log(`[STRIPE-WEBHOOK] ${step}${details ? ` - ${JSON.stringify(details)}` : ''}`);
-};
+async function handleCheckoutCompleted(
+  session: Stripe.Checkout.Session, 
+  supabase: any,
+  logger: any
+): Promise<void> {
+  logger.info('Processing checkout completion', { sessionId: session.id });
 
-serve(async (req) => {
+  // Update order status to paid
+  const { error: orderError } = await supabase
+    .from("orders")
+    .update({ 
+      status: "paid",
+      updated_at: new Date().toISOString()
+    })
+    .eq("provider_order_id", session.id);
+
+  if (orderError) {
+    logger.error('Failed to update order status', { error: orderError, sessionId: session.id });
+    throw new Error(`Failed to update order: ${orderError.message}`);
+  }
+
+  // Get order ID for payment record
+  const { data: order, error: orderSelectError } = await supabase
+    .from("orders")
+    .select("id")
+    .eq("provider_order_id", session.id)
+    .single();
+
+  if (orderSelectError || !order) {
+    logger.error('Failed to find order', { error: orderSelectError, sessionId: session.id });
+    throw new Error('Order not found after update');
+  }
+
+  // Create payment record
+  const paymentData = {
+    order_id: order.id,
+    provider: "stripe",
+    provider_payment_id: session.payment_intent as string,
+    amount: session.amount_total || 0,
+    currency: session.currency || "usd",
+    status: "paid",
+    provider_data: {
+      session_id: session.id,
+      customer_id: session.customer,
+      payment_status: session.payment_status
+    }
+  };
+
+  const { error: paymentError } = await supabase
+    .from("payments")
+    .insert(paymentData);
+
+  if (paymentError) {
+    logger.error('Failed to create payment record', { error: paymentError });
+    throw new Error(`Failed to create payment record: ${paymentError.message}`);
+  }
+
+  logger.info('Payment completed successfully', { sessionId: session.id, orderId: order.id });
+}
+
+async function handleCheckoutExpired(
+  session: Stripe.Checkout.Session, 
+  supabase: any,
+  logger: any
+): Promise<void> {
+  logger.info('Processing checkout expiration', { sessionId: session.id });
+
+  const { error } = await supabase
+    .from("orders")
+    .update({ 
+      status: "canceled",
+      updated_at: new Date().toISOString()
+    })
+    .eq("provider_order_id", session.id);
+
+  if (error) {
+    logger.error('Failed to update expired order', { error, sessionId: session.id });
+    throw new Error(`Failed to update expired order: ${error.message}`);
+  }
+
+  logger.info('Order marked as canceled', { sessionId: session.id });
+}
+
+async function handlePaymentFailed(
+  paymentIntent: Stripe.PaymentIntent, 
+  supabase: any,
+  logger: any
+): Promise<void> {
+  logger.info('Processing payment failure', { paymentIntentId: paymentIntent.id });
+
+  const { error } = await supabase
+    .from("orders")
+    .update({ 
+      status: "failed",
+      updated_at: new Date().toISOString()
+    })
+    .eq("provider_order_id", paymentIntent.id);
+
+  if (error) {
+    logger.error('Failed to update failed payment', { error, paymentIntentId: paymentIntent.id });
+    throw new Error(`Failed to update failed payment: ${error.message}`);
+  }
+
+  logger.info('Order marked as failed', { paymentIntentId: paymentIntent.id });
+}
+
+const handler = createHandler('stripe-webhook', async (req, logger, clientInfo) => {
+  // Method validation
+  if (req.method !== 'POST') {
+    return ResponseHelper.error(
+      'Method not allowed. Use POST.',
+      ErrorType.VALIDATION,
+      405,
+      clientInfo.requestId
+    );
+  }
+
   try {
-    logStep("Webhook received");
-
+    // Validate Stripe configuration
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) {
-      throw new Error("STRIPE_SECRET_KEY is not configured");
+      logger.error('Stripe configuration missing');
+      return ResponseHelper.error(
+        'Stripe not configured',
+        ErrorType.EXTERNAL_API,
+        500,
+        clientInfo.requestId
+      );
     }
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
+    const supabase = createSupabaseClient(true);
 
-    // Create Supabase client with service role
-    const supabaseService = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      { auth: { persistSession: false } }
-    );
-
+    // Get request body and signature
     const body = await req.text();
     const signature = req.headers.get("stripe-signature");
 
     if (!signature) {
-      throw new Error("No Stripe signature found");
+      logger.warn('Missing Stripe signature');
+      return ResponseHelper.error(
+        'Missing Stripe signature',
+        ErrorType.EXTERNAL_API,
+        400,
+        clientInfo.requestId
+      );
     }
 
+    // Verify webhook signature
     let event: Stripe.Event;
     try {
-      // In production, you should set STRIPE_WEBHOOK_SECRET
       const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
       if (webhookSecret) {
         event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
       } else {
-        // For testing, parse the body directly
+        // For testing without webhook secret
         event = JSON.parse(body);
+        logger.warn('Processing webhook without signature verification');
       }
     } catch (err) {
-      logStep("Webhook signature verification failed", { error: err });
-      return new Response("Webhook signature verification failed", { status: 400 });
+      logger.error('Webhook signature verification failed', { error: err });
+      return ResponseHelper.error(
+        'Webhook signature verification failed',
+        ErrorType.EXTERNAL_API,
+        400,
+        clientInfo.requestId
+      );
     }
 
-    logStep("Processing event", { type: event.type, id: event.id });
+    logger.info('Processing Stripe event', { type: event.type, id: event.id });
 
+    // Process different event types
     switch (event.type) {
-      case "checkout.session.completed": {
-        const session = event.data.object as Stripe.Checkout.Session;
-        
-        // Update order status to paid
-        const { error: orderError } = await supabaseService
-          .from("orders")
-          .update({ 
-            status: "paid",
-            updated_at: new Date().toISOString()
-          })
-          .eq("provider_order_id", session.id);
-
-        if (orderError) {
-          logStep("Error updating order", { error: orderError, sessionId: session.id });
-          throw orderError;
-        }
-
-        // Create payment record
-        const paymentData = {
-          order_id: null, // Will be set by trigger or separate query
-          provider: "stripe",
-          provider_payment_id: session.payment_intent as string,
-          amount: session.amount_total || 0,
-          currency: session.currency || "usd",
-          status: "paid",
-          provider_data: {
-            session_id: session.id,
-            customer_id: session.customer,
-            payment_status: session.payment_status
-          }
-        };
-
-        // Get order ID first
-        const { data: order } = await supabaseService
-          .from("orders")
-          .select("id")
-          .eq("provider_order_id", session.id)
-          .single();
-
-        if (order) {
-          paymentData.order_id = order.id;
-          
-          const { error: paymentError } = await supabaseService
-            .from("payments")
-            .insert(paymentData);
-
-          if (paymentError) {
-            logStep("Error creating payment record", { error: paymentError });
-          } else {
-            logStep("Payment completed successfully", { sessionId: session.id, orderId: order.id });
-          }
-        }
-
+      case "checkout.session.completed":
+        await handleCheckoutCompleted(
+          event.data.object as Stripe.Checkout.Session, 
+          supabase, 
+          logger
+        );
         break;
-      }
 
-      case "checkout.session.expired": {
-        const session = event.data.object as Stripe.Checkout.Session;
-        
-        const { error } = await supabaseService
-          .from("orders")
-          .update({ 
-            status: "canceled",
-            updated_at: new Date().toISOString()
-          })
-          .eq("provider_order_id", session.id);
-
-        if (error) {
-          logStep("Error updating expired order", { error, sessionId: session.id });
-        } else {
-          logStep("Order marked as canceled", { sessionId: session.id });
-        }
-
+      case "checkout.session.expired":
+        await handleCheckoutExpired(
+          event.data.object as Stripe.Checkout.Session, 
+          supabase, 
+          logger
+        );
         break;
-      }
 
-      case "payment_intent.payment_failed": {
-        const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        
-        // Find order by payment intent and mark as failed
-        const { error } = await supabaseService
-          .from("orders")
-          .update({ 
-            status: "failed",
-            updated_at: new Date().toISOString()
-          })
-          .eq("provider_order_id", paymentIntent.id);
-
-        if (error) {
-          logStep("Error updating failed payment", { error, paymentIntentId: paymentIntent.id });
-        } else {
-          logStep("Order marked as failed", { paymentIntentId: paymentIntent.id });
-        }
-
+      case "payment_intent.payment_failed":
+        await handlePaymentFailed(
+          event.data.object as Stripe.PaymentIntent, 
+          supabase, 
+          logger
+        );
         break;
-      }
 
       default:
-        logStep("Unhandled event type", { type: event.type });
+        logger.info('Unhandled event type', { type: event.type });
     }
 
-    return new Response(JSON.stringify({ received: true }), {
-      headers: { "Content-Type": "application/json" },
-      status: 200,
-    });
+    return ResponseHelper.success(
+      { received: true, eventType: event.type },
+      'Webhook processed successfully',
+      clientInfo.requestId
+    );
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR", { message: errorMessage });
-    return new Response(JSON.stringify({ error: errorMessage }), {
-      headers: { "Content-Type": "application/json" },
-      status: 500,
-    });
+    logger.error('Webhook processing failed', { error: errorMessage });
+    
+    return ResponseHelper.error(
+      'Webhook processing failed',
+      ErrorType.EXTERNAL_API,
+      500,
+      clientInfo.requestId
+    );
   }
 });
+
+serve(handler);

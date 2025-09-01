@@ -1,10 +1,12 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  createHandler, 
+  createSupabaseClient, 
+  ResponseHelper, 
+  ValidationHelper, 
+  RateLimiter,
+  ErrorType
+} from "../shared/api-framework.ts";
 
 interface ContactSubmissionRequest {
   name: string;
@@ -14,202 +16,131 @@ interface ContactSubmissionRequest {
   captchaToken?: string;
 }
 
-// Rate limiting storage (in production, use Redis or similar)
-const rateLimitMap = new Map<string, number[]>();
+function validateContactSubmission(data: ContactSubmissionRequest): void {
+  // Required field validation
+  ValidationHelper.validateRequired(data.name, 'name');
+  ValidationHelper.validateRequired(data.email, 'email');
+  ValidationHelper.validateRequired(data.message, 'message');
 
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const windowMs = 60 * 1000; // 1 minute
-  const maxRequests = 5;
+  // String length validation
+  ValidationHelper.validateStringLength(data.name, 'name', 2, 100);
+  ValidationHelper.validateStringLength(data.message, 'message', 10, 2000);
   
-  if (!rateLimitMap.has(ip)) {
-    rateLimitMap.set(ip, []);
+  if (data.subject) {
+    ValidationHelper.validateStringLength(data.subject, 'subject', 0, 200);
   }
-  
-  const requests = rateLimitMap.get(ip)!;
-  
-  // Remove old requests outside the window
-  const validRequests = requests.filter(time => now - time < windowMs);
-  rateLimitMap.set(ip, validRequests);
-  
-  if (validRequests.length >= maxRequests) {
-    return true;
-  }
-  
-  // Add current request
-  validRequests.push(now);
-  rateLimitMap.set(ip, validRequests);
-  
-  return false;
-}
 
-function validateEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
-function validateInput(data: ContactSubmissionRequest): string | null {
-  if (!data.name || data.name.trim().length < 2) {
-    return 'Name must be at least 2 characters long';
+  // Email format validation
+  if (!ValidationHelper.isValidEmail(data.email)) {
+    throw new Error('Please provide a valid email address');
   }
-  
-  if (!data.email || !validateEmail(data.email)) {
-    return 'Please provide a valid email address';
-  }
-  
-  if (!data.message || data.message.trim().length < 10) {
-    return 'Message must be at least 10 characters long';
-  }
-  
-  if (data.name.length > 100) {
-    return 'Name is too long';
-  }
-  
-  if (data.email.length > 255) {
-    return 'Email is too long';
-  }
-  
-  if (data.subject && data.subject.length > 200) {
-    return 'Subject is too long';
-  }
-  
-  if (data.message.length > 2000) {
-    return 'Message is too long';
-  }
-  
-  return null;
 }
 
 async function verifyCaptcha(token: string): Promise<boolean> {
   // CAPTCHA verification stub - implement actual verification here
   // For hCaptcha: POST to https://hcaptcha.com/siteverify
   // For reCAPTCHA: POST to https://www.google.com/recaptcha/api/siteverify
-  console.log('CAPTCHA verification stub - token:', token);
   
   // For now, return true (stub implementation)
   // TODO: Implement actual CAPTCHA verification
   return true;
 }
 
-const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+const handler = createHandler('submit-contact', async (req, logger, clientInfo) => {
+  // Method validation
   if (req.method !== 'POST') {
-    return new Response(
-      JSON.stringify({ error: 'Method not allowed' }),
-      { 
-        status: 405, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
+    return ResponseHelper.error(
+      'Method not allowed. Use POST.',
+      ErrorType.VALIDATION,
+      405,
+      clientInfo.requestId
     );
   }
 
+  // Rate limiting - 5 requests per minute per IP
+  if (RateLimiter.isRateLimited(clientInfo.ip, 60000, 5)) {
+    logger.warn('Rate limit exceeded for contact form', { ip: clientInfo.ip });
+    return ResponseHelper.rateLimitError(clientInfo.requestId);
+  }
+
   try {
-    // Get client IP
-    const clientIP = req.headers.get('x-forwarded-for') || 
-                    req.headers.get('x-real-ip') || 
-                    'unknown';
+    // Parse and validate request data
+    const submissionData: ContactSubmissionRequest = await req.json();
+    logger.info('Contact submission received', { 
+      email: submissionData.email,
+      hasSubject: !!submissionData.subject
+    });
 
-    // Check rate limiting
-    if (isRateLimited(clientIP)) {
-      return new Response(
-        JSON.stringify({ 
-          error: 'Too many requests. Please try again in a minute.' 
-        }),
-        { 
-          status: 429, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
-    }
-
-    // Parse and validate request body
-    const body: ContactSubmissionRequest = await req.json();
-    
-    const validationError = validateInput(body);
-    if (validationError) {
-      return new Response(
-        JSON.stringify({ error: validationError }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
-    }
+    validateContactSubmission(submissionData);
 
     // Verify CAPTCHA if provided
-    if (body.captchaToken) {
-      const isValidCaptcha = await verifyCaptcha(body.captchaToken);
+    if (submissionData.captchaToken) {
+      const isValidCaptcha = await verifyCaptcha(submissionData.captchaToken);
       if (!isValidCaptcha) {
-        return new Response(
-          JSON.stringify({ error: 'CAPTCHA verification failed' }),
-          { 
-            status: 400, 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-          }
+        logger.warn('CAPTCHA verification failed', { ip: clientInfo.ip });
+        return ResponseHelper.validationError(
+          'CAPTCHA verification failed',
+          clientInfo.requestId
         );
       }
     }
 
-    // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    // Create Supabase client
+    const supabase = createSupabaseClient(true);
 
     // Insert contact submission
-    const { error } = await supabase
+    const { error: insertError } = await supabase
       .from('contact_submissions')
       .insert({
-        name: body.name.trim(),
-        email: body.email.trim().toLowerCase(),
-        subject: body.subject?.trim() || null,
-        message: body.message.trim(),
-        ip: clientIP,
+        name: ValidationHelper.sanitizeString(submissionData.name, 100),
+        email: submissionData.email.trim().toLowerCase(),
+        subject: submissionData.subject 
+          ? ValidationHelper.sanitizeString(submissionData.subject, 200) 
+          : null,
+        message: ValidationHelper.sanitizeString(submissionData.message, 2000),
+        ip: clientInfo.ip,
       });
 
-    if (error) {
-      console.error('Database error:', error);
-      return new Response(
-        JSON.stringify({ 
-          error: 'Failed to submit contact form. Please try again.' 
-        }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
+    if (insertError) {
+      logger.error('Database insertion failed', { error: insertError });
+      return ResponseHelper.error(
+        'Failed to submit contact form. Please try again.',
+        ErrorType.DATABASE,
+        500,
+        clientInfo.requestId
       );
     }
 
-    console.log('Contact form submitted successfully from IP:', clientIP);
+    logger.info('Contact form submitted successfully', { 
+      ip: clientInfo.ip,
+      email: submissionData.email
+    });
 
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: 'Thank you for your message. We\'ll get back to you soon!' 
-      }),
-      {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+    return ResponseHelper.success(
+      { submitted: true },
+      'Thank you for your message. We\'ll get back to you soon!',
+      clientInfo.requestId
     );
 
-  } catch (error: any) {
-    console.error('Error in submit-contact function:', error);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     
-    return new Response(
-      JSON.stringify({ 
-        error: 'An unexpected error occurred. Please try again.' 
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+    // Handle validation errors specifically
+    if (errorMessage.includes('Invalid') || 
+        errorMessage.includes('required') || 
+        errorMessage.includes('must be')) {
+      logger.warn('Validation error', { error: errorMessage });
+      return ResponseHelper.validationError(errorMessage, clientInfo.requestId);
+    }
+
+    logger.error('Unexpected error in contact submission', { error: errorMessage });
+    return ResponseHelper.error(
+      'An unexpected error occurred. Please try again.',
+      ErrorType.INTERNAL,
+      500,
+      clientInfo.requestId
     );
   }
-};
+});
 
 serve(handler);
