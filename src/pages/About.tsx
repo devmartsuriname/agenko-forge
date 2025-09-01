@@ -130,7 +130,7 @@ const About = () => {
         <section className="py-32 px-4 pt-24">
           <div className="max-w-6xl mx-auto">
             <AutoBreadcrumb />
-            <div className="text-center">
+            <div className="text-center mb-16">
               <div className="inline-block px-4 py-2 bg-agenko-dark-lighter rounded-full text-agenko-green text-sm font-medium mb-6">
                 About Us
               </div>
@@ -143,7 +143,7 @@ const About = () => {
               </p>
             </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-16">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div className="relative">
                 <div className="bg-agenko-dark-lighter rounded-2xl p-8">
                   <img 
@@ -156,6 +156,15 @@ const About = () => {
               </div>
               
               <div>
+                <h2 className="text-3xl md:text-4xl font-bold text-agenko-white mb-6">
+                  Digital Agency With 25+ Years Experience
+                </h2>
+                <p className="text-agenko-gray-light mb-6">
+                  We are a Digital Agency with over 25 years of experience, specializing in delivering cutting-edge digital solutions, including web design, marketing, and branding, to help businesses achieve sustainable growth and success.
+                </p>
+                <p className="text-agenko-gray-light mb-8">
+                  Our experienced team combines creativity with technical expertise to create innovative digital experiences that drive results and exceed expectations.
+                </p>
                 <Link to="/contact">
                   <Button variant="hero" size="lg">
                     Get Started Today
