@@ -91,15 +91,13 @@ const Services = () => {
           headline="Comprehensive •Digital• Solutions"
           subhead="Our Services"
           description="We offer a full range of digital marketing and design services to help your business thrive in the digital landscape. From strategy to execution, we've got you covered."
-          ctaText="View All Services"
-          ctaLink="#services"
           stats={[
             { number: '25+', label: 'Years Experience' },
             { number: '500+', label: 'Projects Delivered' },
             { number: '98%', label: 'Client Satisfaction' },
             { number: '24/7', label: 'Support Available' },
           ]}
-          className="pt-16 px-4"
+          className="pt-8 px-4"
         />
 
         {/* Services Section */}
