@@ -105,7 +105,7 @@ const BreadcrumbEllipsis = ({
 )
 BreadcrumbEllipsis.displayName = "BreadcrumbElipssis"
 
-// Auto breadcrumb component
+// Auto breadcrumb component that dynamically generates breadcrumbs based on current route
 const AutoBreadcrumb = () => {
   const location = useLocation()
   const pathnames = location.pathname.split('/').filter((x) => x)
