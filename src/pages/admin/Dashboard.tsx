@@ -10,6 +10,7 @@ import { format, subDays } from 'date-fns';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { useNavigate } from 'react-router-dom';
+import { PerformanceMonitor } from '@/components/admin/PerformanceMonitor';
 
 interface DashboardStats {
   services: number;
@@ -288,6 +289,9 @@ export default function AdminDashboard() {
             );
           })}
         </div>
+
+        {/* Performance Monitor */}
+        <PerformanceMonitor />
 
         {/* Chart and Quick Actions Row */}
         <div className="grid gap-6 lg:grid-cols-3">
