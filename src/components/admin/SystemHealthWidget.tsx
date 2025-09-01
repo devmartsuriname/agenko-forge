@@ -1,12 +1,12 @@
 /**
- * System health monitoring widget for admin dashboard
+ * Enhanced System Health Widget with standardized admin patterns
  */
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { StandardAdminCard } from './StandardAdminCard';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { RefreshCw, Database, Shield, HardDrive, Zap } from 'lucide-react';
+import { RefreshCw, Database, Shield, HardDrive, Zap, Activity } from 'lucide-react';
 import { performHealthCheck, SystemMonitor, HealthStatus } from '@/lib/health-check';
+import { ADMIN_COLORS } from '@/lib/admin-standards';
 
 export function SystemHealthWidget() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
@@ -58,114 +58,74 @@ export function SystemHealthWidget() {
   };
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">System Health</CardTitle>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={checkHealth}
-            disabled={isLoading}
-            className="gap-2"
-          >
-            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
+    <StandardAdminCard
+      title="System Health"
+      description={health ? getStatusText(health.status) : 'Checking system status...'}
+      badge={health ? {
+        text: health.status,
+        variant: health.status === 'healthy' ? 'default' : 
+                health.status === 'degraded' ? 'secondary' : 'destructive'
+      } : undefined}
+      actions={[{
+        label: 'Refresh',
+        icon: RefreshCw,
+        onClick: checkHealth,
+        loading: isLoading,
+        variant: 'outline'
+      }]}
+      loading={!health && isLoading}
+    >
+      <div className="space-y-6">
+        {/* Service Status Grid */}
+        <div className="grid grid-cols-2 gap-4">
+          {[
+            { key: 'database', label: 'Database', icon: Database },
+            { key: 'auth', label: 'Authentication', icon: Shield },
+            { key: 'storage', label: 'Storage', icon: HardDrive },
+            { key: 'functions', label: 'Edge Functions', icon: Zap },
+          ].map(({ key, label, icon: Icon }) => {
+            const isHealthy = health?.checks[key as keyof typeof health.checks];
+            return (
+              <div key={key} className="flex items-center justify-between p-3 rounded-lg border bg-card">
+                <div className="flex items-center gap-3">
+                  <Icon className={`h-5 w-5 ${isHealthy ? 'text-green-600' : 'text-red-600'}`} />
+                  <span className="text-sm font-medium">{label}</span>
+                </div>
+                <Badge variant={isHealthy ? "default" : "destructive"}>
+                  {isHealthy ? 'Healthy' : 'Error'}
+                </Badge>
+              </div>
+            );
+          })}
         </div>
+
+        {/* Performance Metrics */}
         {health && (
-          <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${getStatusColor(health.status)}`} />
-            <span className="text-sm text-muted-foreground">
-              {getStatusText(health.status)}
-            </span>
-          </div>
-        )}
-      </CardHeader>
-      
-      <CardContent className="space-y-4">
-        {health ? (
-          <>
-            {/* Service Status */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="flex items-center gap-2">
-                <Database className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">Database</span>
-                <Badge 
-                  variant={health.checks.database ? "default" : "destructive"}
-                  className="ml-auto"
-                >
-                  {health.checks.database ? 'OK' : 'Error'}
-                </Badge>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">Auth</span>
-                <Badge 
-                  variant={health.checks.auth ? "default" : "destructive"}
-                  className="ml-auto"
-                >
-                  {health.checks.auth ? 'OK' : 'Error'}
-                </Badge>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <HardDrive className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">Storage</span>
-                <Badge 
-                  variant={health.checks.storage ? "default" : "destructive"}
-                  className="ml-auto"
-                >
-                  {health.checks.storage ? 'OK' : 'Error'}
-                </Badge>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <Zap className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">Functions</span>
-                <Badge 
-                  variant={health.checks.functions ? "default" : "destructive"}
-                  className="ml-auto"
-                >
-                  {health.checks.functions ? 'OK' : 'Error'}
-                </Badge>
+          <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+            <div className="text-center p-3 rounded-lg bg-muted/30">
+              <Activity className="h-5 w-5 text-muted-foreground mx-auto mb-1" />
+              <div className="text-sm text-muted-foreground">DB Latency</div>
+              <div className="text-lg font-semibold">
+                {Math.round(health.performance.dbLatency)}ms
               </div>
             </div>
-
-            {/* Performance Metrics */}
-            <div className="pt-2 border-t">
-              <div className="text-sm text-muted-foreground mb-2">Performance</div>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <span className="text-muted-foreground">DB Latency:</span>
-                  <span className="ml-1 font-medium">
-                    {Math.round(health.performance.dbLatency)}ms
-                  </span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Page Load:</span>
-                  <span className="ml-1 font-medium">
-                    {Math.round(health.performance.pageLoadTime)}ms
-                  </span>
-                </div>
+            <div className="text-center p-3 rounded-lg bg-muted/30">
+              <Activity className="h-5 w-5 text-muted-foreground mx-auto mb-1" />
+              <div className="text-sm text-muted-foreground">Page Load</div>
+              <div className="text-lg font-semibold">
+                {Math.round(health.performance.pageLoadTime)}ms
               </div>
             </div>
-
-            {/* Last Checked */}
-            {lastChecked && (
-              <div className="text-xs text-muted-foreground">
-                Last checked: {lastChecked.toLocaleTimeString()}
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent mx-auto mb-2" />
-            <div className="text-sm text-muted-foreground">Checking system health...</div>
           </div>
         )}
-      </CardContent>
-    </Card>
+
+        {/* Last Checked */}
+        {lastChecked && (
+          <div className="text-center text-xs text-muted-foreground pt-2 border-t">
+            Last updated: {lastChecked.toLocaleTimeString()}
+          </div>
+        )}
+      </div>
+    </StandardAdminCard>
   );
 }
