@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Building, Zap, Palette, Target } from 'lucide-react';
 import heroImage from '@/assets/hero-image.jpg';
 import { Link } from 'react-router-dom';
+import { TimelineShowcase } from '@/components/ui/TimelineShowcase';
 
 const About = () => {
   const { data: aboutPage } = useQuery({
@@ -43,6 +44,73 @@ const About = () => {
     { number: '28+', label: 'Years Experience' },
     { number: '30+', label: 'Team Member' },
     { number: '49+', label: 'Awards Winning' },
+  ];
+
+  const companyTimeline = [
+    {
+      id: '1',
+      year: '2020',
+      title: 'Foundation & Vision',
+      description: 'Devmart was founded with a mission to bridge the gap between innovative technology and business growth. Starting as a small team of passionate developers in Suriname.',
+      achievements: [
+        'Established core team of 5 developers',
+        'Completed first 10 client projects',
+        'Developed proprietary project management system'
+      ],
+      badge: 'Genesis',
+      isHighlight: true
+    },
+    {
+      id: '2', 
+      year: '2021',
+      title: 'Growth & Expansion',
+      description: 'Rapid growth phase with expanding client base and service offerings. We began specializing in modern web technologies and digital transformation.',
+      achievements: [
+        'Reached 50+ completed projects',
+        'Expanded team to 15 members',
+        'Launched innovation lab initiative',
+        'Introduced agile development processes'
+      ]
+    },
+    {
+      id: '3',
+      year: '2022',
+      title: 'Innovation Leadership',
+      description: 'Became recognized as a leading technology partner in the region, focusing on cutting-edge solutions and emerging technologies.',
+      achievements: [
+        'Won "Best Digital Agency" award',
+        'Implemented AI-powered development tools',
+        'Launched mentorship program',
+        'Achieved 98% client retention rate'
+      ],
+      badge: 'Excellence'
+    },
+    {
+      id: '4',
+      year: '2023',
+      title: 'Digital Transformation',
+      description: 'Pivoted to focus on comprehensive digital transformation, helping businesses modernize their entire technology stack.',
+      achievements: [
+        'Completed 200+ projects milestone',
+        'Expanded internationally',
+        'Developed proprietary frameworks',
+        'Launched DevLab for R&D'
+      ]
+    },
+    {
+      id: '5',
+      year: '2024',
+      title: 'Future Ready',
+      description: 'Leading the charge in next-generation web technologies, AI integration, and sustainable digital practices.',
+      achievements: [
+        'Team of 30+ specialists',
+        'Carbon-neutral development practices', 
+        'AI-first development approach',
+        'Industry thought leadership'
+      ],
+      badge: 'Innovation',
+      isHighlight: true
+    }
   ];
 
   return (
@@ -194,6 +262,13 @@ const About = () => {
             </Link>
           </div>
         </section>
+
+        {/* Company Timeline */}
+        <TimelineShowcase 
+          items={companyTimeline}
+          title="Our Journey"
+          subtitle="From startup to industry leader - the milestones that shaped Devmart"
+        />
 
         <Footer />
       </div>

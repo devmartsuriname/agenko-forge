@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
 import { SEOHead } from '@/lib/seo';
@@ -6,12 +7,15 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Calendar, Clock, ArrowRight, ArrowLeft, Mail } from 'lucide-react';
+import { EmailCaptureModal } from '@/components/cta/EmailCaptureModal';
 
 const Blog = () => {
   const [searchParams] = useSearchParams();
   const page = parseInt(searchParams.get('page') || '1');
   const postsPerPage = 6;
+  const [showNewsletterModal, setShowNewsletterModal] = useState(false);
 
   const { data: blogPosts = [], isLoading } = useQuery({
     queryKey: ['blog-posts', page],
@@ -220,26 +224,36 @@ const Blog = () => {
         {/* Newsletter CTA */}
         <section className="py-24 px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-agenko-white mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">
               Stay Updated
             </h2>
-            <p className="text-agenko-gray-light text-lg mb-8">
+            <p className="text-muted-foreground text-lg mb-8">
               Subscribe to our newsletter and never miss our latest insights and tips.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-3 bg-agenko-dark-lighter border border-agenko-gray rounded-lg text-agenko-white placeholder:text-agenko-gray focus:outline-none focus:border-agenko-green"
-              />
-              <button className="bg-agenko-green text-agenko-dark hover:bg-agenko-green-hover font-semibold px-6 py-3 rounded-lg transition-colors">
-                Subscribe
-              </button>
+              <Button 
+                onClick={() => setShowNewsletterModal(true)}
+                size="lg"
+                className="bg-primary hover:bg-primary/90 text-white font-semibold px-8 py-3"
+              >
+                <Mail className="h-5 w-5 mr-2" />
+                Subscribe to Newsletter
+              </Button>
             </div>
           </div>
         </section>
 
         <Footer />
+
+        {/* Newsletter Modal */}
+        <EmailCaptureModal
+          isOpen={showNewsletterModal}
+          onClose={() => setShowNewsletterModal(false)}
+          title="Subscribe to Devmart Insights"
+          description="Get the latest web development tips, industry insights, and exclusive content delivered to your inbox every week."
+          incentive="🎁 Get our free 'Modern Web Development Checklist' as a welcome gift!"
+          source="blog_page"
+        />
       </div>
     </>
   );

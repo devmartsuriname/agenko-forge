@@ -275,6 +275,93 @@ export type Database = {
         }
         Relationships: []
       }
+      cta_interactions: {
+        Row: {
+          action: string
+          created_at: string
+          cta_type: string
+          element_id: string | null
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          page_url: string
+          session_id: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          cta_type: string
+          element_id?: string | null
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          page_url: string
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          cta_type?: string
+          element_id?: string | null
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          page_url?: string
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      email_subscriptions: {
+        Row: {
+          confirmed_at: string | null
+          created_at: string
+          email: string
+          id: string
+          ip_address: string | null
+          name: string | null
+          preferences: Json | null
+          source: string | null
+          status: string
+          unsubscribed_at: string | null
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          confirmed_at?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          ip_address?: string | null
+          name?: string | null
+          preferences?: Json | null
+          source?: string | null
+          status?: string
+          unsubscribed_at?: string | null
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          confirmed_at?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          ip_address?: string | null
+          name?: string | null
+          preferences?: Json | null
+          source?: string | null
+          status?: string
+          unsubscribed_at?: string | null
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       faqs: {
         Row: {
           answer: string

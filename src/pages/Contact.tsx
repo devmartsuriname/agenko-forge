@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Mail, Phone, MapPin, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import { useContactSettings } from '@/hooks/useContactSettings';
+import { MapEmbed } from '@/components/ui/MapEmbed';
 
 interface ContactFormData {
   name: string;
@@ -413,6 +414,26 @@ const Contact = () => {
                 </Card>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* Map Section */}
+        <section className="py-16 px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Visit Our Office</h2>
+              <p className="text-lg text-muted-foreground">
+                Located in the heart of Paramaribo, we're always ready to meet in person.
+              </p>
+            </div>
+            
+            <MapEmbed 
+              address="Paramaribo, Suriname"
+              height="400px"
+              className="rounded-lg shadow-lg"
+              embedUrl="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31789.923456789!2d-55.203611!3d5.8333333!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8d8b7d7d7d7d7d7d%3A0x7d7d7d7d7d7d7d7d!2sParamaribo%2C%20Suriname!5e0!3m2!1sen!2ssr!4v1234567890"
+              directionsUrl="https://www.google.com/maps/dir/?api=1&destination=Paramaribo,Suriname"
+            />
           </div>
         </section>
 
