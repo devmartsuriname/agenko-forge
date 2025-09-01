@@ -97,7 +97,7 @@ const Services = () => {
             { number: '98%', label: 'Client Satisfaction' },
             { number: '24/7', label: 'Support Available' },
           ]}
-          className="pt-8 px-4"
+          className="px-4"
         />
 
         {/* Services Section */}

@@ -66,7 +66,7 @@ export function AnimatedHero({
       )}
       
       {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 pt-16 text-center">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 pt-20 text-center">
         <div className="max-w-4xl mx-auto">
           {/* Subhead */}
           {subhead && (
