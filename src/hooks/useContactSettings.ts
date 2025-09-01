@@ -30,7 +30,7 @@ export function useContactSettings() {
         site_title: data.site_title || 'Devmart',
         site_description: data.site_description || 'Digital agency delivering innovative web development and marketing solutions.',
         contact_email: data.contact_email || 'info@devmart.sr',
-        contact_phone: data.contact_phone || '+555-759-9854',
+        contact_phone: data.contact_phone || '+1 597-759-9854',
         contact_address: data.contact_address || '6801 Hollywood Blvd\nLos Angeles, CA 90028',
         business_hours: data.business_hours || 'Mon - Fri: 9:00 AM - 6:00 PM PST',
         footer_legal_text: data.footer_legal_text || '© 2025 Devmart - All Rights Reserved.',
@@ -43,10 +43,10 @@ export function useContactSettings() {
       // Fail silently for public pages and use defaults
       console.error('Failed to load contact settings:', error);
       setSettings({
-      site_title: 'Devmart',
-      site_description: 'Digital agency delivering innovative web development and marketing solutions.',
-      contact_email: 'info@devmart.sr',
-        contact_phone: '+555-759-9854',
+        site_title: 'Devmart',
+        site_description: 'Digital agency delivering innovative web development and marketing solutions.',
+        contact_email: 'info@devmart.sr',
+        contact_phone: '+1 597-759-9854',
         contact_address: '6801 Hollywood Blvd\nLos Angeles, CA 90028',
         business_hours: 'Mon - Fri: 9:00 AM - 6:00 PM PST',
         footer_legal_text: '© 2025 Devmart - All Rights Reserved.',
