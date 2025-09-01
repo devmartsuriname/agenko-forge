@@ -225,10 +225,10 @@ const Blog = () => {
         <section className="py-24 px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Stay Updated
+              Stay Updated with Our Blog
             </h2>
             <p className="text-muted-foreground text-lg mb-8">
-              Subscribe to our newsletter and never miss our latest insights and tips.
+              Get the latest tutorials, company news, and development tips delivered to your inbox.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
               <Button 
@@ -237,7 +237,7 @@ const Blog = () => {
                 className="bg-primary hover:bg-primary/90 text-white font-semibold px-8 py-3"
               >
                 <Mail className="h-5 w-5 mr-2" />
-                Subscribe to Newsletter
+                Subscribe to Blog Updates
               </Button>
             </div>
           </div>
@@ -249,9 +249,9 @@ const Blog = () => {
         <EmailCaptureModal
           isOpen={showNewsletterModal}
           onClose={() => setShowNewsletterModal(false)}
-          title="Subscribe to Devmart Insights"
-          description="Get the latest web development tips, industry insights, and exclusive content delivered to your inbox every week."
-          incentive="🎁 Get our free 'Modern Web Development Checklist' as a welcome gift!"
+          title="Subscribe to Devmart Blog"
+          description="Get tutorials, development tips, company updates, and behind-the-scenes content delivered weekly."
+          incentive="🎁 Get our free 'Web Developer's Toolkit Guide' as a welcome gift!"
           source="blog_page"
         />
       </div>

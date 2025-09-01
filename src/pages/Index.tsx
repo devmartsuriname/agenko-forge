@@ -8,6 +8,7 @@ import { PageBodySchema } from '@/lib/sections/schema';
 import { HomeSkeleton } from '@/components/HomeSkeleton';
 import { injectHeroPreload } from '@/lib/performance';
 import { useEffect } from 'react';
+import { InsightsPreviewSection } from '@/components/sections/InsightsPreviewSection';
 
 const Index = () => {
 

@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Search, Calendar, User } from 'lucide-react';
+import { Search, Calendar, User, ArrowRight } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
@@ -36,7 +36,40 @@ const Insights = () => {
         .order('published_at', { ascending: false });
 
       if (error) throw error;
-      return data || [];
+      
+      // Filter for insights content - posts with strategic/analytical tags
+      const insightTags = [
+        'industry-analysis',
+        'tech-trends', 
+        'market-insights',
+        'digital-transformation',
+        'innovation',
+        'strategy',
+        'leadership',
+        'thought-leadership',
+        'future-tech',
+        'business-intelligence',
+        'data-science',
+        'ai-machine-learning',
+        'cybersecurity',
+        'cloud-computing',
+        'enterprise',
+        'startup-insights'
+      ];
+
+      const insightPosts = (data || []).filter(post => {
+        if (!post.tags || !Array.isArray(post.tags)) return false;
+        
+        return post.tags.some(tag => 
+          insightTags.includes(tag.toLowerCase()) ||
+          tag.toLowerCase().includes('insight') ||
+          tag.toLowerCase().includes('trend') ||
+          tag.toLowerCase().includes('analysis') ||
+          tag.toLowerCase().includes('strategy')
+        );
+      });
+
+      return insightPosts;
     }
   });
 
@@ -89,11 +122,20 @@ const Insights = () => {
           >
             <div className="max-w-4xl mx-auto text-center">
               <h1 className="text-4xl md:text-5xl font-bold text-agenko-white mb-6">
-                Insights & Innovation
+                Industry Insights
               </h1>
               <p className="text-xl text-agenko-gray-light mb-8 max-w-2xl mx-auto">
-                Stay ahead with the latest insights, trends, and expert perspectives on digital innovation, technology, and business growth.
+                Strategic analysis, market trends, and thought leadership from our experts. Deep dives into the future of technology and digital transformation.
               </p>
+              
+              {/* Insights Categories */}
+              <div className="flex flex-wrap gap-2 justify-center mb-6">
+                <Badge variant="outline" className="text-xs">Tech Trends</Badge>
+                <Badge variant="outline" className="text-xs">Market Analysis</Badge>
+                <Badge variant="outline" className="text-xs">Digital Strategy</Badge>
+                <Badge variant="outline" className="text-xs">Innovation</Badge>
+                <Badge variant="outline" className="text-xs">Leadership</Badge>
+              </div>
               
               {/* Search & Filter */}
               <div className="max-w-2xl mx-auto space-y-4">
@@ -213,7 +255,22 @@ const Insights = () => {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <p className="text-agenko-gray-light text-lg">No insights found matching your criteria.</p>
+                  <div className="max-w-md mx-auto">
+                    <h3 className="text-xl font-semibold text-agenko-white mb-4">
+                      No Strategic Insights Yet
+                    </h3>
+                    <p className="text-agenko-gray-light mb-6">
+                      We're working on curating deep industry analysis and strategic content. 
+                      Check back soon for expert perspectives on digital transformation.
+                    </p>
+                    <Link 
+                      to="/blog" 
+                      className="inline-flex items-center gap-2 text-agenko-green hover:text-agenko-green-hover transition-colors"
+                    >
+                      Browse Our Blog Instead
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>
