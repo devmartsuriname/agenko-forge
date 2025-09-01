@@ -1326,10 +1326,13 @@ export type Database = {
         Args: { post_id: string }
         Returns: {
           color: string
+          created_at: string
           description: string
           id: string
           name: string
           slug: string
+          status: string
+          updated_at: string
         }[]
       }
       get_current_user_role: {

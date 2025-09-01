@@ -248,18 +248,42 @@ export const cms = {
     const postsWithCategories = await Promise.all(
       posts.map(async (post) => {
         try {
-          const { data: categories, error: categoriesError } = await supabase
+          const { data: categoriesData, error: categoriesError } = await supabase
             .rpc('get_blog_post_categories', { post_id: post.id });
 
           if (categoriesError) {
             console.warn('Error fetching categories for post:', post.id, categoriesError);
-            return { ...post, categories: [] };
+            return { 
+              ...post, 
+              status: post.status as 'draft' | 'published',
+              categories: [] 
+            };
           }
 
-          return { ...post, categories: categories || [] };
+          // Map the raw data to BlogCategory type
+          const categories: BlogCategory[] = (categoriesData || []).map(cat => ({
+            id: cat.id,
+            name: cat.name,
+            slug: cat.slug,
+            color: cat.color,
+            description: cat.description,
+            status: cat.status as 'draft' | 'published',
+            created_at: cat.created_at,
+            updated_at: cat.updated_at
+          }));
+
+          return { 
+            ...post, 
+            status: post.status as 'draft' | 'published',
+            categories 
+          };
         } catch (error) {
           console.warn('Error fetching categories for post:', post.id, error);
-          return { ...post, categories: [] };
+          return { 
+            ...post, 
+            status: post.status as 'draft' | 'published',
+            categories: [] 
+          };
         }
       })
     );
@@ -374,34 +398,26 @@ export const cms = {
   },
 
   async getBlogPostCategories(postId: string): Promise<BlogCategory[]> {
-    const { data, error } = await supabase
-      .from('blog_post_categories')
-      .select(`
-        blog_categories!inner(
-          id,
-          name,
-          slug,
-          color,
-          description,
-          status,
-          created_at,
-          updated_at
-        )
-      `)
-      .eq('blog_post_id', postId);
+    try {
+      const { data, error } = await supabase
+        .rpc('get_blog_post_categories', { post_id: postId });
 
-    if (error) throw error;
-    
-    return (data || []).map(item => ({
-      id: (item as any).blog_categories.id,
-      name: (item as any).blog_categories.name,
-      slug: (item as any).blog_categories.slug,
-      color: (item as any).blog_categories.color,
-      description: (item as any).blog_categories.description,
-      status: (item as any).blog_categories.status as 'draft' | 'published',
-      created_at: (item as any).blog_categories.created_at,
-      updated_at: (item as any).blog_categories.updated_at
-    }));
+      if (error) throw error;
+      
+      return (data || []).map(cat => ({
+        id: cat.id,
+        name: cat.name,
+        slug: cat.slug,
+        color: cat.color,
+        description: cat.description,
+        status: cat.status as 'draft' | 'published',
+        created_at: cat.created_at,
+        updated_at: cat.updated_at
+      }));
+    } catch (error) {
+      console.warn('Error fetching categories for post:', postId, error);
+      return [];
+    }
   },
 
   // Get category by slug
