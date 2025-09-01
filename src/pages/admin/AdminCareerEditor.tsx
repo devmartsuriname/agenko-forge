@@ -37,7 +37,7 @@ interface Job {
 export default function AdminCareerEditor() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, isEditor } = useAuth();
+  const { user, isEditor, loading: authLoading } = useAuth();
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -45,6 +45,8 @@ export default function AdminCareerEditor() {
   const isEditing = id !== 'new';
 
   useEffect(() => {
+    if (authLoading) return; // Wait for auth to load
+    
     if (isEditing) {
       fetchJob();
     } else {
@@ -70,7 +72,7 @@ export default function AdminCareerEditor() {
       });
       setLoading(false);
     }
-  }, [id, user, isEditing]);
+  }, [id, user, isEditing, authLoading]);
 
   const fetchJob = async () => {
     try {
@@ -195,7 +197,7 @@ export default function AdminCareerEditor() {
     );
   }
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
         <LoadingListSkeleton />

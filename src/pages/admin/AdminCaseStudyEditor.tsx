@@ -40,7 +40,7 @@ interface CaseStudy {
 export default function AdminCaseStudyEditor() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, isEditor } = useAuth();
+  const { user, isEditor, loading: authLoading } = useAuth();
   const [caseStudy, setCaseStudy] = useState<CaseStudy | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -48,6 +48,8 @@ export default function AdminCaseStudyEditor() {
   const isEditing = id !== 'new';
 
   useEffect(() => {
+    if (authLoading) return; // Wait for auth to load
+    
     if (isEditing) {
       fetchCaseStudy();
     } else {
@@ -72,7 +74,7 @@ export default function AdminCaseStudyEditor() {
       });
       setLoading(false);
     }
-  }, [id, user, isEditing]);
+  }, [id, user, isEditing, authLoading]);
 
   const fetchCaseStudy = async () => {
     try {
@@ -170,7 +172,7 @@ export default function AdminCaseStudyEditor() {
     );
   }
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
         <LoadingListSkeleton />

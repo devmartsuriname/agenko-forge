@@ -34,7 +34,7 @@ interface LabProject {
 export default function AdminInnovationLabEditor() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, isEditor } = useAuth();
+  const { user, isEditor, loading: authLoading } = useAuth();
   const [project, setProject] = useState<LabProject | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -42,6 +42,8 @@ export default function AdminInnovationLabEditor() {
   const isEditing = id !== 'new';
 
   useEffect(() => {
+    if (authLoading) return; // Wait for auth to load
+    
     if (isEditing) {
       fetchProject();
     } else {
@@ -63,7 +65,7 @@ export default function AdminInnovationLabEditor() {
       });
       setLoading(false);
     }
-  }, [id, user, isEditing]);
+  }, [id, user, isEditing, authLoading]);
 
   const fetchProject = async () => {
     try {
@@ -161,7 +163,7 @@ export default function AdminInnovationLabEditor() {
     );
   }
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
         <LoadingListSkeleton />
