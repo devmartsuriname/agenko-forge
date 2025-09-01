@@ -6,6 +6,8 @@ import { generateMetaDescription } from '@/lib/seo';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { AutoBreadcrumb } from '@/components/ui/breadcrumb';
 import { ArrowLeft, CheckCircle } from 'lucide-react';
 
 const ServiceDetail = () => {
@@ -69,8 +71,13 @@ const ServiceDetail = () => {
       <div className="min-h-screen bg-agenko-dark">
         <Navigation />
         
+        {/* Breadcrumb */}
+        <div className="container mx-auto px-4 pt-8">
+          <AutoBreadcrumb />
+        </div>
+        
         {/* Hero Section */}
-        <section className="py-32 px-4 pt-24">
+        <section className="py-32 px-4 pt-16">
           <div className="max-w-4xl mx-auto">
             <Link 
               to="/services" 
@@ -80,16 +87,18 @@ const ServiceDetail = () => {
               Back to Services
             </Link>
             
-            <div className="inline-block px-4 py-2 bg-agenko-dark-lighter rounded-full text-agenko-green text-sm font-medium mb-6">
-              Service Details
+            <div className="flex items-center justify-center mb-6">
+              <Badge variant="outline" className="px-4 py-2 text-sm font-medium border-agenko-green/20 bg-agenko-green/5 text-agenko-green">
+                Service Details
+              </Badge>
             </div>
             
-            <h1 className="text-4xl md:text-6xl font-bold text-agenko-white leading-tight mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold text-agenko-white leading-tight mb-6 text-center">
               {service.title}
             </h1>
             
             {service.excerpt && (
-              <p className="text-xl text-agenko-gray-light mb-12">
+              <p className="text-xl text-agenko-gray-light mb-12 leading-relaxed text-center max-w-3xl mx-auto">
                 {service.excerpt}
               </p>
             )}
@@ -164,16 +173,19 @@ const ServiceDetail = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="py-24 px-4">
+        <section className="py-24 px-4 bg-gradient-to-br from-agenko-green/5 via-agenko-dark to-agenko-dark">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-4xl md:text-5xl font-bold text-agenko-white mb-6">
-              Ready to get started?
+              Ready to{' '}
+              <span className="bg-gradient-to-r from-agenko-green to-agenko-green-hover bg-clip-text text-transparent">
+                get started?
+              </span>
             </h2>
-            <p className="text-agenko-gray-light text-xl mb-8">
+            <p className="text-agenko-gray-light text-xl mb-8 leading-relaxed">
               Let's discuss how {service.title.toLowerCase()} can help grow your business.
             </p>
             <Link to="/contact">
-              <Button variant="hero" size="lg" className="text-lg px-12 py-6">
+              <Button variant="hero" size="lg" className="text-lg px-12 py-6 bg-agenko-green hover:bg-agenko-green-hover text-agenko-dark font-semibold">
                 Start Your Project
               </Button>
             </Link>

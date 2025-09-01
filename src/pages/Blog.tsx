@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { AutoBreadcrumb } from '@/components/ui/breadcrumb';
 import { Calendar, Clock, ArrowRight, ArrowLeft, Mail } from 'lucide-react';
 import { EmailCaptureModal } from '@/components/cta/EmailCaptureModal';
 
@@ -60,17 +61,28 @@ const Blog = () => {
       <div className="min-h-screen bg-agenko-dark">
         <Navigation />
         
+        {/* Breadcrumb */}
+        <div className="container mx-auto px-4 pt-8">
+          <AutoBreadcrumb />
+        </div>
+        
         {/* Hero Section */}
-        <section className="py-32 px-4 pt-24">
+        <section className="py-32 px-4 pt-16">
           <div className="max-w-6xl mx-auto text-center">
-            <div className="inline-block px-4 py-2 bg-agenko-dark-lighter rounded-full text-agenko-green text-sm font-medium mb-6">
-              Our Blog
+            <div className="flex items-center justify-center mb-6">
+              <Badge variant="outline" className="mb-4 px-4 py-2 text-sm font-medium border-primary/20 bg-primary/5 text-primary">
+                Our Blog
+              </Badge>
             </div>
             <h1 className="text-4xl md:text-6xl font-bold text-agenko-white leading-tight mb-6">
-              Insights & <span className="text-gradient">Expert Knowledge</span>
+              Insights &{' '}
+              <span className="bg-gradient-to-r from-agenko-green to-agenko-green-hover bg-clip-text text-transparent">
+                Expert Knowledge
+              </span>
             </h1>
-            <p className="text-xl text-agenko-gray-light max-w-3xl mx-auto mb-12">
-              Stay ahead with the latest trends, tips, and insights in digital marketing, web design, and business growth from our team of experts.
+            <p className="text-xl text-agenko-gray-light max-w-3xl mx-auto mb-12 leading-relaxed">
+              Stay ahead with the latest trends, tips, and insights in digital marketing, web design, 
+              and business growth from our team of experts.
             </p>
           </div>
         </section>

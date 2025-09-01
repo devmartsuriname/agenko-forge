@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { AutoBreadcrumb } from '@/components/ui/breadcrumb';
 import { supabase } from '@/integrations/supabase/client';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
@@ -75,17 +76,17 @@ export default function CaseStudyDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-agenko-dark">
         <Navigation />
         <main className="pt-20">
           <div className="container mx-auto px-4 py-16">
             <div className="animate-pulse space-y-8">
-              <div className="h-8 bg-muted rounded w-3/4"></div>
-              <div className="h-64 bg-muted rounded"></div>
+              <div className="h-8 bg-agenko-dark-lighter rounded w-3/4"></div>
+              <div className="h-64 bg-agenko-dark-lighter rounded"></div>
               <div className="space-y-4">
-                <div className="h-4 bg-muted rounded w-full"></div>
-                <div className="h-4 bg-muted rounded w-3/4"></div>
-                <div className="h-4 bg-muted rounded w-5/6"></div>
+                <div className="h-4 bg-agenko-dark-lighter rounded w-full"></div>
+                <div className="h-4 bg-agenko-dark-lighter rounded w-3/4"></div>
+                <div className="h-4 bg-agenko-dark-lighter rounded w-5/6"></div>
               </div>
             </div>
           </div>
@@ -118,7 +119,7 @@ export default function CaseStudyDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-agenko-dark">
       <Helmet>
         <title>{caseStudy.title} | Case Studies | Devmart</title>
         <meta name="description" content={caseStudy.summary} />
@@ -134,22 +135,34 @@ export default function CaseStudyDetail() {
 
       <Navigation />
       
-      <main className="pt-20">
+      {/* Breadcrumb */}
+      <div className="container mx-auto px-4 pt-8">
+        <AutoBreadcrumb />
+      </div>
+      
+      <main className="pt-12">
         {/* Hero Section */}
-        <section className="py-16 bg-gradient-to-br from-primary/5 to-secondary/5">
-          <div className="container mx-auto px-4">
+        <section className="py-16 bg-gradient-to-br from-agenko-green/5 via-agenko-dark to-agenko-dark relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-agenko-green/10 via-transparent to-agenko-green/5" />
+          <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-4xl mx-auto text-center space-y-6">
               <div className="flex items-center justify-center space-x-2">
-                <Badge variant="outline">{caseStudy.industry}</Badge>
-                {caseStudy.client && <Badge variant="secondary">{caseStudy.client}</Badge>}
+                <Badge variant="outline" className="border-agenko-green/30 bg-agenko-green/10 text-agenko-green">
+                  {caseStudy.industry}
+                </Badge>
+                {caseStudy.client && (
+                  <Badge variant="secondary" className="bg-agenko-dark-lighter text-agenko-white">
+                    {caseStudy.client}
+                  </Badge>
+                )}
               </div>
               
-              <h1 className="text-4xl md:text-5xl font-bold text-foreground">
+              <h1 className="text-4xl md:text-5xl font-bold text-agenko-white leading-tight">
                 {caseStudy.title}
               </h1>
               
               {caseStudy.summary && (
-                <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                <p className="text-xl text-agenko-gray-light max-w-3xl mx-auto leading-relaxed">
                   {caseStudy.summary}
                 </p>
               )}
@@ -174,21 +187,26 @@ export default function CaseStudyDetail() {
 
         {/* Key Metrics */}
         {caseStudy.metrics && caseStudy.metrics.length > 0 && (
-          <section className="py-16 bg-muted/30">
+          <section className="py-16 bg-agenko-dark-lighter/50">
             <div className="container mx-auto px-4">
               <div className="max-w-6xl mx-auto">
-                <h2 className="text-3xl font-bold text-center mb-12">Key Results</h2>
+                <h2 className="text-3xl font-bold text-center mb-12 text-agenko-white">
+                  Key{' '}
+                  <span className="bg-gradient-to-r from-agenko-green to-agenko-green-hover bg-clip-text text-transparent">
+                    Results
+                  </span>
+                </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   {caseStudy.metrics.map((metric, index) => (
-                    <Card key={index} className="text-center">
+                    <Card key={index} className="text-center bg-agenko-dark-lighter border-agenko-gray/20">
                       <CardContent className="p-8">
-                        <div className="text-4xl font-bold text-primary mb-2">
+                        <div className="text-4xl font-bold text-agenko-green mb-2">
                           {metric.value}
                         </div>
-                        <div className="text-lg font-semibold mb-2">
+                        <div className="text-lg font-semibold mb-2 text-agenko-white">
                           {metric.label}
                         </div>
-                        <p className="text-muted-foreground">
+                        <p className="text-agenko-gray-light">
                           {metric.description}
                         </p>
                       </CardContent>
@@ -217,20 +235,23 @@ export default function CaseStudyDetail() {
         />
 
         {/* CTA Section */}
-        <section className="py-16">
+        <section className="py-16 bg-gradient-to-br from-agenko-green/5 via-agenko-dark to-agenko-dark">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center space-y-8">
-              <h2 className="text-3xl font-bold">
-                Ready to Achieve Similar Results?
+              <h2 className="text-3xl font-bold text-agenko-white">
+                Ready to Achieve{' '}
+                <span className="bg-gradient-to-r from-agenko-green to-agenko-green-hover bg-clip-text text-transparent">
+                  Similar Results?
+                </span>
               </h2>
-              <p className="text-xl text-muted-foreground">
+              <p className="text-xl text-agenko-gray-light leading-relaxed">
                 Let's discuss how we can help transform your business with innovative solutions.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button asChild size="lg">
+                <Button asChild size="lg" className="bg-agenko-green hover:bg-agenko-green-hover text-agenko-dark font-semibold">
                   <a href="/get-quote">Get Your Quote</a>
                 </Button>
-                <Button variant="outline" size="lg" asChild>
+                <Button variant="outline" size="lg" asChild className="border-agenko-green text-agenko-green hover:bg-agenko-green hover:text-agenko-dark">
                   <a href="/case-studies">View More Case Studies</a>
                 </Button>
               </div>

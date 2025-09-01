@@ -6,6 +6,8 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { AutoBreadcrumb } from '@/components/ui/breadcrumb';
 import { ArrowLeft, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 
@@ -74,15 +76,32 @@ const ProjectDetail = () => {
       <div className="min-h-screen bg-agenko-dark">
         <Navigation />
         
-        <section className="py-32 px-4 pt-24">
+        {/* Breadcrumb */}
+        <div className="container mx-auto px-4 pt-8">
+          <AutoBreadcrumb />
+        </div>
+        
+        <section className="py-32 px-4 pt-16">
           <div className="max-w-6xl mx-auto">
             <Link to="/portfolio" className="inline-flex items-center text-agenko-green hover:text-agenko-green-hover transition-colors mb-8">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Portfolio
             </Link>
             
-            <h1 className="text-4xl md:text-5xl font-bold text-agenko-white mb-6">{project.title}</h1>
-            {project.excerpt && <p className="text-xl text-agenko-gray-light mb-12">{project.excerpt}</p>}
+            <div className="flex items-center justify-center mb-6">
+              <Badge variant="outline" className="px-4 py-2 text-sm font-medium border-agenko-green/20 bg-agenko-green/5 text-agenko-green">
+                Portfolio Project
+              </Badge>
+            </div>
+            
+            <h1 className="text-4xl md:text-5xl font-bold text-agenko-white mb-6 text-center">
+              {project.title}
+            </h1>
+            {project.excerpt && (
+              <p className="text-xl text-agenko-gray-light mb-12 text-center max-w-3xl mx-auto leading-relaxed">
+                {project.excerpt}
+              </p>
+            )}
 
             {/* Image Gallery */}
             {images.length > 0 && (
