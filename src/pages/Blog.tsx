@@ -242,11 +242,11 @@ const Blog = () => {
             <p className="text-muted-foreground text-lg mb-8">
               Get the latest tutorials, company news, and development tips delivered to your inbox.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+            <div className="flex justify-center">
               <Button 
                 onClick={() => setShowNewsletterModal(true)}
                 size="lg"
-                className="bg-primary hover:bg-primary/90 text-white font-semibold px-8 py-3"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-3"
               >
                 <Mail className="h-5 w-5 mr-2" />
                 Subscribe to Blog Updates
