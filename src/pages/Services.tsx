@@ -7,7 +7,6 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { InteractiveServiceCard } from '@/components/ui/InteractiveServiceCard';
 import { ServiceFilters } from '@/components/ui/ServiceFilters';
-import { AnimatedHero } from '@/components/ui/AnimatedHero';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { Building, Zap, Palette, Target, Globe, Smartphone, Code, Cpu, Rocket } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -87,18 +86,38 @@ const Services = () => {
         <Navigation />
         
         {/* Hero Section */}
-        <AnimatedHero
-          headline="Comprehensive •Digital• Solutions"
-          subhead="Our Services"
-          description="We offer a full range of digital marketing and design services to help your business thrive in the digital landscape. From strategy to execution, we've got you covered."
-          stats={[
-            { number: '25+', label: 'Years Experience' },
-            { number: '500+', label: 'Projects Delivered' },
-            { number: '98%', label: 'Client Satisfaction' },
-            { number: '24/7', label: 'Support Available' },
-          ]}
-          className="px-4"
-        />
+        <section className="py-32 px-4 pt-24">
+          <div className="max-w-6xl mx-auto text-center">
+            <div className="inline-block px-4 py-2 bg-agenko-dark-lighter rounded-full text-agenko-green text-sm font-medium mb-6">
+              Our Services
+            </div>
+            <h1 className="text-4xl md:text-6xl font-bold text-agenko-white leading-tight mb-6">
+              Comprehensive <span className="text-gradient">Digital</span> Solutions
+            </h1>
+            <p className="text-xl text-agenko-gray-light max-w-3xl mx-auto mb-12">
+              We offer a full range of digital marketing and design services to help your business thrive in the digital landscape. From strategy to execution, we've got you covered.
+            </p>
+            
+            {/* Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+              {[
+                { number: '25+', label: 'Years Experience' },
+                { number: '500+', label: 'Projects Delivered' },
+                { number: '98%', label: 'Client Satisfaction' },
+                { number: '24/7', label: 'Support Available' },
+              ].map((stat, index) => (
+                <div key={index} className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-agenko-green mb-2">
+                    {stat.number}
+                  </div>
+                  <div className="text-agenko-gray-light text-sm md:text-base">
+                    {stat.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
         {/* Services Section */}
         <section id="services" className="py-16 px-4">
