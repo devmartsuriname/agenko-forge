@@ -9,6 +9,7 @@ import { Search, Calendar, User, ArrowRight } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import { AutoBreadcrumb } from '@/components/ui/breadcrumb';
 
 interface BlogPost {
   id: string;
@@ -114,17 +115,16 @@ const Insights = () => {
 
         <main id="main-content">
           {/* Hero Section */}
-          <section 
-            ref={heroRef}
-            className={`relative pt-24 pb-16 px-4 transition-all duration-1000 ${
-              heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
-          >
-            <div className="max-w-4xl mx-auto text-center">
-              <h1 className="text-4xl md:text-5xl font-bold text-agenko-white mb-6">
-                Industry Insights
+          <section className="py-32 px-4 pt-24">
+            <div className="max-w-6xl mx-auto text-center">
+              <AutoBreadcrumb />
+              <div className="inline-block px-4 py-2 bg-agenko-dark-lighter rounded-full text-agenko-green text-sm font-medium mb-6">
+                Insights Hub
+              </div>
+              <h1 className="text-4xl md:text-6xl font-bold text-agenko-white leading-tight mb-6">
+                Industry <span className="text-gradient">Insights</span>
               </h1>
-              <p className="text-xl text-agenko-gray-light mb-8 max-w-2xl mx-auto">
+              <p className="text-xl text-agenko-gray-light max-w-3xl mx-auto mb-12">
                 Strategic analysis, market trends, and thought leadership from our experts. Deep dives into the future of technology and digital transformation.
               </p>
               
@@ -181,12 +181,7 @@ const Insights = () => {
           </section>
 
           {/* Posts Grid */}
-          <section 
-            ref={gridRef}
-            className={`pb-20 px-4 transition-all duration-1000 delay-200 ${
-              gridVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
-          >
+          <section className="pb-20 px-4">
             <div className="max-w-6xl mx-auto">
               {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

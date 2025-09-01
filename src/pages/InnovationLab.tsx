@@ -8,6 +8,7 @@ import { ExternalLink, Github, Play, Beaker } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import { AutoBreadcrumb } from '@/components/ui/breadcrumb';
 
 interface LabProject {
   id: string;
@@ -76,33 +77,23 @@ const InnovationLab = () => {
 
         <main id="main-content">
           {/* Hero Section */}
-          <section 
-            ref={heroRef}
-            className={`relative pt-24 pb-16 px-4 transition-all duration-1000 ${
-              heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
-          >
-            <div className="max-w-4xl mx-auto text-center">
-              <div className="flex items-center justify-center gap-3 mb-6">
-                <Beaker className="h-12 w-12 text-agenko-green" />
-                <h1 className="text-4xl md:text-5xl font-bold text-agenko-white">
-                  Innovation Lab
-                </h1>
+          <section className="py-32 px-4 pt-24">
+            <div className="max-w-6xl mx-auto text-center">
+              <AutoBreadcrumb />
+              <div className="inline-block px-4 py-2 bg-agenko-dark-lighter rounded-full text-agenko-green text-sm font-medium mb-6">
+                Innovation Lab
               </div>
-              <p className="text-xl text-agenko-gray-light mb-8 max-w-2xl mx-auto">
-                Explore cutting-edge experiments, AI demonstrations, and innovative tools. 
-                This is where we push boundaries and turn bold ideas into reality.
+              <h1 className="text-4xl md:text-6xl font-bold text-agenko-white leading-tight mb-6">
+                Experimental <span className="text-gradient">Projects</span>
+              </h1>
+              <p className="text-xl text-agenko-gray-light max-w-3xl mx-auto mb-12">
+                Explore cutting-edge experiments, AI demonstrations, and innovative tools. This is where we push boundaries and turn bold ideas into reality.
               </p>
             </div>
           </section>
 
           {/* Projects Grid */}
-          <section 
-            ref={gridRef}
-            className={`pb-20 px-4 transition-all duration-1000 delay-200 ${
-              gridVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
-          >
+          <section className="pb-20 px-4">
             <div className="max-w-6xl mx-auto">
               {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

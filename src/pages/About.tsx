@@ -10,6 +10,7 @@ import heroImage from '@/assets/hero-image.jpg';
 import { Link } from 'react-router-dom';
 import { TimelineShowcase } from '@/components/ui/TimelineShowcase';
 import { TeamShowcase } from '@/components/about/TeamShowcase';
+import { AutoBreadcrumb } from '@/components/ui/breadcrumb';
 
 const About = () => {
   const { data: aboutPage } = useQuery({
@@ -126,27 +127,23 @@ const About = () => {
         <Navigation />
         
         {/* Hero Section */}
-        <section className="relative py-32 px-4 pt-24">
+        <section className="py-32 px-4 pt-24">
           <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              <div>
-                <div className="inline-block px-4 py-2 bg-agenko-dark-lighter rounded-full text-agenko-green text-sm font-medium mb-6">
-                  About Us
-                </div>
-                <h1 className="text-4xl md:text-6xl font-bold text-agenko-white leading-tight mb-6">
-                  We are a leading <span className="text-gradient">innovative marketing agency</span>
-                </h1>
-                <p className="text-xl text-agenko-gray-light mb-8">
-                  {aboutPage?.body?.blocks?.[0]?.data?.text || 
-                   "We are a leading innovative marketing agency, specializing in creative solutions that drive business growth, enhance brand visibility, and increase customer engagement using data-driven approaches."}
-                </p>
-                <Link to="/contact">
-                  <Button variant="hero" size="lg">
-                    Get Started Today
-                  </Button>
-                </Link>
+            <AutoBreadcrumb />
+            <div className="text-center">
+              <div className="inline-block px-4 py-2 bg-agenko-dark-lighter rounded-full text-agenko-green text-sm font-medium mb-6">
+                About Us
               </div>
-
+              <h1 className="text-4xl md:text-6xl font-bold text-agenko-white leading-tight mb-6">
+                We are a leading <span className="text-gradient">innovative marketing agency</span>
+              </h1>
+              <p className="text-xl text-agenko-gray-light max-w-3xl mx-auto mb-12">
+                {aboutPage?.body?.blocks?.[0]?.data?.text || 
+                 "We are a leading innovative marketing agency, specializing in creative solutions that drive business growth, enhance brand visibility, and increase customer engagement using data-driven approaches."}
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-16">
               <div className="relative">
                 <div className="bg-agenko-dark-lighter rounded-2xl p-8">
                   <img 
@@ -156,6 +153,14 @@ const About = () => {
                     loading="eager"
                   />
                 </div>
+              </div>
+              
+              <div>
+                <Link to="/contact">
+                  <Button variant="hero" size="lg">
+                    Get Started Today
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

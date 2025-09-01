@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
-import { ChevronRight, MoreHorizontal } from "lucide-react"
+import { ChevronRight, MoreHorizontal, Home } from "lucide-react"
+import { Link, useLocation } from "react-router-dom"
 
 import { cn } from "@/lib/utils"
 
@@ -104,6 +105,73 @@ const BreadcrumbEllipsis = ({
 )
 BreadcrumbEllipsis.displayName = "BreadcrumbElipssis"
 
+// Auto breadcrumb component
+const AutoBreadcrumb = () => {
+  const location = useLocation()
+  const pathnames = location.pathname.split('/').filter((x) => x)
+
+  const getPageTitle = (path: string) => {
+    const titles: Record<string, string> = {
+      'about': 'About Us',
+      'services': 'Services',
+      'portfolio': 'Portfolio',
+      'blog': 'Blog',
+      'insights': 'Insights',
+      'case-studies': 'Case Studies',
+      'careers': 'Careers',
+      'innovation-lab': 'Innovation Lab',
+      'contact': 'Contact',
+      'pricing': 'Pricing',
+    }
+    return titles[path] || path.charAt(0).toUpperCase() + path.slice(1)
+  }
+
+  if (pathnames.length === 0) {
+    return null // Don't show breadcrumb on home page
+  }
+
+  return (
+    <Breadcrumb className="mb-6">
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink asChild>
+            <Link to="/" className="text-agenko-gray-light hover:text-agenko-green flex items-center gap-1">
+              <Home className="h-4 w-4" />
+              Home
+            </Link>
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        {pathnames.map((value, index) => {
+          const to = `/${pathnames.slice(0, index + 1).join('/')}`
+          const isLast = index === pathnames.length - 1
+
+          return (
+            <React.Fragment key={to}>
+              <BreadcrumbSeparator className="text-agenko-gray" />
+              <BreadcrumbItem>
+                {isLast ? (
+                  <BreadcrumbPage className="text-agenko-green">
+                    {getPageTitle(value)}
+                  </BreadcrumbPage>
+                ) : (
+                  <BreadcrumbLink asChild>
+                    <Link 
+                      to={to} 
+                      className="text-agenko-gray-light hover:text-agenko-green"
+                    >
+                      {getPageTitle(value)}
+                    </Link>
+                  </BreadcrumbLink>
+                )}
+              </BreadcrumbItem>
+            </React.Fragment>
+          )
+        })}
+      </BreadcrumbList>
+    </Breadcrumb>
+  )
+}
+
 export {
   Breadcrumb,
   BreadcrumbList,
@@ -112,4 +180,5 @@ export {
   BreadcrumbPage,
   BreadcrumbSeparator,
   BreadcrumbEllipsis,
+  AutoBreadcrumb,
 }
