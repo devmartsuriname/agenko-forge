@@ -89,8 +89,8 @@ const AdminTestHarness = lazy(() => import("./pages/admin/TestHarness"));
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <HelmetProvider>
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <GlobalIntegrations />
         <TooltipProvider>
@@ -333,8 +333,8 @@ const App = () => (
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>
-    </HelmetProvider>
-  </QueryClientProvider>
+    </QueryClientProvider>
+  </HelmetProvider>
 );
 
 export default App;
