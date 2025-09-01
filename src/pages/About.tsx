@@ -246,13 +246,13 @@ const About = () => {
                   Our Mission
                 </div>
                 <h2 className="text-4xl md:text-5xl font-bold text-agenko-white mb-6">
-                  Digital Agency With 25+ Years Experience
+                  Empowering Digital Transformation
                 </h2>
                 <p className="text-agenko-gray-light mb-6">
-                  We are a Digital Agency with over 25 years of experience, specializing in delivering cutting-edge digital solutions, including web design, marketing, and branding, to help businesses achieve sustainable growth and success.
+                  Our mission is to empower businesses across the Caribbean and globally with innovative digital solutions that drive meaningful growth and sustainable success in today's rapidly evolving digital landscape.
                 </p>
                 <p className="text-agenko-gray-light mb-8">
-                  Our experienced team combines creativity with technical expertise to create innovative digital experiences that drive results and exceed expectations.
+                  We believe in building long-term partnerships with our clients, combining cutting-edge technology with strategic thinking to deliver exceptional results that exceed expectations and create lasting impact.
                 </p>
                 <Link to="/services">
                   <Button variant="cta" size="lg">
