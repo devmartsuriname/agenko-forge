@@ -279,11 +279,13 @@ const About = () => {
             <p className="text-agenko-gray-light text-xl mb-8">
               Let's work together to create innovative solutions that drive your business forward.
             </p>
-            <Link to="/contact">
-              <Button variant="hero" size="lg" className="text-lg px-12 py-6">
-                Start Your Project
-              </Button>
-            </Link>
+            <div className="flex justify-center">
+              <Link to="/contact">
+                <Button variant="hero" size="lg" className="text-lg px-12 py-6 text-agenko-dark bg-agenko-green hover:bg-agenko-green-hover">
+                  Start Your Project
+                </Button>
+              </Link>
+            </div>
           </div>
         </section>
 
