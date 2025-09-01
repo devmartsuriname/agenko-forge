@@ -19,4 +19,35 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    // Performance optimizations
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor chunks for better caching
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-accordion', '@radix-ui/react-toast'],
+          utils: ['date-fns', 'clsx', 'tailwind-merge'],
+        },
+      },
+    },
+    // Optimize chunk size warnings
+    chunkSizeWarningLimit: 1000,
+    // Enable source maps for production debugging
+    sourcemap: mode === 'production' ? 'hidden' : true,
+  },
+  // Optimize dependencies
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      '@tanstack/react-query',
+      'lucide-react',
+    ],
+  },
+  // Add performance hints
+  define: {
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+  },
 }));

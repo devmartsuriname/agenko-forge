@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async';
+import { generateBreadcrumbStructuredData, generateWebsiteStructuredData } from './seo-advanced';
 
 interface SEOProps {
   title?: string;
@@ -13,6 +14,10 @@ interface SEOProps {
   tags?: string[];
   gscVerificationCode?: string;
   structuredData?: any;
+  breadcrumbs?: Array<{ name: string; url: string }>;
+  canonical?: string;
+  noindex?: boolean;
+  nofollow?: boolean;
 }
 
 export function SEOHead({
@@ -28,6 +33,10 @@ export function SEOHead({
   tags = [],
   gscVerificationCode,
   structuredData,
+  breadcrumbs,
+  canonical,
+  noindex = false,
+  nofollow = false,
 }: SEOProps) {
   const siteName = 'Devmart';
   const defaultDescription = 'Innovative technology solutions for Caribbean and global markets. A leading tech company specializing in cutting-edge digital solutions, AI innovation, and reliable technology services.';
@@ -36,9 +45,12 @@ export function SEOHead({
   const fullTitle = title ? `${title} | ${siteName}` : siteName;
   const seoDescription = description || defaultDescription;
   const seoKeywords = [...keywords, ...defaultKeywords].join(', ');
-  const currentUrl = url || typeof window !== 'undefined' ? window.location.href : '';
-  const seoImage = image || '/og-image.jpg'; // Default OG image
+  const currentUrl = url || canonical || (typeof window !== 'undefined' ? window.location.href : '');
+  const seoImage = image || '/og-image.jpg';
   const storageOrigin = 'https://dvgubqqjvmsepkilnkak.supabase.co';
+
+  // Robots meta tag
+  const robotsContent = `${noindex ? 'noindex' : 'index'}, ${nofollow ? 'nofollow' : 'follow'}`;
 
   // JSON-LD Schema
   const organizationSchema = {
@@ -71,6 +83,16 @@ export function SEOHead({
 
   const schemas: any[] = [organizationSchema];
 
+  // Add Website schema for homepage
+  if (type === 'website' && (!title || title.includes('Devmart'))) {
+    schemas.push(generateWebsiteStructuredData());
+  }
+
+  // Add Breadcrumb schema
+  if (breadcrumbs && breadcrumbs.length > 1) {
+    schemas.push(generateBreadcrumbStructuredData(breadcrumbs));
+  }
+
   // Add Article schema for blog posts
   if (type === 'article' && publishedAt) {
     schemas.push({
@@ -94,6 +116,10 @@ export function SEOHead({
       datePublished: publishedAt,
       dateModified: modifiedAt || publishedAt,
       keywords: tags.join(', '),
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': currentUrl,
+      },
     });
   }
 
@@ -122,7 +148,13 @@ export function SEOHead({
       
       {/* Viewport and Mobile */}
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <meta name="robots" content="index, follow" />
+      <meta name="robots" content={robotsContent} />
+      
+      {/* Performance hints */}
+      <meta name="theme-color" content="#A1FF4C" />
+      <meta name="msapplication-TileColor" content="#161A1E" />
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       
       {/* Google Search Console Verification */}
       {gscVerificationCode && (
@@ -137,6 +169,7 @@ export function SEOHead({
       <meta property="og:image" content={seoImage} />
       <meta property="og:image:alt" content={title || siteName} />
       <meta property="og:site_name" content={siteName} />
+      <meta property="og:locale" content="en_US" />
       
       {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />
@@ -158,14 +191,20 @@ export function SEOHead({
       )}
       
       {/* Canonical URL */}
-      <link rel="canonical" href={currentUrl} />
+      <link rel="canonical" href={canonical || currentUrl} />
       
-      {/* Preconnect to Storage for faster image loading */}
+      {/* Preconnect to external domains for better performance */}
       <link rel="preconnect" href={storageOrigin} crossOrigin="anonymous" />
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      
+      {/* DNS prefetch for external resources */}
+      <link rel="dns-prefetch" href={storageOrigin} />
+      <link rel="dns-prefetch" href="https://www.google-analytics.com" />
       
       {/* JSON-LD Schema */}
       {schemas.map((schema, index) => (
-        <script key={index} type="application/ld+json">
+        <script key={`schema-${index}`} type="application/ld+json">
           {JSON.stringify(schema)}
         </script>
       ))}
