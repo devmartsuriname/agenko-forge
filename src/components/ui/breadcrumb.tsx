@@ -135,7 +135,7 @@ const AutoBreadcrumb = () => {
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link to="/" className="text-agenko-gray-light hover:text-agenko-green flex items-center gap-1">
+            <Link to="/" className="text-muted-foreground hover:text-primary flex items-center gap-1">
               <Home className="h-4 w-4" />
               Home
             </Link>
@@ -147,17 +147,17 @@ const AutoBreadcrumb = () => {
 
           return (
             <React.Fragment key={to}>
-              <BreadcrumbSeparator className="text-agenko-gray" />
+              <BreadcrumbSeparator />
               <BreadcrumbItem>
                 {isLast ? (
-                  <BreadcrumbPage className="text-agenko-green">
+                  <BreadcrumbPage className="text-primary">
                     {getPageTitle(value)}
                   </BreadcrumbPage>
                 ) : (
                   <BreadcrumbLink asChild>
                     <Link 
                       to={to} 
-                      className="text-agenko-gray-light hover:text-agenko-green"
+                      className="text-muted-foreground hover:text-primary"
                     >
                       {getPageTitle(value)}
                     </Link>
