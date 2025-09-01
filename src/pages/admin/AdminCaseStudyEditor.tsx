@@ -7,14 +7,15 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { LoadingSkeleton } from '@/components/admin/LoadingSkeleton';
+import { LoadingListSkeleton } from '@/components/admin/LoadingSkeleton';
 import { SEOEditor } from '@/components/admin/SEOEditor';
-import { GalleryManager } from '@/components/admin/GalleryManager';
+// Remove the GalleryManager import since we're not using it
+// import { GalleryManager } from '@/components/admin/GalleryManager';
 import { TagInput } from '@/components/admin/TagInput';
 import { generateSlug, ensureUniqueSlug, formatDate, getStatusBadgeVariant } from '@/lib/admin-utils';
 import { adminToast } from '@/lib/toast-utils';
 import { SEOHead } from '@/lib/seo';
-import { ArrowLeft, ExternalLink, Save, Eye } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Save, Eye, Plus, X } from 'lucide-react';
 
 interface CaseStudy {
   id: string;
@@ -28,7 +29,7 @@ interface CaseStudy {
   hero_image: string;
   gallery: string[];
   body: string;
-  metrics: any[];
+  metrics: any;
   status: string;
   published_at: string | null;
   created_by: string;
@@ -172,7 +173,7 @@ export default function AdminCaseStudyEditor() {
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <LoadingSkeleton />
+        <LoadingListSkeleton />
       </div>
     );
   }
@@ -307,16 +308,16 @@ export default function AdminCaseStudyEditor() {
                 <div>
                   <label className="block text-sm font-medium mb-2">Services</label>
                   <TagInput
-                    value={caseStudy.services}
-                    onChange={(services) => setCaseStudy({ ...caseStudy, services })}
+                    tags={caseStudy.services}
+                    onTagsChange={(services) => setCaseStudy({ ...caseStudy, services })}
                     placeholder="Add service (press Enter)"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">Tech Stack</label>
                   <TagInput
-                    value={caseStudy.tech_stack}
-                    onChange={(tech_stack) => setCaseStudy({ ...caseStudy, tech_stack })}
+                    tags={caseStudy.tech_stack}
+                    onTagsChange={(tech_stack) => setCaseStudy({ ...caseStudy, tech_stack })}
                     placeholder="Add technology (press Enter)"
                   />
                 </div>
@@ -360,10 +361,42 @@ export default function AdminCaseStudyEditor() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">Gallery Images</label>
-                  <GalleryManager
-                    images={caseStudy.gallery}
-                    onChange={(gallery) => setCaseStudy({ ...caseStudy, gallery })}
-                  />
+                  <div className="space-y-2">
+                    {caseStudy.gallery.map((url, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <Input
+                          value={url}
+                          onChange={(e) => {
+                            const newGallery = [...caseStudy.gallery];
+                            newGallery[index] = e.target.value;
+                            setCaseStudy({ ...caseStudy, gallery: newGallery });
+                          }}
+                          placeholder="https://example.com/image.jpg"
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const newGallery = caseStudy.gallery.filter((_, i) => i !== index);
+                            setCaseStudy({ ...caseStudy, gallery: newGallery });
+                          }}
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                    ))}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setCaseStudy({ ...caseStudy, gallery: [...caseStudy.gallery, ''] });
+                      }}
+                      className="flex items-center gap-2"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add Image URL
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -427,7 +460,7 @@ export default function AdminCaseStudyEditor() {
                     rows={6}
                   />
                   <p className="text-xs text-muted-foreground mt-1">
-                    JSON format: [{"label": "Metric Name", "value": number, "unit": "string"}]
+                    JSON format: {`[{"label": "Metric Name", "value": number, "unit": "string"}]`}
                   </p>
                 </div>
               </CardContent>

@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { LoadingSkeleton } from '@/components/admin/LoadingSkeleton';
+import { LoadingListSkeleton } from '@/components/admin/LoadingSkeleton';
 import { TagInput } from '@/components/admin/TagInput';
 import { generateSlug, ensureUniqueSlug, formatDate, getStatusBadgeVariant } from '@/lib/admin-utils';
 import { adminToast } from '@/lib/toast-utils';
@@ -164,7 +164,7 @@ export default function AdminInnovationLabEditor() {
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <LoadingSkeleton />
+        <LoadingListSkeleton />
       </div>
     );
   }
@@ -325,8 +325,8 @@ export default function AdminInnovationLabEditor() {
                 <div>
                   <label className="block text-sm font-medium mb-2">Tags</label>
                   <TagInput
-                    value={project.tags}
-                    onChange={(tags) => setProject({ ...project, tags })}
+                    tags={project.tags}
+                    onTagsChange={(tags) => setProject({ ...project, tags })}
                     placeholder="Add tag (press Enter)"
                   />
                   <p className="text-xs text-muted-foreground mt-1">

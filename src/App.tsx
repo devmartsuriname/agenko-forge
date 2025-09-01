@@ -68,8 +68,11 @@ const AdminClients = lazy(() => import("./pages/admin/AdminClients"));
 const AdminBlogCategories = lazy(() => import("./pages/admin/AdminBlogCategories"));
 const AdminFAQ = lazy(() => import("./pages/admin/AdminFAQ"));
 const AdminCaseStudies = lazy(() => import("./pages/admin/AdminCaseStudies"));
+const AdminCaseStudyEditor = lazy(() => import("./pages/admin/AdminCaseStudyEditor"));
 const AdminInnovationLab = lazy(() => import("./pages/admin/AdminInnovationLab"));
+const AdminInnovationLabEditor = lazy(() => import("./pages/admin/AdminInnovationLabEditor"));
 const AdminCareers = lazy(() => import("./pages/admin/AdminCareers"));
+const AdminCareerEditor = lazy(() => import("./pages/admin/AdminCareerEditor"));
 const AdminTestHarness = lazy(() => import("./pages/admin/TestHarness"));
 
 const queryClient = new QueryClient();
@@ -218,14 +221,44 @@ const App = () => (
                     <AdminCaseStudies />
                   </Suspense>
                 } />
+                <Route path="case-studies/new" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminCaseStudyEditor />
+                  </Suspense>
+                } />
+                <Route path="case-studies/:id/edit" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminCaseStudyEditor />
+                  </Suspense>
+                } />
                 <Route path="innovation-lab" element={
                   <Suspense fallback={<Spinner />}>
                     <AdminInnovationLab />
                   </Suspense>
                 } />
+                <Route path="innovation-lab/new" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminInnovationLabEditor />
+                  </Suspense>
+                } />
+                <Route path="innovation-lab/:id/edit" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminInnovationLabEditor />
+                  </Suspense>
+                } />
                 <Route path="careers" element={
                   <Suspense fallback={<Spinner />}>
                     <AdminCareers />
+                  </Suspense>
+                } />
+                <Route path="careers/new" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminCareerEditor />
+                  </Suspense>
+                } />
+                <Route path="careers/:id/edit" element={
+                  <Suspense fallback={<Spinner />}>
+                    <AdminCareerEditor />
                   </Suspense>
                 } />
                 <Route path="clients" element={

@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { LoadingSkeleton } from '@/components/admin/LoadingSkeleton';
+import { LoadingListSkeleton } from '@/components/admin/LoadingSkeleton';
 import { generateSlug, ensureUniqueSlug, formatDate, getStatusBadgeVariant } from '@/lib/admin-utils';
 import { adminToast } from '@/lib/toast-utils';
 import { SEOHead } from '@/lib/seo';
@@ -198,7 +198,7 @@ export default function AdminCareerEditor() {
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <LoadingSkeleton />
+        <LoadingListSkeleton />
       </div>
     );
   }
