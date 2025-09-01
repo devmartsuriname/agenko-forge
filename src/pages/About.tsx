@@ -156,6 +156,9 @@ const About = () => {
               </div>
               
               <div>
+                <div className="inline-block px-4 py-2 bg-agenko-dark-lighter rounded-full text-agenko-green text-sm font-medium mb-6">
+                  About Us
+                </div>
                 <h2 className="text-3xl md:text-4xl font-bold text-agenko-white mb-6">
                   Digital Agency With 25+ Years Experience
                 </h2>
