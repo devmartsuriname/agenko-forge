@@ -9,6 +9,7 @@ import { Building, Zap, Palette, Target } from 'lucide-react';
 import heroImage from '@/assets/hero-image.jpg';
 import { Link } from 'react-router-dom';
 import { TimelineShowcase } from '@/components/ui/TimelineShowcase';
+import { TeamShowcase } from '@/components/about/TeamShowcase';
 
 const About = () => {
   const { data: aboutPage } = useQuery({
@@ -262,6 +263,9 @@ const About = () => {
             </Link>
           </div>
         </section>
+
+        {/* Team Showcase */}
+        <TeamShowcase />
 
         {/* Company Timeline */}
         <TimelineShowcase 

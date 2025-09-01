@@ -7,7 +7,9 @@ import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from '@/lib/auth';
 import { Suspense, lazy } from 'react';
 import { Spinner } from "@/components/ui/spinner";
-import { GlobalIntegrations } from "@/components/GlobalIntegrations";
+import { TrackingScripts } from '@/components/TrackingScripts';
+import { GlobalIntegrations } from '@/components/GlobalIntegrations';
+import { PWAInstallPrompt } from '@/components/ui/PWAInstallPrompt';
 import { CTAProvider } from "@/components/cta/CTAProvider";
 
 // Public pages
@@ -88,6 +90,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <CTAProvider>
+              <PWAInstallPrompt />
               <Routes>
               {/* Public Routes */}
               <Route path="/" element={<Index />} />

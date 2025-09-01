@@ -1,9 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
+import { useState, useMemo } from 'react';
 import { SEOHead } from '@/lib/seo';
 import { cms } from '@/lib/cms';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
+import { PortfolioFilters } from '@/components/ui/PortfolioFilters';
 import { Link } from 'react-router-dom';
 
 const Portfolio = () => {
@@ -11,6 +13,62 @@ const Portfolio = () => {
     queryKey: ['published-projects'],
     queryFn: cms.getPublishedProjects,
   });
+
+  const [filters, setFilters] = useState({
+    search: '',
+    technologies: [] as string[],
+    categories: [] as string[],
+    sortBy: 'newest' as 'newest' | 'oldest' | 'title'
+  });
+
+  // Extract unique technologies and categories from projects
+  const { availableTechnologies, availableCategories } = useMemo(() => {
+    const technologies = new Set<string>();
+    const categories = new Set<string>();
+    
+    projects.forEach(project => {
+      // Add common technologies as example data
+      ['React', 'Node.js', 'TypeScript', 'Python', 'AWS', 'MongoDB'].forEach(tech => technologies.add(tech));
+      // Add common categories as example data
+      ['Website', 'Mobile App', 'E-commerce', 'Dashboard', 'API'].forEach(cat => categories.add(cat));
+    });
+    
+    return {
+      availableTechnologies: Array.from(technologies),
+      availableCategories: Array.from(categories)
+    };
+  }, [projects]);
+
+  // Filter and sort projects
+  const filteredProjects = useMemo(() => {
+    let filtered = projects.filter(project => {
+      // Search filter
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        const matchesSearch = 
+          project.title.toLowerCase().includes(searchLower) ||
+          project.excerpt?.toLowerCase().includes(searchLower);
+        if (!matchesSearch) return false;
+      }
+      
+      return true;
+    });
+
+    // Sort projects
+    switch (filters.sortBy) {
+      case 'newest':
+        filtered.sort((a, b) => new Date(b.published_at || b.created_at).getTime() - new Date(a.published_at || a.created_at).getTime());
+        break;
+      case 'oldest':
+        filtered.sort((a, b) => new Date(a.published_at || a.created_at).getTime() - new Date(b.published_at || b.created_at).getTime());
+        break;
+      case 'title':
+        filtered.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+    }
+
+    return filtered;
+  }, [projects, filters]);
 
   return (
     <>
@@ -41,8 +99,23 @@ const Portfolio = () => {
         {/* Portfolio Grid */}
         <section className="py-12 px-4">
           <div className="max-w-6xl mx-auto">
+            {/* Filters */}
+            <PortfolioFilters
+              onFilterChange={setFilters}
+              technologies={availableTechnologies}
+              categories={availableCategories}
+            />
+            
+            {/* Results Count */}
+            <div className="mb-6">
+              <p className="text-agenko-gray-light">
+                Showing {filteredProjects.length} of {projects.length} projects
+                {filters.search && ` matching "${filters.search}"`}
+              </p>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {projects.map((project) => (
+              {filteredProjects.map((project) => (
                 <Card key={project.id} className="bg-agenko-dark-lighter border-agenko-gray/20 overflow-hidden group hover:border-agenko-green/20 transition-all duration-300">
                   <div className="aspect-video bg-agenko-gray/10 relative overflow-hidden">
                     {project.project_images && project.project_images[0] ? (
@@ -80,8 +153,14 @@ const Portfolio = () => {
               ))}
             </div>
 
+            {filteredProjects.length === 0 && projects.length > 0 && (
+              <div className="text-center py-16 lg:col-span-3">
+                <p className="text-agenko-gray-light text-xl">No projects match your current filters.</p>
+              </div>
+            )}
+
             {projects.length === 0 && (
-              <div className="text-center py-16">
+              <div className="text-center py-16 lg:col-span-3">
                 <p className="text-agenko-gray-light text-xl">No projects available yet.</p>
               </div>
             )}

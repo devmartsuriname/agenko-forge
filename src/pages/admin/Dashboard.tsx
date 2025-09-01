@@ -11,6 +11,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { useNavigate } from 'react-router-dom';
 import { PerformanceMonitor } from '@/components/admin/PerformanceMonitor';
+import { CTAAnalytics } from '@/components/admin/analytics/CTAAnalytics';
 
 interface DashboardStats {
   services: number;
@@ -288,6 +289,12 @@ export default function AdminDashboard() {
               </Card>
             );
           })}
+        </div>
+
+        {/* CTA Analytics */}
+        <div>
+          <h2 className="text-2xl font-bold text-foreground mb-4">CTA Analytics</h2>
+          <CTAAnalytics />
         </div>
 
         {/* Performance Monitor */}
