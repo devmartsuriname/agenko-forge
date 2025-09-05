@@ -1,8 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import Navigation from '@/components/Navigation';
-import Footer from '@/components/Footer';
 import { GlobalNavigation } from '@/components/GlobalNavigation';
+import Footer from '@/components/Footer';
 import { SEOHead } from '@/lib/seo';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -61,7 +60,7 @@ export function FAQ() {
   if (isLoading) {
     return (
       <>
-        <Navigation />
+        <GlobalNavigation overlay={false} />
         <main className="min-h-screen bg-background">
           <div className="container mx-auto px-4 py-16">
             <div className="text-center mb-12">
@@ -92,7 +91,7 @@ export function FAQ() {
   if (error) {
     return (
       <>
-        <Navigation />
+        <GlobalNavigation overlay={false} />
         <main className="min-h-screen bg-background">
           <div className="container mx-auto px-4 py-16 text-center">
             <h1 className="text-4xl font-bold mb-4">Error Loading FAQs</h1>

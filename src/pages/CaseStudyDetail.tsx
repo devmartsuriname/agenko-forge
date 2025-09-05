@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AutoBreadcrumb } from '@/components/ui/breadcrumb';
 import { supabase } from '@/integrations/supabase/client';
-import Navigation from '@/components/Navigation';
+import { GlobalNavigation } from '@/components/GlobalNavigation';
 import Footer from '@/components/Footer';
 import { CaseStudyStory } from '@/components/ui/CaseStudyStory';
 import { ExternalLink, ArrowRight } from 'lucide-react';
@@ -77,7 +77,7 @@ export default function CaseStudyDetail() {
   if (loading) {
     return (
       <div className="min-h-screen bg-agenko-dark">
-        <Navigation />
+        <GlobalNavigation overlay={false} />
         <main className="pt-20">
           <div className="container mx-auto px-4 py-16">
             <div className="animate-pulse space-y-8">
@@ -133,7 +133,7 @@ export default function CaseStudyDetail() {
         </script>
       </Helmet>
 
-      <Navigation />
+      <GlobalNavigation overlay={false} />
       
       {/* Breadcrumb */}
       <div className="container mx-auto px-4 pt-8">

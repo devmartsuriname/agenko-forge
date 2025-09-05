@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
-import Navigation from '@/components/Navigation';
+import { GlobalNavigation } from '@/components/GlobalNavigation';
 import Footer from '@/components/Footer';
 import { DemoShowcase } from '@/components/ui/DemoShowcase';
 import { ExternalLink, Github, Play, Star } from 'lucide-react';
@@ -65,7 +65,7 @@ export default function LabProjectDetail() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <GlobalNavigation overlay={false} />
         <main className="pt-20">
           <div className="container mx-auto px-4 py-16">
             <div className="animate-pulse space-y-8">
@@ -119,7 +119,7 @@ export default function LabProjectDetail() {
         </script>
       </Helmet>
 
-      <Navigation />
+      <GlobalNavigation overlay={false} />
       
       <main className="pt-20">
         {/* Hero Section */}

@@ -1,6 +1,5 @@
-import Navigation from '@/components/Navigation';
-import Footer from '@/components/Footer';
 import { GlobalNavigation } from '@/components/GlobalNavigation';
+import Footer from '@/components/Footer';
 
 const PrivacyPolicy = () => {
   return (

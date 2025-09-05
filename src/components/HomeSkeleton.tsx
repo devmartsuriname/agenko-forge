@@ -1,12 +1,12 @@
 import React from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import Navigation from '@/components/Navigation';
+import { GlobalNavigation } from '@/components/GlobalNavigation';
 import Footer from '@/components/Footer';
 
 export function HomeSkeleton() {
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <GlobalNavigation overlay={false} />
       
       {/* Hero Section Skeleton */}
       <section className="relative min-h-screen flex items-center justify-center px-4 pt-16">

@@ -1,9 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { SEOHead } from '@/lib/seo';
 import { cms } from '@/lib/cms';
-import Navigation from '@/components/Navigation';
-import Footer from '@/components/Footer';
 import { GlobalNavigation } from '@/components/GlobalNavigation';
+import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Building, Zap, Palette, Target } from 'lucide-react';

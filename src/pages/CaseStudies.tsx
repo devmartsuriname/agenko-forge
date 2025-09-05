@@ -6,9 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, TrendingUp } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
-import Navigation from '@/components/Navigation';
-import Footer from '@/components/Footer';
 import { GlobalNavigation } from '@/components/GlobalNavigation';
+import Footer from '@/components/Footer';
 import { AutoBreadcrumb } from '@/components/ui/breadcrumb';
 
 interface CaseStudy {

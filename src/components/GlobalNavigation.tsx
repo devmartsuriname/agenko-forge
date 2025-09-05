@@ -141,7 +141,7 @@ export function GlobalNavigation({ overlay = false }: GlobalNavigationProps) {
           </div>
           
           <div className="flex items-center space-x-3">
-            <Button asChild className="bg-white text-black hover:bg-white/90">
+            <Button variant="hero" asChild>
               <Link to="/get-quote">Get Started</Link>
             </Button>
           </div>
@@ -193,8 +193,8 @@ export function GlobalNavigation({ overlay = false }: GlobalNavigationProps) {
               <div className="pt-4">
                 <Button 
                   asChild 
-                  variant="outline" 
-                  className="w-full justify-start border-gray-700 text-white hover:bg-white/10"
+                  variant="hero" 
+                  className="w-full justify-start"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <Link to="/get-quote" className="flex items-center">

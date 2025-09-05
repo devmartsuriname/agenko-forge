@@ -7,9 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Search, Calendar, User, ArrowRight } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
-import Navigation from '@/components/Navigation';
-import Footer from '@/components/Footer';
 import { GlobalNavigation } from '@/components/GlobalNavigation';
+import Footer from '@/components/Footer';
 import { AutoBreadcrumb } from '@/components/ui/breadcrumb';
 
 interface BlogPost {

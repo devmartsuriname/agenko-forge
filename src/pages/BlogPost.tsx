@@ -2,7 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { SEOHead, generateMetaDescription } from '@/lib/seo';
 import { cms } from '@/lib/cms';
-import Navigation from '@/components/Navigation';
+import { GlobalNavigation } from '@/components/GlobalNavigation';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -104,7 +104,7 @@ const BlogPost = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-agenko-dark">
-        <Navigation />
+        <GlobalNavigation overlay={false} />
         <div className="pt-24 px-4">
           <div className="max-w-4xl mx-auto">
             <div className="animate-pulse">
@@ -123,7 +123,7 @@ const BlogPost = () => {
   if (!post) {
     return (
       <div className="min-h-screen bg-agenko-dark">
-        <Navigation />
+        <GlobalNavigation overlay={false} />
         <div className="pt-24 px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl font-bold text-agenko-white mb-4">Post Not Found</h1>
@@ -190,7 +190,7 @@ const BlogPost = () => {
       <ReadingProgress target="article" />
       
       <div className="min-h-screen bg-agenko-dark">
-        <Navigation />
+        <GlobalNavigation overlay={false} />
         
         {/* Breadcrumbs */}
         <div className="px-4 pt-24 pb-4">

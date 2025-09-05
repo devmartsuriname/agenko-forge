@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { SEOHead } from '@/lib/seo';
 import { cms } from '@/lib/cms';
 import { generateMetaDescription } from '@/lib/seo';
-import Navigation from '@/components/Navigation';
+import { GlobalNavigation } from '@/components/GlobalNavigation';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,7 +22,7 @@ const ServiceDetail = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-agenko-dark">
-        <Navigation />
+        <GlobalNavigation overlay={false} />
         <div className="pt-24 px-4">
           <div className="max-w-4xl mx-auto">
             <div className="animate-pulse">
@@ -41,7 +41,7 @@ const ServiceDetail = () => {
   if (!service) {
     return (
       <div className="min-h-screen bg-agenko-dark">
-        <Navigation />
+        <GlobalNavigation overlay={false} />
         <div className="pt-24 px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl font-bold text-agenko-white mb-4">Service Not Found</h1>
@@ -69,7 +69,7 @@ const ServiceDetail = () => {
       />
       
       <div className="min-h-screen bg-agenko-dark">
-        <Navigation />
+        <GlobalNavigation overlay={false} />
         
         {/* Breadcrumb */}
         <div className="container mx-auto px-4 pt-8">
