@@ -1,130 +1,196 @@
-import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { useState } from "react";
+import { ArrowRight, Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import type { HeroSection } from '@/lib/sections/schema';
-import { ResponsiveImage } from '@/components/ui/responsive-image';
-import { ScrollReveal } from '@/components/ui/ScrollReveal';
-import { FloatingElement } from '@/components/ui/FloatingElement';
-import { useScrollProgress } from '@/hooks/useScrollProgress';
-import { ProgressScrubbing } from '@/components/ui/ProgressScrubbing';
-import { cn } from '@/lib/utils';
+import logo from '@/assets/logo.png';
 
 interface HeroSectionProps {
   section: HeroSection;
 }
 
 export function HeroSectionComponent({ section }: HeroSectionProps) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data } = section;
-  const { progress, getParallaxTransform } = useScrollProgress();
+
+  // Use CMS data with fallbacks to new design defaults
+  const title = data.title || "Unbeatable Pricing for Dynamic Development Tools";
+  const subtitle = data.subtitle || "Join the revolution today!";
+  const description = data.description || "Delivering unmatched web solutions every day at unbeatable rates. Our tools redefine cost-effectiveness for modern businesses.";
+  const ctaText = data.ctaText || "Start Your 7 Day Free Trial";
+  const ctaLink = data.ctaLink || "/get-quote";
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center px-4 pt-16 gradient-overlay animated-bg overflow-hidden">
-      {/* Enhanced floating background elements */}
-      <FloatingElement className="absolute top-20 left-10 w-16 h-16 bg-primary/10 rounded-full blur-xl">
-        <div />
-      </FloatingElement>
-      <FloatingElement variant="delayed" className="absolute bottom-32 right-16 w-24 h-24 bg-primary/5 rounded-full blur-2xl">
-        <div />
-      </FloatingElement>
-      
-      {/* Enhanced parallax background */}
-      {data.backgroundImage && (
-        <div 
-          className="absolute inset-0 parallax-bg"
-          style={{
-            transform: getParallaxTransform('background'),
-          }}
-        >
-          <div className="w-full h-full aspect-[16/9] sm:aspect-[21/9] lg:aspect-[32/9]">
-            {typeof data.backgroundImage === 'string' ? (
-              <ResponsiveImage
-                src={data.backgroundImage}
-                alt="Hero background"
-                className="w-full h-full object-cover"
-                priority={true}
-                aspectRatio="var(--hero-aspect-ratio, 16 / 9)"
-                sizes="100vw"
-                loading="eager"
-                fetchPriority="high"
-              />
-            ) : (
-              <img
-                src={data.backgroundImage.src}
-                srcSet={data.backgroundImage.srcset}
-                sizes={data.backgroundImage.sizes}
-                alt={data.backgroundImage.alt || "Hero background"}
-                width={data.backgroundImage.width}
-                height={data.backgroundImage.height}
-                className="w-full h-full object-cover"
-                loading="eager"
-                fetchPriority="high"
-              />
-            )}
+    <div className="relative min-h-screen overflow-hidden bg-black">
+      {/* Gradient background with grain effect */}
+      <div className="flex flex-col items-end absolute -right-60 -top-10 blur-xl z-0 ">
+        <div className="h-[10rem] rounded-full w-[60rem] z-1 bg-gradient-to-b blur-[6rem] from-purple-600 to-sky-600"></div>
+        <div className="h-[10rem] rounded-full w-[90rem] z-1 bg-gradient-to-b blur-[6rem] from-pink-900 to-yellow-400"></div>
+        <div className="h-[10rem] rounded-full w-[60rem] z-1 bg-gradient-to-b blur-[6rem] from-yellow-600 to-sky-500"></div>
+      </div>
+      <div className="absolute inset-0 z-0 bg-noise opacity-30"></div>
+
+      {/* Content container */}
+      <div className="relative z-10">
+        {/* Navigation */}
+        <nav className="container mx-auto flex items-center justify-between px-4 py-4 mt-6">
+          <Link to="/" className="flex items-center">
+            <img src={logo} alt="Logo" className="h-8 w-8" />
+            <span className="ml-2 text-xl font-bold text-white">Devmart</span>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-6">
+            <div className="flex items-center space-x-6">
+              <NavItem label="Services" href="/services" />
+              <NavItem label="Portfolio" href="/portfolio" />
+              <NavItem label="About" href="/about" />
+              <NavItem label="Pricing" href="/pricing" />
+            </div>
+            <div className="flex items-center space-x-3">
+              <Button asChild className="bg-white text-black hover:bg-white/90">
+                <Link to="/contact">Get Started</Link>
+              </Button>
+            </div>
           </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-black/80" />
-        </div>
-      )}
-      
-      <div className="relative z-10 max-w-7xl mx-auto text-center">
-        <div className="max-w-4xl mx-auto">
-          {data.subtitle && (
-            <ScrollReveal direction="down" delay={0.2}>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-                <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-                <span className="text-primary text-sm font-medium">
-                  {data.subtitle}
-                </span>
+
+          {/* Mobile menu button */}
+          <button
+            className="md:hidden"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            <span className="sr-only">Toggle menu</span>
+            {mobileMenuOpen ? (
+              <X className="h-6 w-6 text-white" />
+            ) : (
+              <Menu className="h-6 w-6 text-white" />
+            )}
+          </button>
+        </nav>
+
+        {/* Mobile Navigation Menu with animation */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ y: "-100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "-100%" }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 z-50 flex flex-col p-4 bg-black/95 md:hidden"
+            >
+              <div className="flex items-center justify-between">
+                <Link to="/" className="flex items-center" onClick={() => setMobileMenuOpen(false)}>
+                  <img src={logo} alt="Logo" className="h-8 w-8" />
+                  <span className="ml-2 text-xl font-bold text-white">Devmart</span>
+                </Link>
+                <button onClick={() => setMobileMenuOpen(false)}>
+                  <X className="h-6 w-6 text-white" />
+                </button>
               </div>
-            </ScrollReveal>
-          )}
-          
-          <ScrollReveal direction="up" delay={0.4}>
-            <ProgressScrubbing intensity={0.3} direction="up">
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-                {data.title}
-              </h1>
-            </ProgressScrubbing>
-          </ScrollReveal>
-          
-          {data.description && (
-            <ScrollReveal direction="up" delay={0.6}>
-              <ProgressScrubbing intensity={0.2} direction="up">
-                <p className="text-xl md:text-2xl text-white/90 mb-8 leading-relaxed max-w-3xl mx-auto">
-                  {data.description}
-                </p>
-              </ProgressScrubbing>
-            </ScrollReveal>
-          )}
-          
-          {data.ctaText && data.ctaLink && (
-            <ScrollReveal direction="scale" delay={0.8}>
-              <div className="mb-16">
-                <Button 
-                  asChild 
-                  size="lg" 
-                  className={cn(
-                    "bg-primary hover:bg-primary/90 text-primary-foreground",
-                    "px-8 py-4 text-lg rounded-full",
-                    "transform hover:scale-105 transition-all duration-300",
-                    "shadow-lg hover:shadow-xl shadow-primary/25"
-                  )}
-                >
-                  <Link to={data.ctaLink}>
-                    {data.ctaText}
-                    <ArrowRight className="ml-2 h-5 w-5" />
+              <div className="mt-8 flex flex-col space-y-6">
+                <MobileNavItem label="Services" href="/services" onClick={() => setMobileMenuOpen(false)} />
+                <MobileNavItem label="Portfolio" href="/portfolio" onClick={() => setMobileMenuOpen(false)} />
+                <MobileNavItem label="About" href="/about" onClick={() => setMobileMenuOpen(false)} />
+                <MobileNavItem label="Pricing" href="/pricing" onClick={() => setMobileMenuOpen(false)} />
+                <div className="pt-4">
+                  <Button 
+                    asChild 
+                    variant="outline" 
+                    className="w-full justify-start border-gray-700 text-white hover:bg-white/10"
+                  >
+                    <Link to="/contact" onClick={() => setMobileMenuOpen(false)}>
+                      Contact Us
+                    </Link>
+                  </Button>
+                </div>
+                <Button asChild className="bg-white text-black hover:bg-white/90">
+                  <Link to="/get-quote" onClick={() => setMobileMenuOpen(false)}>
+                    Get Started For Free
                   </Link>
                 </Button>
               </div>
-            </ScrollReveal>
+            </motion.div>
           )}
-        </div>
-        
-        {data.stats && data.stats.length > 0 && (
-          <ScrollReveal direction="up" delay={1.0} stagger>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+        </AnimatePresence>
+
+        {/* Badge */}
+        {subtitle && (
+          <div className="mx-auto mt-6 flex max-w-fit items-center justify-center space-x-2 rounded-full bg-white/10 px-4 py-2 backdrop-blur-sm">
+            <span className="text-sm font-medium text-white">
+              {subtitle}
+            </span>
+            <ArrowRight className="h-4 w-4 text-white" />
+          </div>
+        )}
+
+        {/* Hero section */}
+        <div className="container mx-auto mt-12 px-4 text-center">
+          <h1 className="mx-auto max-w-4xl text-5xl font-bold leading-tight text-white md:text-6xl lg:text-7xl">
+            {title}
+          </h1>
+          {description && (
+            <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-300">
+              {description}
+            </p>
+          )}
+          <div className="mt-10 flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+            <Button asChild className="bg-white text-black hover:bg-white/90">
+              <Link to={ctaLink}>
+                {ctaText}
+              </Link>
+            </Button>
+            <Button 
+              asChild 
+              variant="outline" 
+              className="border-gray-600 text-white hover:bg-white/10"
+            >
+              <Link to="/portfolio">
+                View Our Work
+              </Link>
+            </Button>
+          </div>
+
+          {/* Hero Image Section */}
+          <div className="relative mx-auto my-20 w-full max-w-6xl">
+            <div className="absolute inset-0 rounded shadow-lg bg-white blur-[10rem] bg-grainy opacity-20" />
+
+            {/* Use CMS background image if available, otherwise show placeholder */}
+            {data.backgroundImage ? (
+              <div className="relative w-full h-auto">
+                {typeof data.backgroundImage === 'string' ? (
+                  <img
+                    src={data.backgroundImage}
+                    alt="Hero showcase"
+                    className="relative w-full h-auto shadow-md grayscale-100 rounded"
+                  />
+                ) : (
+                  <img
+                    src={data.backgroundImage.src}
+                    srcSet={data.backgroundImage.srcset}
+                    sizes={data.backgroundImage.sizes}
+                    alt={data.backgroundImage.alt || "Hero showcase"}
+                    width={data.backgroundImage.width}
+                    height={data.backgroundImage.height}
+                    className="relative w-full h-auto shadow-md grayscale-100 rounded"
+                  />
+                )}
+              </div>
+            ) : (
+              <img
+                src="https://kikxai.netlify.app/_next/image?url=%2Fassets%2Fhero-image.png&w=1920&q=75"
+                alt="Hero showcase"
+                className="relative w-full h-auto shadow-md grayscale-100 rounded"
+              />
+            )}
+          </div>
+
+          {/* Stats section if available from CMS */}
+          {data.stats && data.stats.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto mt-16">
               {data.stats.map((stat, index) => (
                 <div key={index} className="text-center transform hover:scale-105 transition-transform duration-300">
-                  <div className="text-3xl md:text-4xl font-bold text-primary mb-2 glow-green">
+                  <div className="text-3xl md:text-4xl font-bold text-primary mb-2">
                     {stat.number}
                   </div>
                   <div className="text-white/80 text-sm md:text-base">
@@ -133,9 +199,47 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
                 </div>
               ))}
             </div>
-          </ScrollReveal>
-        )}
+          )}
+        </div>
       </div>
-    </section>
+    </div>
+  );
+}
+
+function NavItem({
+  label,
+  href,
+}: {
+  label: string;
+  href: string;
+}) {
+  return (
+    <Link
+      to={href}
+      className="flex items-center text-sm text-gray-300 hover:text-white transition-colors"
+    >
+      <span>{label}</span>
+    </Link>
+  );
+}
+
+function MobileNavItem({ 
+  label, 
+  href, 
+  onClick 
+}: { 
+  label: string; 
+  href: string; 
+  onClick: () => void;
+}) {
+  return (
+    <Link
+      to={href}
+      onClick={onClick}
+      className="flex items-center justify-between border-b border-gray-800 pb-2 text-lg text-white"
+    >
+      <span>{label}</span>
+      <ArrowRight className="h-4 w-4 text-gray-400" />
+    </Link>
   );
 }
