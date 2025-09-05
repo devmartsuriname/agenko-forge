@@ -61,12 +61,7 @@ export function GlobalNavigation({ overlay = false }: GlobalNavigationProps) {
 
   return (
     <div className={`relative ${overlay ? 'absolute inset-x-0 top-0 z-20' : 'relative z-10'}`}>
-      {/* Background for non-overlay mode */}
-      {!overlay && (
-        <div className="absolute inset-0 bg-black">
-          <div className="absolute inset-0 bg-noise opacity-30"></div>
-        </div>
-      )}
+      {/* Transparent background for non-overlay mode */}
 
       {/* Gradient background for overlay mode */}
       {overlay && (
@@ -84,7 +79,6 @@ export function GlobalNavigation({ overlay = false }: GlobalNavigationProps) {
       <nav className="container mx-auto flex items-center justify-between px-4 py-4 mt-6 relative z-10">
         <Link to="/" className="flex items-center">
           <img src={logo} alt="Devmart Logo" className="h-8 w-auto object-contain" />
-          {!overlay && <span className="ml-2 text-xl font-bold text-white">Devmart</span>}
         </Link>
 
         {/* Desktop Navigation */}
@@ -174,7 +168,6 @@ export function GlobalNavigation({ overlay = false }: GlobalNavigationProps) {
             <div className="flex items-center justify-between">
               <Link to="/" className="flex items-center" onClick={() => setMobileMenuOpen(false)}>
                 <img src={logo} alt="Devmart Logo" className="h-8 w-auto object-contain" />
-                {!overlay && <span className="ml-2 text-xl font-bold text-white">Devmart</span>}
               </Link>
               <button onClick={() => setMobileMenuOpen(false)}>
                 <X className="h-6 w-6 text-white" />
