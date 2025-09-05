@@ -358,12 +358,91 @@ export const cms = {
       throw error;
     }
     
-    console.log('✅ [CMS] Pages fetched successfully:', {
-      count: data?.length || 0,
-      pages: (data || []).map(p => ({ slug: p.slug, title: p.title, hasBody: !!p.body }))
+    console.log('✅ [CMS] Raw pages data from DB:', data);
+    
+    // Process pages and ensure body field is properly parsed
+    const processedPages = (data || []).map(page => {
+      let processedBody: any = page.body;
+      
+      console.log('🔍 [CMS] Processing page body for:', page.slug, {
+        bodyType: typeof page.body,
+        bodyValue: page.body,
+        isNull: page.body === null,
+        isString: typeof page.body === 'string'
+      });
+      
+      // If body is a string, try to parse it as JSON
+      if (typeof page.body === 'string') {
+        try {
+          processedBody = JSON.parse(page.body);
+          console.log('🔄 [CMS] Parsed string body for page:', page.slug);
+        } catch (e) {
+          console.warn('⚠️ [CMS] Failed to parse body JSON for page:', page.slug, e);
+          processedBody = null;
+        }
+      }
+      
+      // Handle special case where body might be wrapped in extra structure
+      if (processedBody && typeof processedBody === 'object' && !Array.isArray(processedBody)) {
+        const bodyObj = processedBody as Record<string, any>;
+        
+        // Check if body has a _type and value structure (PostgreSQL JSON artifact)
+        if (bodyObj._type === 'undefined' && bodyObj.value === 'undefined') {
+          console.warn('⚠️ [CMS] Found undefined body structure for page:', page.slug);
+          processedBody = null;
+        }
+        // If body is wrapped in a value property, unwrap it
+        else if (bodyObj.value && typeof bodyObj.value === 'object') {
+          processedBody = bodyObj.value;
+          console.log('🔄 [CMS] Unwrapped body.value for page:', page.slug);
+        }
+      }
+      
+      const finalPage = {
+        ...page,
+        body: processedBody
+      };
+      
+      const sectionsCount = (processedBody && 
+                           typeof processedBody === 'object' && 
+                           !Array.isArray(processedBody) && 
+                           processedBody.sections && 
+                           Array.isArray(processedBody.sections)) ? 
+                           processedBody.sections.length : 0;
+      
+      console.log('📄 [CMS] Processed page:', {
+        slug: page.slug,
+        title: page.title,
+        hasBody: !!processedBody,
+        bodyType: typeof processedBody,
+        hasSections: sectionsCount > 0,
+        sectionsCount,
+        rawBodyType: typeof page.body,
+        bodyPreview: processedBody ? JSON.stringify(processedBody).substring(0, 200) + '...' : 'null'
+      });
+      
+      return finalPage;
     });
     
-    return (data || []) as Page[];
+    console.log('✅ [CMS] Pages processed successfully:', {
+      count: processedPages.length,
+      pages: processedPages.map(p => {
+        const sectionsCount = (p.body && 
+                             typeof p.body === 'object' && 
+                             !Array.isArray(p.body) && 
+                             p.body.sections && 
+                             Array.isArray(p.body.sections)) ? 
+                             p.body.sections.length : 0;
+        return { 
+          slug: p.slug, 
+          title: p.title, 
+          hasBody: !!p.body,
+          sectionsCount
+        };
+      })
+    });
+    
+    return processedPages as Page[];
   },
 
   // Get published blog categories
