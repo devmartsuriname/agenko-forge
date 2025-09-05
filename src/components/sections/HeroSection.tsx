@@ -18,90 +18,109 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
   const ctaLink = data.ctaLink || "/get-quote";
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-agenko-dark">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-agenko-dark via-agenko-dark/95 to-black">
+      {/* Background Pattern */}
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-noise opacity-30"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+      </div>
+
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-10 -left-10 w-72 h-72 bg-agenko-green/5 rounded-full blur-3xl floating-element"></div>
+        <div className="absolute top-1/3 -right-20 w-96 h-96 bg-primary/3 rounded-full blur-3xl floating-element-delayed"></div>
+        <div className="absolute -bottom-20 left-1/3 w-80 h-80 bg-agenko-green/5 rounded-full blur-3xl floating-element"></div>
+      </div>
+
       {/* Content container */}
       <div className="relative z-20">
-
         {/* Badge */}
         {subtitle && (
-          <div className="mx-auto mt-6 flex max-w-fit items-center justify-center space-x-2 rounded-full bg-white/10 px-4 py-2 backdrop-blur-sm">
-            <span className="text-sm font-medium text-white">
-              {subtitle}
-            </span>
-            <ArrowRight className="h-4 w-4 text-white" />
+          <div className="flex justify-center pt-24 pb-8">
+            <div className="flex max-w-fit items-center justify-center space-x-2 rounded-full bg-white/10 px-6 py-3 backdrop-blur-sm border border-white/20">
+              <span className="text-sm font-medium text-white">
+                {subtitle}
+              </span>
+              <ArrowRight className="h-4 w-4 text-white" />
+            </div>
           </div>
         )}
 
         {/* Hero section */}
-        <div className="container mx-auto mt-12 px-4 text-center">
-          <h1 className="mx-auto max-w-4xl text-5xl font-bold leading-tight text-white md:text-6xl lg:text-7xl">
-            {title}
-          </h1>
-          {description && (
-            <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-300">
-              {description}
-            </p>
-          )}
-          <div className="mt-10 flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-            <Button asChild className="bg-agenko-green text-agenko-dark hover:bg-agenko-green/90 font-semibold">
-              <Link to={ctaLink}>
-                {ctaText}
-              </Link>
-            </Button>
-            <Button 
-              asChild 
-              variant="outline" 
-              className="border-agenko-green text-agenko-green hover:bg-agenko-green/10"
-            >
-              <Link to="/portfolio">
-                View Our Work
-              </Link>
-            </Button>
+        <div className="container mx-auto px-6 text-center">
+          <div className="max-w-5xl mx-auto">
+            <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold leading-tight text-white mb-8">
+              {title}
+            </h1>
+            {description && (
+              <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
+                {description}
+              </p>
+            )}
+            <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-6 sm:space-y-0 mb-20">
+              <Button asChild className="bg-agenko-green text-agenko-dark hover:bg-agenko-green/90 font-semibold px-8 py-4 text-lg">
+                <Link to={ctaLink}>
+                  {ctaText}
+                </Link>
+              </Button>
+              <Button 
+                asChild 
+                variant="outline" 
+                className="border-agenko-green text-agenko-green hover:bg-agenko-green/10 px-8 py-4 text-lg"
+              >
+                <Link to="/portfolio">
+                  View Our Work
+                </Link>
+              </Button>
+            </div>
           </div>
 
           {/* Hero Image Section */}
-          <div className="relative mx-auto my-20 w-full max-w-6xl">
-            <div className="absolute inset-0 rounded shadow-lg bg-white blur-[10rem] bg-grainy opacity-20" />
-
-            {/* Use CMS background image if available, otherwise show placeholder */}
-            {data.backgroundImage ? (
-              <div className="relative w-full h-auto">
-                {typeof data.backgroundImage === 'string' ? (
-                  <img
-                    src={data.backgroundImage}
-                    alt="Hero showcase"
-                    className="relative w-full h-auto shadow-md grayscale-100 rounded"
-                  />
-                ) : (
-                  <img
-                    src={data.backgroundImage.src}
-                    srcSet={data.backgroundImage.srcset}
-                    sizes={data.backgroundImage.sizes}
-                    alt={data.backgroundImage.alt || "Hero showcase"}
-                    width={data.backgroundImage.width}
-                    height={data.backgroundImage.height}
-                    className="relative w-full h-auto shadow-md grayscale-100 rounded"
-                  />
-                )}
-              </div>
-            ) : (
-              <img
-                src="https://kikxai.netlify.app/_next/image?url=%2Fassets%2Fhero-image.png&w=1920&q=75"
-                alt="Hero showcase"
-                className="relative w-full h-auto shadow-md grayscale-100 rounded"
-              />
-            )}
+          <div className="relative mx-auto mb-24 w-full max-w-7xl px-4">
+            {/* Glow effect behind image */}
+            <div className="absolute inset-0 bg-gradient-to-r from-agenko-green/20 via-primary/20 to-agenko-green/20 blur-3xl scale-110 opacity-50"></div>
+            
+            {/* Image container */}
+            <div className="relative">
+              {data.backgroundImage ? (
+                <div className="relative w-full h-auto">
+                  {typeof data.backgroundImage === 'string' ? (
+                    <img
+                      src={data.backgroundImage}
+                      alt="Hero showcase"
+                      className="relative w-full h-auto shadow-2xl rounded-lg border border-white/10"
+                    />
+                  ) : (
+                    <img
+                      src={data.backgroundImage.src}
+                      srcSet={data.backgroundImage.srcset}
+                      sizes={data.backgroundImage.sizes}
+                      alt={data.backgroundImage.alt || "Hero showcase"}
+                      width={data.backgroundImage.width}
+                      height={data.backgroundImage.height}
+                      className="relative w-full h-auto shadow-2xl rounded-lg border border-white/10"
+                    />
+                  )}
+                </div>
+              ) : (
+                <img
+                  src="https://kikxai.netlify.app/_next/image?url=%2Fassets%2Fhero-image.png&w=1920&q=75"
+                  alt="Hero showcase"
+                  className="relative w-full h-auto shadow-2xl rounded-lg border border-white/10"
+                />
+              )}
+            </div>
           </div>
 
           {/* Stats section if available from CMS */}
           {data.stats && data.stats.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto mt-16">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto pb-20">
               {data.stats.map((stat, index) => (
                 <div key={index} className="text-center transform hover:scale-105 transition-transform duration-300">
-                  <div className="text-3xl md:text-4xl font-bold text-primary mb-2">
+                  <div className="text-4xl md:text-5xl font-bold text-agenko-green mb-3">
                     {stat.number}
                   </div>
-                  <div className="text-white/80 text-sm md:text-base">
+                  <div className="text-white/80 text-base md:text-lg">
                     {stat.label}
                   </div>
                 </div>
