@@ -2,7 +2,6 @@ import { ArrowRight } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import type { HeroSection } from '@/lib/sections/schema';
-import { GlobalNavigation } from '@/components/GlobalNavigation';
 
 interface HeroSectionProps {
   section: HeroSection;
@@ -22,8 +21,6 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
     <div className="relative min-h-screen overflow-hidden bg-agenko-dark">
       {/* Content container */}
       <div className="relative z-10">
-        {/* Global Navigation with overlay style */}
-        <GlobalNavigation overlay={true} />
 
         {/* Badge */}
         {subtitle && (

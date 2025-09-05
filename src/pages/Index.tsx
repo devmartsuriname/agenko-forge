@@ -102,8 +102,7 @@ const Index = () => {
           keywords={['technology', 'software development', 'web development', 'digital solutions']}
         />
         <div className="min-h-screen bg-background">
-          {/* Only show GlobalNavigation if first section is not hero (hero handles its own nav) */}
-          {sections[0]?.type !== 'hero' && <GlobalNavigation overlay={false} />}
+          <GlobalNavigation overlay={sections[0]?.type === 'hero'} />
           <main id="main-content" className={sections[0]?.type !== 'hero' ? 'pt-16' : ''}>
             <SectionRenderer sections={sections} context="home" />
           </main>
