@@ -128,14 +128,14 @@ const App = () => (
               
               {/* Admin Routes */}
               <Route path="/admin/login" element={
-                <Suspense fallback={<Spinner />}>
+                <SuspenseWithTimeout fallback={<Spinner />}>
                   <AdminLogin />
-                </Suspense>
+                </SuspenseWithTimeout>
               } />
               <Route path="/admin/register" element={
-                <Suspense fallback={<Spinner />}>
+                <SuspenseWithTimeout fallback={<Spinner />}>
                   <AdminRegister />
-                </Suspense>
+                </SuspenseWithTimeout>
               } />
               <Route path="/admin" element={
                 <AdminErrorBoundary>
@@ -143,34 +143,34 @@ const App = () => (
                 </AdminErrorBoundary>
               }>
                 <Route index element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminDashboard />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="pages" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminPages />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="pages/new" element={
-                  <Suspense fallback={
+                  <SuspenseWithTimeout fallback={
                     <div>
                       <div style={{ display: 'none' }}>Loading AdminPageEditor...</div>
                       <Spinner />
                     </div>
                   }>
                     <AdminPageEditor />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="pages/:id/edit" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminPageEditor />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="services" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminServices />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="services/new" element={
                   <SuspenseWithTimeout fallback={<Spinner />}>
@@ -183,49 +183,49 @@ const App = () => (
                   </SuspenseWithTimeout>
                 } />
                 <Route path="projects" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminProjects />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="projects/new" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminProjectEditor />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="projects/:id/edit" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminProjectEditor />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="blog" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminBlog />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="blog/new" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminBlogEditor />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="blog/edit/:id" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminBlogEditor />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="blog/categories" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminBlogCategories />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="faq" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminFAQ />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="case-studies" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminCaseStudies />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="case-studies/new" element={
                   <SuspenseWithTimeout fallback={<Spinner />}>
@@ -238,79 +238,79 @@ const App = () => (
                   </SuspenseWithTimeout>
                 } />
                 <Route path="innovation-lab" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminInnovationLab />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="innovation-lab/new" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminInnovationLabEditor />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="innovation-lab/:id/edit" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminInnovationLabEditor />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="careers" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminCareers />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="careers/new" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminCareerEditor />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="careers/:id/edit" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminCareerEditor />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="clients" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminClients />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="media" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminMedia />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="contact" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <ContactSubmissions />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="settings" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <Settings />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="users" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <Users />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="quotes" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminQuotes />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="payments" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminPayments />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="proposals" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminProposals />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
                 <Route path="test-harness" element={
-                  <Suspense fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminTestHarness />
-                  </Suspense>
+                  </SuspenseWithTimeout>
                 } />
               </Route>
               
