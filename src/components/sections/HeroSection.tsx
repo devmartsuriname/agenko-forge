@@ -18,18 +18,18 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
   const ctaLink = data.ctaLink || "/get-quote";
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-agenko-dark via-agenko-dark/95 to-black">
+    <div className="relative min-h-screen overflow-x-hidden overflow-y-auto bg-gradient-to-br from-agenko-dark via-agenko-dark/95 to-black">
       {/* Background Pattern */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-noise opacity-30"></div>
+        <div className="absolute inset-0 bg-noise opacity-60"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
       </div>
 
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-10 -left-10 w-72 h-72 bg-agenko-green/5 rounded-full blur-3xl floating-element"></div>
-        <div className="absolute top-1/3 -right-20 w-96 h-96 bg-primary/3 rounded-full blur-3xl floating-element-delayed"></div>
-        <div className="absolute -bottom-20 left-1/3 w-80 h-80 bg-agenko-green/5 rounded-full blur-3xl floating-element"></div>
+        <div className="absolute top-10 left-10 w-72 h-72 bg-agenko-green/5 rounded-full blur-3xl floating-element"></div>
+        <div className="absolute top-1/3 right-10 w-96 h-96 bg-primary/3 rounded-full blur-3xl floating-element-delayed"></div>
+        <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-agenko-green/5 rounded-full blur-3xl floating-element"></div>
       </div>
 
       {/* Content container */}
