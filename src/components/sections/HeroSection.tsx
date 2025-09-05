@@ -19,15 +19,7 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
   const ctaLink = data.ctaLink || "/get-quote";
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-black">
-      {/* Gradient background with grain effect */}
-      <div className="flex flex-col items-end absolute -right-60 -top-10 blur-xl z-0 ">
-        <div className="h-[10rem] rounded-full w-[60rem] z-1 bg-gradient-to-b blur-[6rem] from-purple-600 to-sky-600"></div>
-        <div className="h-[10rem] rounded-full w-[90rem] z-1 bg-gradient-to-b blur-[6rem] from-pink-900 to-yellow-400"></div>
-        <div className="h-[10rem] rounded-full w-[60rem] z-1 bg-gradient-to-b blur-[6rem] from-yellow-600 to-sky-500"></div>
-      </div>
-      <div className="absolute inset-0 z-0 bg-noise opacity-30"></div>
-
+    <div className="relative min-h-screen overflow-hidden bg-agenko-dark">
       {/* Content container */}
       <div className="relative z-10">
         {/* Global Navigation with overlay style */}
@@ -54,7 +46,7 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
             </p>
           )}
           <div className="mt-10 flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-            <Button asChild className="bg-white text-black hover:bg-white/90">
+            <Button asChild className="bg-agenko-green text-agenko-dark hover:bg-agenko-green/90 font-semibold">
               <Link to={ctaLink}>
                 {ctaText}
               </Link>
@@ -62,7 +54,7 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
             <Button 
               asChild 
               variant="outline" 
-              className="border-gray-600 text-white hover:bg-white/10"
+              className="border-agenko-green text-agenko-green hover:bg-agenko-green/10"
             >
               <Link to="/portfolio">
                 View Our Work
