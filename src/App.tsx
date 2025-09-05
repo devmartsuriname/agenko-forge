@@ -79,6 +79,7 @@ const AdminCareers = lazy(() => import("./pages/admin/AdminCareers"));
 const AdminCareerEditor = lazy(() => import("./pages/admin/AdminCareerEditor"));
 const AdminTestHarness = lazy(() => import("./pages/admin/TestHarness"));
 const ErrorBoundaryTest = lazy(() => import("./components/admin/ErrorBoundaryTest"));
+const PerformanceValidator = lazy(() => import("./components/admin/PerformanceValidator"));
 
 const queryClient = new QueryClient();
 
@@ -316,6 +317,11 @@ const App = () => (
                 <Route path="error-boundary-test" element={
                   <SuspenseWithTimeout fallback={<Spinner />}>
                     <ErrorBoundaryTest />
+                  </SuspenseWithTimeout>
+                } />
+                <Route path="performance-validator" element={
+                  <SuspenseWithTimeout fallback={<Spinner />}>
+                    <PerformanceValidator />
                   </SuspenseWithTimeout>
                 } />
               </Route>

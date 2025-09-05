@@ -41,25 +41,28 @@ export function initializeProductionOptimizations() {
 
 function preloadCriticalAssets() {
   // Only preload assets that actually exist
-  const heroImages = [
-    // Fix asset path to match actual location
+  const assets = [
+    // Use correct paths for assets
     '/src/assets/hero-image.jpg',
+    '/src/assets/logo.png'
   ];
   
-  heroImages.forEach(src => {
-    // Check if asset exists before preloading
-    const img = new Image();
-    img.onload = () => {
-      const link = document.createElement('link');
-      link.rel = 'preload';
-      link.as = 'image';
-      link.href = src;
-      document.head.appendChild(link);
-    };
-    img.onerror = () => {
-      console.warn(`Asset not found for preloading: ${src}`);
-    };
-    img.src = src;
+  assets.forEach(src => {
+    // Check if asset exists before preloading to avoid 404s
+    fetch(src, { method: 'HEAD' })
+      .then(response => {
+        if (response.ok) {
+          const link = document.createElement('link');
+          link.rel = 'preload';
+          link.as = 'image';
+          link.href = src;
+          document.head.appendChild(link);
+        }
+      })
+      .catch(() => {
+        // Silently fail for missing assets to avoid console spam
+        console.warn(`Asset not available for preloading: ${src}`);
+      });
   });
 }
 
