@@ -20,7 +20,7 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
   return (
     <div className="relative min-h-screen overflow-x-hidden overflow-y-auto bg-gradient-to-br from-agenko-dark via-agenko-dark/95 to-black">
       {/* Noise Pattern - Overlay on Background */}
-      <div className="absolute inset-0 z-5 bg-noise opacity-40"></div>
+      <div className="absolute inset-0 z-10 bg-grainy opacity-40"></div>
       
       {/* Reduced Opacity Background Pattern */}
       <div className="absolute inset-0">
