@@ -105,7 +105,7 @@ export function GlobalNavigation({ overlay = false }: GlobalNavigationProps) {
                 <span>Solutions</span>
                 <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-black/95 border-gray-700 backdrop-blur-sm">
+              <DropdownMenuContent className="bg-agenko-dark/95 border-agenko-green/20 backdrop-blur-sm">
                 {solutionsItems.map((item) => (
                   <DropdownMenuItem key={item.href} asChild>
                     <Link 
@@ -125,7 +125,7 @@ export function GlobalNavigation({ overlay = false }: GlobalNavigationProps) {
                 <span>Company</span>
                 <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-black/95 border-gray-700 backdrop-blur-sm">
+              <DropdownMenuContent className="bg-agenko-dark/95 border-agenko-green/20 backdrop-blur-sm">
                 {companyItems.map((item) => (
                   <DropdownMenuItem key={item.href} asChild>
                     <Link 
