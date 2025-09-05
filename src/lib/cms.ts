@@ -345,13 +345,24 @@ export const cms = {
 
   // Contact Submissions
   async getPublishedPages(): Promise<Page[]> {
+    console.log('📚 [CMS] Fetching published pages...');
+    
     const { data, error } = await supabase
       .from('pages')
       .select('*')
       .eq('status', 'published')
       .order('published_at', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ [CMS] Error fetching pages:', error);
+      throw error;
+    }
+    
+    console.log('✅ [CMS] Pages fetched successfully:', {
+      count: data?.length || 0,
+      pages: (data || []).map(p => ({ slug: p.slug, title: p.title, hasBody: !!p.body }))
+    });
+    
     return (data || []) as Page[];
   },
 
