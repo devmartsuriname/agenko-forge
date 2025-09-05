@@ -142,8 +142,9 @@ export default function HomePage() {
         keywords={['technology', 'software development', 'web development', 'digital solutions']}
       />
       <div className="min-h-screen bg-background">
-        <Navigation />
-        <main className="pt-16">
+        {/* Only show Navigation if first section is not hero (hero handles its own nav) */}
+        {(sections.length === 0 || sections[0]?.type !== 'hero') && <Navigation />}
+        <main className={(sections.length === 0 || sections[0]?.type !== 'hero') ? 'pt-16' : ''}>
           {sections.length > 0 ? (
             <SectionRenderer sections={sections} context="home" />
           ) : (

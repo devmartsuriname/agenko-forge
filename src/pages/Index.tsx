@@ -102,8 +102,9 @@ const Index = () => {
           keywords={['technology', 'software development', 'web development', 'digital solutions']}
         />
         <div className="min-h-screen bg-background">
-          <Navigation />
-          <main id="main-content" className="pt-16">
+          {/* Only show Navigation if first section is not hero (hero handles its own nav) */}
+          {sections[0]?.type !== 'hero' && <Navigation />}
+          <main id="main-content" className={sections[0]?.type !== 'hero' ? 'pt-16' : ''}>
             <SectionRenderer sections={sections} context="home" />
           </main>
           <Footer />
