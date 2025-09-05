@@ -1,17 +1,14 @@
-import { useState } from "react";
-import { ArrowRight, Menu, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import type { HeroSection } from '@/lib/sections/schema';
-import logo from '@/assets/logo.png';
+import { GlobalNavigation } from '@/components/GlobalNavigation';
 
 interface HeroSectionProps {
   section: HeroSection;
 }
 
 export function HeroSectionComponent({ section }: HeroSectionProps) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data } = section;
 
   // Use CMS data with fallbacks to new design defaults
@@ -33,86 +30,8 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
 
       {/* Content container */}
       <div className="relative z-10">
-        {/* Navigation */}
-        <nav className="container mx-auto flex items-center justify-between px-4 py-4 mt-6">
-          <Link to="/" className="flex items-center">
-            <img src={logo} alt="Logo" className="h-8 w-8" />
-            <span className="ml-2 text-xl font-bold text-white">Devmart</span>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
-            <div className="flex items-center space-x-6">
-              <NavItem label="Services" href="/services" />
-              <NavItem label="Portfolio" href="/portfolio" />
-              <NavItem label="About" href="/about" />
-              <NavItem label="Pricing" href="/pricing" />
-            </div>
-            <div className="flex items-center space-x-3">
-              <Button asChild className="bg-white text-black hover:bg-white/90">
-                <Link to="/contact">Get Started</Link>
-              </Button>
-            </div>
-          </div>
-
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            <span className="sr-only">Toggle menu</span>
-            {mobileMenuOpen ? (
-              <X className="h-6 w-6 text-white" />
-            ) : (
-              <Menu className="h-6 w-6 text-white" />
-            )}
-          </button>
-        </nav>
-
-        {/* Mobile Navigation Menu with animation */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ y: "-100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "-100%" }}
-              transition={{ duration: 0.3 }}
-              className="fixed inset-0 z-50 flex flex-col p-4 bg-black/95 md:hidden"
-            >
-              <div className="flex items-center justify-between">
-                <Link to="/" className="flex items-center" onClick={() => setMobileMenuOpen(false)}>
-                  <img src={logo} alt="Logo" className="h-8 w-8" />
-                  <span className="ml-2 text-xl font-bold text-white">Devmart</span>
-                </Link>
-                <button onClick={() => setMobileMenuOpen(false)}>
-                  <X className="h-6 w-6 text-white" />
-                </button>
-              </div>
-              <div className="mt-8 flex flex-col space-y-6">
-                <MobileNavItem label="Services" href="/services" onClick={() => setMobileMenuOpen(false)} />
-                <MobileNavItem label="Portfolio" href="/portfolio" onClick={() => setMobileMenuOpen(false)} />
-                <MobileNavItem label="About" href="/about" onClick={() => setMobileMenuOpen(false)} />
-                <MobileNavItem label="Pricing" href="/pricing" onClick={() => setMobileMenuOpen(false)} />
-                <div className="pt-4">
-                  <Button 
-                    asChild 
-                    variant="outline" 
-                    className="w-full justify-start border-gray-700 text-white hover:bg-white/10"
-                  >
-                    <Link to="/contact" onClick={() => setMobileMenuOpen(false)}>
-                      Contact Us
-                    </Link>
-                  </Button>
-                </div>
-                <Button asChild className="bg-white text-black hover:bg-white/90">
-                  <Link to="/get-quote" onClick={() => setMobileMenuOpen(false)}>
-                    Get Started For Free
-                  </Link>
-                </Button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Global Navigation with overlay style */}
+        <GlobalNavigation overlay={true} />
 
         {/* Badge */}
         {subtitle && (
@@ -203,43 +122,5 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
         </div>
       </div>
     </div>
-  );
-}
-
-function NavItem({
-  label,
-  href,
-}: {
-  label: string;
-  href: string;
-}) {
-  return (
-    <Link
-      to={href}
-      className="flex items-center text-sm text-gray-300 hover:text-white transition-colors"
-    >
-      <span>{label}</span>
-    </Link>
-  );
-}
-
-function MobileNavItem({ 
-  label, 
-  href, 
-  onClick 
-}: { 
-  label: string; 
-  href: string; 
-  onClick: () => void;
-}) {
-  return (
-    <Link
-      to={href}
-      onClick={onClick}
-      className="flex items-center justify-between border-b border-gray-800 pb-2 text-lg text-white"
-    >
-      <span>{label}</span>
-      <ArrowRight className="h-4 w-4 text-gray-400" />
-    </Link>
   );
 }

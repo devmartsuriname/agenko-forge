@@ -8,6 +8,7 @@ import { ArrowRight, TrendingUp } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import { GlobalNavigation } from '@/components/GlobalNavigation';
 import { AutoBreadcrumb } from '@/components/ui/breadcrumb';
 
 interface CaseStudy {
@@ -73,7 +74,7 @@ const CaseStudies = () => {
       </Helmet>
 
       <div className="min-h-screen bg-agenko-dark">
-        <Navigation />
+        <GlobalNavigation overlay={false} />
 
         {/* Breadcrumb */}
         <div className="container mx-auto px-4 pt-8">

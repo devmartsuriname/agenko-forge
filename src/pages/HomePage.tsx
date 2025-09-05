@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { cms, type Page } from '@/lib/cms';
 import { SEOHead } from '@/lib/seo';
-import Navigation from '@/components/Navigation';
+import { GlobalNavigation } from '@/components/GlobalNavigation';
 import Footer from '@/components/Footer';
 import { SectionRenderer } from '@/components/sections/SectionRenderer';
 import { PageBodySchema } from '@/lib/sections/schema';
@@ -41,7 +41,7 @@ export default function HomePage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <GlobalNavigation overlay={false} />
         <div className="pt-16">
           <Skeleton className="h-96 w-full" />
           <div className="container mx-auto px-4 py-8 space-y-8">
@@ -58,7 +58,7 @@ export default function HomePage() {
   if (error || !page) {
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <GlobalNavigation overlay={false} />
         <div className="pt-16 container mx-auto px-4 py-8">
           <div className="text-center mb-8">
             <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
@@ -142,8 +142,8 @@ export default function HomePage() {
         keywords={['technology', 'software development', 'web development', 'digital solutions']}
       />
       <div className="min-h-screen bg-background">
-        {/* Only show Navigation if first section is not hero (hero handles its own nav) */}
-        {(sections.length === 0 || sections[0]?.type !== 'hero') && <Navigation />}
+        {/* Only show GlobalNavigation if first section is not hero (hero handles its own nav) */}
+        {(sections.length === 0 || sections[0]?.type !== 'hero') && <GlobalNavigation overlay={false} />}
         <main className={(sections.length === 0 || sections[0]?.type !== 'hero') ? 'pt-16' : ''}>
           {sections.length > 0 ? (
             <SectionRenderer sections={sections} context="home" />

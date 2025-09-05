@@ -5,6 +5,8 @@ import { QuoteWizard } from '@/components/quote/QuoteWizard';
 import { QuoteFormData } from '@/types/quote';
 import { AutoBreadcrumb } from '@/components/ui/breadcrumb';
 import { Badge } from '@/components/ui/badge';
+import { GlobalNavigation } from '@/components/GlobalNavigation';
+import Footer from '@/components/Footer';
 
 export default function GetQuote() {
   const [searchParams] = useSearchParams();
@@ -51,6 +53,7 @@ export default function GetQuote() {
       />
       
       <div className="min-h-screen bg-background">
+        <GlobalNavigation overlay={false} />
         {/* Breadcrumb */}
         <div className="container mx-auto px-4 pt-8">
           <AutoBreadcrumb />
@@ -79,6 +82,7 @@ export default function GetQuote() {
           {/* Quote Wizard */}
           <QuoteWizard initialData={initialData} />
         </div>
+        <Footer />
       </div>
     </>
   );

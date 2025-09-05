@@ -4,6 +4,7 @@ import { SEOHead } from '@/lib/seo';
 import { cms } from '@/lib/cms';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import { GlobalNavigation } from '@/components/GlobalNavigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AutoBreadcrumb } from '@/components/ui/breadcrumb';
@@ -81,7 +82,7 @@ const Portfolio = () => {
       />
       
       <div className="min-h-screen bg-agenko-dark">
-        <Navigation />
+        <GlobalNavigation overlay={false} />
         
         {/* Breadcrumb */}
         <div className="container mx-auto px-4 pt-8">

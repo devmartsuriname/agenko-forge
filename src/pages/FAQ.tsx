@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import { GlobalNavigation } from '@/components/GlobalNavigation';
 import { SEOHead } from '@/lib/seo';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -114,7 +115,7 @@ export function FAQ() {
         structuredData={structuredData}
       />
       
-      <Navigation />
+      <GlobalNavigation overlay={false} />
       
       <main className="min-h-screen bg-background">
         {/* Breadcrumb */}

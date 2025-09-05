@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { cms } from '@/lib/cms';
 import { SEOHead } from '@/lib/seo';
-import Navigation from '@/components/Navigation';
+import { GlobalNavigation } from '@/components/GlobalNavigation';
 import Footer from '@/components/Footer';
 import { SectionRenderer } from '@/components/sections/SectionRenderer';
 import { PageBodySchema } from '@/lib/sections/schema';
@@ -79,7 +79,7 @@ const Index = () => {
           description="Leading technology company delivering innovative solutions."
         />
         <div className="min-h-screen bg-background">
-          <Navigation />
+          <GlobalNavigation overlay={false} />
           <div className="pt-16 container mx-auto px-4 py-8 text-center">
             <h1 className="text-3xl font-bold text-foreground mb-4">Welcome to Devmart</h1>
             <p className="text-muted-foreground">
@@ -102,8 +102,8 @@ const Index = () => {
           keywords={['technology', 'software development', 'web development', 'digital solutions']}
         />
         <div className="min-h-screen bg-background">
-          {/* Only show Navigation if first section is not hero (hero handles its own nav) */}
-          {sections[0]?.type !== 'hero' && <Navigation />}
+          {/* Only show GlobalNavigation if first section is not hero (hero handles its own nav) */}
+          {sections[0]?.type !== 'hero' && <GlobalNavigation overlay={false} />}
           <main id="main-content" className={sections[0]?.type !== 'hero' ? 'pt-16' : ''}>
             <SectionRenderer sections={sections} context="home" />
           </main>
@@ -121,7 +121,7 @@ const Index = () => {
         description="Leading technology company delivering innovative solutions."
       />
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <GlobalNavigation overlay={false} />
         <div className="pt-16 container mx-auto px-4 py-8 text-center">
           <h1 className="text-3xl font-bold text-foreground mb-4">Welcome to Devmart</h1>
           <div className="space-y-4">
