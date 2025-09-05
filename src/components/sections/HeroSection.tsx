@@ -20,7 +20,7 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
   return (
     <div className="relative min-h-screen overflow-hidden bg-agenko-dark">
       {/* Content container */}
-      <div className="relative z-10">
+      <div className="relative z-20">
 
         {/* Badge */}
         {subtitle && (

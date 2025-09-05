@@ -71,12 +71,12 @@ export function GlobalNavigation({ overlay = false }: GlobalNavigationProps) {
       {/* Gradient background for overlay mode */}
       {overlay && (
         <>
-          <div className="flex flex-col items-end absolute -right-60 -top-10 blur-xl z-0 ">
-            <div className="h-[10rem] rounded-full w-[60rem] z-1 bg-gradient-to-b blur-[6rem] from-purple-600 to-sky-600"></div>
-            <div className="h-[10rem] rounded-full w-[90rem] z-1 bg-gradient-to-b blur-[6rem] from-pink-900 to-yellow-400"></div>
-            <div className="h-[10rem] rounded-full w-[60rem] z-1 bg-gradient-to-b blur-[6rem] from-yellow-600 to-sky-500"></div>
+          <div className="flex flex-col items-end absolute -right-60 -top-10 blur-xl -z-10 ">
+            <div className="h-[10rem] rounded-full w-[60rem] bg-gradient-to-b blur-[6rem] from-purple-600 to-sky-600"></div>
+            <div className="h-[10rem] rounded-full w-[90rem] bg-gradient-to-b blur-[6rem] from-pink-900 to-yellow-400"></div>
+            <div className="h-[10rem] rounded-full w-[60rem] bg-gradient-to-b blur-[6rem] from-yellow-600 to-sky-500"></div>
           </div>
-          <div className="absolute inset-0 z-0 bg-noise opacity-30"></div>
+          <div className="absolute inset-0 -z-10 bg-noise opacity-30"></div>
         </>
       )}
 
@@ -84,7 +84,7 @@ export function GlobalNavigation({ overlay = false }: GlobalNavigationProps) {
       <nav className="container mx-auto flex items-center justify-between px-4 py-4 mt-6 relative z-10">
         <Link to="/" className="flex items-center">
           <img src={logo} alt="Devmart Logo" className="h-8 w-8" />
-          <span className="ml-2 text-xl font-bold text-white">Devmart</span>
+          {!overlay && <span className="ml-2 text-xl font-bold text-white">Devmart</span>}
         </Link>
 
         {/* Desktop Navigation */}
@@ -174,7 +174,7 @@ export function GlobalNavigation({ overlay = false }: GlobalNavigationProps) {
             <div className="flex items-center justify-between">
               <Link to="/" className="flex items-center" onClick={() => setMobileMenuOpen(false)}>
                 <img src={logo} alt="Devmart Logo" className="h-8 w-8" />
-                <span className="ml-2 text-xl font-bold text-white">Devmart</span>
+                {!overlay && <span className="ml-2 text-xl font-bold text-white">Devmart</span>}
               </Link>
               <button onClick={() => setMobileMenuOpen(false)}>
                 <X className="h-6 w-6 text-white" />
