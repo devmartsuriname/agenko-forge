@@ -19,10 +19,12 @@ export function HeroSectionComponent({ section }: HeroSectionProps) {
 
   return (
     <div className="relative min-h-screen overflow-x-hidden overflow-y-auto bg-gradient-to-br from-agenko-dark via-agenko-dark/95 to-black">
-      {/* Background Pattern */}
+      {/* Enhanced Noise Pattern - Higher Z-Index */}
+      <div className="absolute inset-0 z-10 bg-noise opacity-30 mix-blend-overlay"></div>
+      
+      {/* Reduced Opacity Background Pattern */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-noise opacity-60"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent"></div>
       </div>
 
       {/* Animated Background Elements */}
