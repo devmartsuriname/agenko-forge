@@ -78,6 +78,7 @@ const AdminInnovationLabEditor = lazy(() => import("./pages/admin/AdminInnovatio
 const AdminCareers = lazy(() => import("./pages/admin/AdminCareers"));
 const AdminCareerEditor = lazy(() => import("./pages/admin/AdminCareerEditor"));
 const AdminTestHarness = lazy(() => import("./pages/admin/TestHarness"));
+const ErrorBoundaryTest = lazy(() => import("./components/admin/ErrorBoundaryTest"));
 
 const queryClient = new QueryClient();
 
@@ -310,6 +311,11 @@ const App = () => (
                 <Route path="test-harness" element={
                   <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminTestHarness />
+                  </SuspenseWithTimeout>
+                } />
+                <Route path="error-boundary-test" element={
+                  <SuspenseWithTimeout fallback={<Spinner />}>
+                    <ErrorBoundaryTest />
                   </SuspenseWithTimeout>
                 } />
               </Route>
