@@ -83,7 +83,7 @@ export function GlobalNavigation({ overlay = false }: GlobalNavigationProps) {
       {/* Navigation */}
       <nav className="container mx-auto flex items-center justify-between px-4 py-4 mt-6 relative z-10">
         <Link to="/" className="flex items-center">
-          <img src={logo} alt="Devmart Logo" className="h-8 w-8" />
+          <img src={logo} alt="Devmart Logo" className="h-8 w-auto object-contain" />
           {!overlay && <span className="ml-2 text-xl font-bold text-white">Devmart</span>}
         </Link>
 
@@ -173,7 +173,7 @@ export function GlobalNavigation({ overlay = false }: GlobalNavigationProps) {
           >
             <div className="flex items-center justify-between">
               <Link to="/" className="flex items-center" onClick={() => setMobileMenuOpen(false)}>
-                <img src={logo} alt="Devmart Logo" className="h-8 w-8" />
+                <img src={logo} alt="Devmart Logo" className="h-8 w-auto object-contain" />
                 {!overlay && <span className="ml-2 text-xl font-bold text-white">Devmart</span>}
               </Link>
               <button onClick={() => setMobileMenuOpen(false)}>
