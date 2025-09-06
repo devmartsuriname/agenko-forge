@@ -8,8 +8,14 @@ interface About3SectionProps {
 export function About3Section({ section }: About3SectionProps) {
   const { data } = section;
 
-  // Enhanced About3 layout - check for new fields
-  const hasEnhancedLayout = data.mainImage || data.secondaryImage || data.breakout || data.companies || data.achievements;
+  // Enhanced About3 layout - check for new fields more robustly
+  const hasEnhancedLayout = !!(
+    data.mainImage || 
+    data.secondaryImage || 
+    data.breakout || 
+    (data.companies && Array.isArray(data.companies) && data.companies.length > 0) || 
+    (data.achievements && Array.isArray(data.achievements) && data.achievements.length > 0)
+  );
 
   // If it's the legacy layout, fall back to the original AboutSection component
   if (!hasEnhancedLayout) {
