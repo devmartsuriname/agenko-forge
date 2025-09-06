@@ -81,8 +81,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setUserRole(null);
+    try {
+      // Check if there's a session to sign out
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        // No session exists, just clear local state
+        console.warn('No active session found, clearing local state');
+        setSession(null);
+        setUser(null);
+        setUserRole(null);
+        return;
+      }
+
+      // Attempt to sign out from Supabase
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Supabase signOut error:', error);
+        // Even if signOut fails, clear local state to prevent UI inconsistencies
+        setSession(null);
+        setUser(null);
+        setUserRole(null);
+      } else {
+        // Clear local state (auth state listener will also handle this)
+        setSession(null);
+        setUser(null);
+        setUserRole(null);
+      }
+    } catch (error) {
+      console.error('Unexpected error during signOut:', error);
+      // Force clear local state even on unexpected errors
+      setSession(null);
+      setUser(null);
+      setUserRole(null);
+    }
   };
 
   const isAdmin = userRole === 'admin';

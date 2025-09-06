@@ -77,8 +77,23 @@ export function AdminSidebar() {
   // Fix: Don't use user?.role as it's always undefined
   const isEditor = userRole === 'editor' || userRole === 'admin';
 
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
   const handleSignOut = async () => {
-    await signOut();
+    if (isSigningOut) return; // Prevent double clicks
+    
+    setIsSigningOut(true);
+    try {
+      await signOut();
+      // Redirect to login after successful logout
+      window.location.href = '/admin/login';
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Still redirect to login to ensure clean state
+      window.location.href = '/admin/login';
+    } finally {
+      setIsSigningOut(false);
+    }
   };
 
   const toggleExpanded = (href: string) => {
@@ -208,10 +223,17 @@ export function AdminSidebar() {
       <div className="p-4 border-t border-border">
         <button
           onClick={handleSignOut}
-          className="flex items-center space-x-3 px-3 py-2 rounded-md transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground w-full"
+          disabled={isSigningOut}
+          className="flex items-center space-x-3 px-3 py-2 rounded-md transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground w-full disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <LogOut className="h-5 w-5" />
-          <span className="font-medium">Sign Out</span>
+          {isSigningOut ? (
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          ) : (
+            <LogOut className="h-5 w-5" />
+          )}
+          <span className="font-medium">
+            {isSigningOut ? 'Signing Out...' : 'Sign Out'}
+          </span>
         </button>
       </div>
     </div>
