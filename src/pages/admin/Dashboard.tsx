@@ -11,6 +11,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { useNavigate } from 'react-router-dom';
 import { UnifiedPerformanceMonitor } from '@/components/performance/UnifiedPerformanceMonitor';
+import { FinalValidationDashboard } from '@/components/admin/FinalValidationDashboard';
 import { CTAAnalytics } from '@/components/admin/analytics/CTAAnalytics';
 import { SystemHealthWidget } from '@/components/admin/SystemHealthWidget';
 import { ErrorBoundaryWrapper } from '@/components/admin/ErrorBoundaryWrapper';
@@ -303,6 +304,14 @@ export default function AdminDashboard() {
 
         {/* Performance Monitor */}
         <UnifiedPerformanceMonitor />
+
+        {/* Final Performance Validation */}
+        <div>
+          <h2 className="text-2xl font-bold text-foreground mb-4">Performance Validation</h2>
+          <ErrorBoundaryWrapper>
+            <FinalValidationDashboard />
+          </ErrorBoundaryWrapper>
+        </div>
 
         {/* Chart and Quick Actions Row */}
         <div className="grid gap-6 lg:grid-cols-3">

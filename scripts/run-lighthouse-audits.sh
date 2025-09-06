@@ -1,79 +1,82 @@
 #!/bin/bash
 
-# Lighthouse Performance Audit Runner
-# Usage: ./scripts/run-lighthouse-audits.sh
+# Performance Validation Script - Phase 6
+# Runs comprehensive Lighthouse audits for all critical routes
 
 set -e
 
-echo "🚀 Starting Lighthouse Performance Audits"
-echo "=========================================="
+echo "🚀 Starting Phase 6: Final Performance Validation"
 
-# Check if lighthouse is installed
+# Ensure required dependencies are installed
 if ! command -v lighthouse &> /dev/null; then
-    echo "❌ Lighthouse not found. Installing..."
+    echo "Installing Lighthouse..."
     npm install -g lighthouse
 fi
 
-# Check if chrome-launcher is available
-if ! npm list chrome-launcher &> /dev/null; then
-    echo "❌ chrome-launcher not found. Installing..."
+if ! command -v chrome-launcher &> /dev/null; then
+    echo "Installing chrome-launcher..."
     npm install chrome-launcher
 fi
 
-# Ensure docs/perf directory exists
+# Create performance reports directory
 mkdir -p docs/perf
 
 # Check if server is running
-if ! curl -s http://localhost:3000 > /dev/null; then
+if ! curl -f http://localhost:3000 &> /dev/null; then
     echo "❌ Server not running on localhost:3000"
-    echo "Please start the server with: npm run build && npm run preview"
+    echo "Please start the development server with 'npm run dev'"
     exit 1
 fi
 
-echo "✅ Server is running"
-echo "📊 Running audits (this may take a few minutes)..."
+echo "✅ Server is running, proceeding with audits..."
 
-# Define routes to test
-routes=(
-    "/:home"
-    "/services:services" 
-    "/portfolio:portfolio"
-    "/blog:blog"
-    "/pricing:pricing"
-    "/contact:contact"
+# Define routes to audit
+declare -a routes=(
+    "/:Home"
+    "/services:Services"
+    "/portfolio:Portfolio" 
+    "/blog:Blog"
+    "/pricing:Pricing"
+    "/contact:Contact"
+    "/about:About"
 )
 
+BASE_URL="http://localhost:3000"
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+
+echo "📊 Running Lighthouse audits for ${#routes[@]} routes..."
+
 # Run audits for each route
-for route_info in "${routes[@]}"; do
-    IFS=":" read -r path name <<< "$route_info"
-    url="http://localhost:3000$path"
+for route in "${routes[@]}"; do
+    IFS=':' read -r path name <<< "$route"
     
-    echo "Testing $name ($path)..."
+    echo "🔍 Auditing ${name} (${path})..."
     
     # Mobile audit
-    echo "  📱 Mobile..."
-    lighthouse "$url" \
-        --quiet \
-        --chrome-flags='--headless=new' \
+    lighthouse "${BASE_URL}${path}" \
         --preset=mobile \
+        --only-categories=performance \
         --output=json \
-        --output-path="./docs/perf/${name}-mobile.json" \
-        --only-categories=performance
+        --output-path="docs/perf/${name}_mobile_${TIMESTAMP}.json" \
+        --quiet \
+        --chrome-flags="--headless --no-sandbox"
     
     # Desktop audit  
-    echo "  🖥️  Desktop..."
-    lighthouse "$url" \
-        --quiet \
-        --chrome-flags='--headless=new' \
+    lighthouse "${BASE_URL}${path}" \
         --preset=desktop \
+        --only-categories=performance \
         --output=json \
-        --output-path="./docs/perf/${name}-desktop.json" \
-        --only-categories=performance
-    
-    echo "  ✅ $name complete"
+        --output-path="docs/perf/${name}_desktop_${TIMESTAMP}.json" \
+        --quiet \
+        --chrome-flags="--headless --no-sandbox"
+        
+    echo "✅ ${name} audit complete"
 done
 
-echo ""
-echo "🎉 All audits complete!"
-echo "📄 Results saved to docs/perf/"
-echo "🔍 Run 'node scripts/lighthouse-runner.js' for detailed summary"
+echo "🎯 Performance audits complete! Reports saved to docs/perf/"
+echo "📈 Running performance analysis..."
+
+# Generate summary report
+node scripts/lighthouse-runner.js
+
+echo "🏆 Phase 6 validation complete!"
