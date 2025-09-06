@@ -12,7 +12,8 @@ import { TrackingScripts } from '@/components/TrackingScripts';
 import { GlobalIntegrations } from '@/components/GlobalIntegrations';
 import { PWAInstallPrompt } from '@/components/ui/PWAInstallPrompt';
 import { CTAProvider } from "@/components/cta/CTAProvider";
-import { EnhancedErrorBoundary } from "@/components/ui/EnhancedErrorBoundary";
+import { ProductionErrorBoundary } from "@/components/ui/ProductionErrorBoundary";
+import { PerformanceMonitor } from "@/components/performance/PerformanceMonitor";
 
 // Public pages
 import Index from "./pages/Index";
@@ -85,7 +86,7 @@ const PerformanceValidator = lazy(() => import("./components/admin/PerformanceVa
 const queryClient = new QueryClient();
 
 const App = () => (
-  <EnhancedErrorBoundary>
+  <ProductionErrorBoundary showDetails={process.env.NODE_ENV === 'development'}>
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
@@ -96,6 +97,7 @@ const App = () => (
             <BrowserRouter>
               <CTAProvider>
                 <PWAInstallPrompt />
+                <PerformanceMonitor />
                 <Routes>
               {/* Public Routes */}
               <Route path="/" element={<Index />} />
@@ -342,7 +344,7 @@ const App = () => (
         </AuthProvider>
       </QueryClientProvider>
     </HelmetProvider>
-  </EnhancedErrorBoundary>
+  </ProductionErrorBoundary>
 );
 
 export default App;
