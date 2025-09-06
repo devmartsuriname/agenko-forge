@@ -1028,6 +1028,7 @@ export type Database = {
           quote_id: string | null
           rejected_at: string | null
           rejection_reason: string | null
+          security_level: string | null
           sent_at: string | null
           status: string
           subject: string
@@ -1049,6 +1050,7 @@ export type Database = {
           quote_id?: string | null
           rejected_at?: string | null
           rejection_reason?: string | null
+          security_level?: string | null
           sent_at?: string | null
           status?: string
           subject: string
@@ -1070,6 +1072,7 @@ export type Database = {
           quote_id?: string | null
           rejected_at?: string | null
           rejection_reason?: string | null
+          security_level?: string | null
           sent_at?: string | null
           status?: string
           subject?: string
@@ -1308,6 +1311,10 @@ export type Database = {
           p_max_requests?: number
           p_window_minutes?: number
         }
+        Returns: boolean
+      }
+      check_sensitive_rate_limit: {
+        Args: { operation_type: string }
         Returns: boolean
       }
       cleanup_old_logs: {
