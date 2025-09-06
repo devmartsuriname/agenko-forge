@@ -14,7 +14,7 @@ interface SuspenseWithTimeoutProps {
 export const SuspenseWithTimeout: React.FC<SuspenseWithTimeoutProps> = ({
   children,
   fallback = <Spinner />,
-  timeout = 20000, // 20 seconds for admin dashboard
+  timeout = 8000, // Reduced to 8 seconds for better UX
   onTimeout
 }) => {
   const [hasTimedOut, setHasTimedOut] = useState(false);

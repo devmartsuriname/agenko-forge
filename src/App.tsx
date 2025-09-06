@@ -169,31 +169,19 @@ const App = () => (
               <Route path="/terms-conditions" element={<TermsConditions />} />
               
               {/* Admin Routes */}
-              <Route path="/admin/login" element={
-                <SuspenseWithTimeout fallback={<Spinner />}>
-                  <AdminLogin />
-                </SuspenseWithTimeout>
-              } />
-              <Route path="/admin/register" element={
-                <SuspenseWithTimeout fallback={<Spinner />}>
-                  <AdminRegister />
-                </SuspenseWithTimeout>
-              } />
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin/register" element={<AdminRegister />} />
               <Route path="/admin" element={
                 <AdminErrorBoundary>
                   <AdminLayout />
                 </AdminErrorBoundary>
               }>
                 <Route index element={
-                  <SuspenseWithTimeout fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />} timeout={10000}>
                     <AdminDashboard />
                   </SuspenseWithTimeout>
                 } />
-                <Route path="pages" element={
-                  <SuspenseWithTimeout fallback={<Spinner />}>
-                    <AdminPages />
-                  </SuspenseWithTimeout>
-                } />
+                <Route path="pages" element={<AdminPages />} />
                 <Route path="pages/new" element={
                   <SuspenseWithTimeout fallback={
                     <div>
@@ -209,11 +197,7 @@ const App = () => (
                     <AdminPageEditor />
                   </SuspenseWithTimeout>
                 } />
-                <Route path="services" element={
-                  <SuspenseWithTimeout fallback={<Spinner />}>
-                    <AdminServices />
-                  </SuspenseWithTimeout>
-                } />
+                <Route path="services" element={<AdminServices />} />
                 <Route path="services/new" element={
                   <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminServiceEditor />
@@ -224,11 +208,7 @@ const App = () => (
                     <AdminServiceEditor />
                   </SuspenseWithTimeout>
                 } />
-                <Route path="projects" element={
-                  <SuspenseWithTimeout fallback={<Spinner />}>
-                    <AdminProjects />
-                  </SuspenseWithTimeout>
-                } />
+                <Route path="projects" element={<AdminProjects />} />
                 <Route path="projects/new" element={
                   <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminProjectEditor />
@@ -239,11 +219,7 @@ const App = () => (
                     <AdminProjectEditor />
                   </SuspenseWithTimeout>
                 } />
-                <Route path="blog" element={
-                  <SuspenseWithTimeout fallback={<Spinner />}>
-                    <AdminBlog />
-                  </SuspenseWithTimeout>
-                } />
+                <Route path="blog" element={<AdminBlog />} />
                 <Route path="blog/new" element={
                   <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminBlogEditor />
