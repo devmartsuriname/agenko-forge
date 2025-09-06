@@ -11,7 +11,7 @@ export const CacheStrategies = {
   // Homepage content - critical path, longer cache with background refresh
   HOMEPAGE: {
     staleTime: 2 * 60 * 1000, // 2 minutes - consider fresh
-    cacheTime: 15 * 60 * 1000, // 15 minutes - keep in memory
+    gcTime: 15 * 60 * 1000, // 15 minutes - keep in memory (renamed from cacheTime)
     refetchOnWindowFocus: false, // Don't refetch on focus to prevent flashing
     refetchOnMount: false, // Don't refetch on mount if data exists
     refetchInterval: 5 * 60 * 1000, // Background refresh every 5 minutes
@@ -23,7 +23,7 @@ export const CacheStrategies = {
   // Static content (pages, services, projects)
   STATIC_CONTENT: {
     staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 30 * 60 * 1000, // 30 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchInterval: 10 * 60 * 1000, // 10 minutes background refresh
@@ -33,7 +33,7 @@ export const CacheStrategies = {
   // Dynamic content (blog posts, comments)
   DYNAMIC_CONTENT: {
     staleTime: 1 * 60 * 1000, // 1 minute
-    cacheTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: true,
     refetchOnMount: true,
     retry: 2,
@@ -42,7 +42,7 @@ export const CacheStrategies = {
   // User-specific data
   USER_DATA: {
     staleTime: 30 * 1000, // 30 seconds
-    cacheTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: true,
     refetchOnMount: true,
     retry: 3,
@@ -51,7 +51,7 @@ export const CacheStrategies = {
   // Settings and configuration
   SETTINGS: {
     staleTime: 10 * 60 * 1000, // 10 minutes
-    cacheTime: 60 * 60 * 1000, // 1 hour
+    gcTime: 60 * 60 * 1000, // 1 hour
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     retry: 1,
@@ -60,7 +60,7 @@ export const CacheStrategies = {
   // Real-time data (analytics, monitoring)
   REAL_TIME: {
     staleTime: 0, // Always stale
-    cacheTime: 1 * 60 * 1000, // 1 minute
+    gcTime: 1 * 60 * 1000, // 1 minute
     refetchOnWindowFocus: true,
     refetchOnMount: true,
     refetchInterval: 30 * 1000, // 30 seconds
@@ -248,5 +248,27 @@ export const DevTools = {
   }
 };
 
-// Export default optimized client instance
-export const optimizedQueryClient = createOptimizedQueryClient();
+// Export default optimized client instance (lazy initialization to avoid issues)
+export const optimizedQueryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // Global defaults - conservative settings
+      staleTime: 30 * 1000, // 30 seconds
+      gcTime: 5 * 60 * 1000, // 5 minutes (renamed from cacheTime)
+      refetchOnWindowFocus: false, // Prevent unexpected refetches
+      refetchOnMount: true,
+      refetchOnReconnect: true,
+      retry: (failureCount: number, error: Error) => {
+        // Don't retry on 404s or authentication errors
+        if (error.message.includes('404') || error.message.includes('401')) {
+          return false;
+        }
+        return failureCount < 2;
+      },
+      retryDelay: (attemptIndex: number) => Math.min(1000 * 2 ** attemptIndex, 10000),
+    },
+    mutations: {
+      retry: 1,
+    }
+  }
+});

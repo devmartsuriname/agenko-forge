@@ -1,158 +1,244 @@
-const CACHE_NAME = 'devmart-v1';
-const STATIC_CACHE = 'devmart-static-v1';
-const DYNAMIC_CACHE = 'devmart-dynamic-v1';
+// Enhanced service worker with smart caching
+const CACHE_VERSION = 'v3';
+const CACHE_PREFIX = 'devmart-';
+const STATIC_CACHE = CACHE_PREFIX + 'static-' + CACHE_VERSION;
+const DYNAMIC_CACHE = CACHE_PREFIX + 'dynamic-' + CACHE_VERSION;
+const API_CACHE = CACHE_PREFIX + 'api-' + CACHE_VERSION;
 
-// Assets to cache on install
-const STATIC_ASSETS = [
-  '/',
-  '/manifest.json',
-  '/assets/hero-image.jpg',
-  '/assets/logo.png'
-];
+let cacheConfig = {
+  version: '3.0.0',
+  staticAssets: [],
+  dynamicRoutes: [],
+  apiEndpoints: [],
+  maxAge: {
+    static: 24 * 60 * 60 * 1000, // 24 hours
+    dynamic: 60 * 60 * 1000, // 1 hour
+    api: 10 * 60 * 1000 // 10 minutes
+  }
+};
 
-// Install event - cache static assets
+// Install event - cache critical resources
 self.addEventListener('install', (event) => {
+  console.log('Service Worker installing...');
   event.waitUntil(
-    caches.open(STATIC_CACHE)
-      .then((cache) => {
-        return cache.addAll(STATIC_ASSETS);
-      })
-      .then(() => {
-        return self.skipWaiting();
-      })
+    caches.open(STATIC_CACHE).then((cache) => {
+      const criticalAssets = [
+        '/',
+        '/offline.html',
+        '/manifest.json',
+        '/assets/logo.png',
+        '/assets/hero-image.jpg'
+      ];
+      return cache.addAll(criticalAssets);
+    })
   );
+  self.skipWaiting();
 });
 
-// Activate event - clean up old caches
+// Activate event - cleanup old caches
 self.addEventListener('activate', (event) => {
+  console.log('Service Worker activating...');
   event.waitUntil(
-    caches.keys()
-      .then((cacheNames) => {
-        return Promise.all(
-          cacheNames
-            .filter((cacheName) => {
-              return cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE;
-            })
-            .map((cacheName) => {
-              return caches.delete(cacheName);
-            })
-        );
-      })
-      .then(() => {
-        return self.clients.claim();
-      })
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames
+          .filter(name => name.startsWith(CACHE_PREFIX) && 
+                         name !== STATIC_CACHE && 
+                         name !== DYNAMIC_CACHE && 
+                         name !== API_CACHE)
+          .map(name => {
+            console.log('Deleting old cache:', name);
+            return caches.delete(name);
+          })
+      );
+    })
   );
+  self.clients.claim();
 });
 
-// Fetch event - serve cached content when offline
+// Fetch event - smart caching strategy
 self.addEventListener('fetch', (event) => {
   const { request } = event;
+  const url = new URL(request.url);
   
   // Skip non-GET requests
   if (request.method !== 'GET') {
     return;
   }
-
+  
   // Skip external requests
   if (!request.url.startsWith(self.location.origin)) {
     return;
   }
 
-  event.respondWith(
-    caches.match(request)
-      .then((cachedResponse) => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-
-        return fetch(request)
-          .then((response) => {
-            // Don't cache non-successful responses
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-
-            // Clone the response
-            const responseToCache = response.clone();
-
-            // Cache dynamic content
-            caches.open(DYNAMIC_CACHE)
-              .then((cache) => {
-                cache.put(request, responseToCache);
-              });
-
-            return response;
-          })
-          .catch(() => {
-            // Return offline page for navigation requests
-            if (request.destination === 'document') {
-              return caches.match('/');
-            }
-          });
-      })
-  );
-});
-
-// Background sync for offline form submissions
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'contact-form-sync') {
-    event.waitUntil(syncContactForms());
+  // Handle different request types
+  if (isStaticAsset(url)) {
+    event.respondWith(handleStaticAsset(request));
+  } else if (isApiRequest(url)) {
+    event.respondWith(handleApiRequest(request));
+  } else if (isDynamicRoute(url)) {
+    event.respondWith(handleDynamicRoute(request));
   }
 });
 
-async function syncContactForms() {
-  // Handle offline form submissions when back online
-  const db = await openIndexedDB();
-  const forms = await getOfflineForms(db);
+// Message event - handle cache updates
+self.addEventListener('message', (event) => {
+  const { type, config, pattern, resources } = event.data;
   
-  for (const form of forms) {
-    try {
-      await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(form.data)
-      });
+  switch (type) {
+    case 'INIT_CACHE_CONFIG':
+    case 'UPDATE_CACHE_CONFIG':
+      cacheConfig = { ...cacheConfig, ...config };
+      console.log('Cache config updated:', cacheConfig);
+      break;
       
-      // Remove from offline storage after successful submission
-      await removeOfflineForm(db, form.id);
-    } catch (error) {
-      console.log('Failed to sync form:', error);
+    case 'INVALIDATE_CACHE':
+      invalidateMatchingCache(pattern);
+      break;
+      
+    case 'PRELOAD_RESOURCES':
+      preloadResources(resources);
+      break;
+  }
+});
+
+// Helper functions
+function isStaticAsset(url) {
+  return url.pathname.match(/\.(js|css|png|jpg|jpeg|gif|svg|woff|woff2|ttf|ico)$/);
+}
+
+function isApiRequest(url) {
+  return url.pathname.startsWith('/api/') || 
+         url.hostname.includes('supabase.co') ||
+         cacheConfig.apiEndpoints.some(endpoint => url.pathname.includes(endpoint));
+}
+
+function isDynamicRoute(url) {
+  return !isStaticAsset(url) && !isApiRequest(url);
+}
+
+async function handleStaticAsset(request) {
+  try {
+    const cache = await caches.open(STATIC_CACHE);
+    const cachedResponse = await cache.match(request);
+    
+    if (cachedResponse && !isExpired(cachedResponse, cacheConfig.maxAge.static)) {
+      return cachedResponse;
+    }
+    
+    const networkResponse = await fetch(request);
+    if (networkResponse.ok) {
+      cache.put(request, networkResponse.clone());
+    }
+    return networkResponse;
+  } catch (error) {
+    const cachedResponse = await caches.match(request);
+    return cachedResponse || new Response('Asset not available offline', { status: 503 });
+  }
+}
+
+async function handleApiRequest(request) {
+  try {
+    const networkResponse = await fetch(request);
+    
+    if (networkResponse.ok) {
+      const cache = await caches.open(API_CACHE);
+      cache.put(request, networkResponse.clone());
+    }
+    
+    return networkResponse;
+  } catch (error) {
+    const cache = await caches.open(API_CACHE);
+    const cachedResponse = await cache.match(request);
+    
+    if (cachedResponse && !isExpired(cachedResponse, cacheConfig.maxAge.api)) {
+      return cachedResponse;
+    }
+    
+    return new Response(JSON.stringify({ error: 'API not available offline' }), { 
+      status: 503,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
+
+async function handleDynamicRoute(request) {
+  try {
+    const networkResponse = await fetch(request);
+    
+    if (networkResponse.ok) {
+      const cache = await caches.open(DYNAMIC_CACHE);
+      cache.put(request, networkResponse.clone());
+    }
+    
+    return networkResponse;
+  } catch (error) {
+    const cache = await caches.open(DYNAMIC_CACHE);
+    const cachedResponse = await cache.match(request);
+    
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+    
+    // Return offline page for navigation requests
+    if (request.destination === 'document') {
+      const offlinePage = await caches.match('/offline.html');
+      return offlinePage || caches.match('/');
+    }
+    
+    return new Response('Resource not available offline', { status: 503 });
+  }
+}
+
+function isExpired(response, maxAge) {
+  const dateHeader = response.headers.get('date');
+  if (!dateHeader) return false;
+  
+  const responseDate = new Date(dateHeader);
+  return Date.now() - responseDate.getTime() > maxAge;
+}
+
+async function invalidateMatchingCache(pattern) {
+  const cacheNames = await caches.keys();
+  const regex = new RegExp(pattern);
+  
+  for (const cacheName of cacheNames) {
+    if (cacheName.startsWith(CACHE_PREFIX)) {
+      const cache = await caches.open(cacheName);
+      const requests = await cache.keys();
+      
+      for (const request of requests) {
+        if (regex.test(request.url)) {
+          await cache.delete(request);
+        }
+      }
     }
   }
-}
-
-// IndexedDB helpers for offline storage
-function openIndexedDB() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('DevmartOffline', 1);
-    
-    request.onerror = () => reject(request.error);
-    request.onsuccess = () => resolve(request.result);
-    
-    request.onupgradeneeded = (event) => {
-      const db = event.target.result;
-      if (!db.objectStoreNames.contains('forms')) {
-        db.createObjectStore('forms', { keyPath: 'id', autoIncrement: true });
-      }
-    };
+  
+  self.clients.matchAll().then(clients => {
+    clients.forEach(client => {
+      client.postMessage({ type: 'CACHE_UPDATED', data: { pattern } });
+    });
   });
 }
 
-function getOfflineForms(db) {
-  return new Promise((resolve) => {
-    const transaction = db.transaction(['forms'], 'readonly');
-    const store = transaction.objectStore('forms');
-    const request = store.getAll();
+async function preloadResources(resources) {
+  try {
+    const cache = await caches.open(STATIC_CACHE);
+    await cache.addAll(resources);
     
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => resolve([]);
-  });
+    self.clients.matchAll().then(clients => {
+      clients.forEach(client => {
+        client.postMessage({ type: 'PRELOAD_COMPLETE', data: { count: resources.length } });
+      });
+    });
+  } catch (error) {
+    self.clients.matchAll().then(clients => {
+      clients.forEach(client => {
+        client.postMessage({ type: 'CACHE_ERROR', data: { error: error.message } });
+      });
+    });
+  }
 }
 
-function removeOfflineForm(db, id) {
-  const transaction = db.transaction(['forms'], 'readwrite');
-  const store = transaction.objectStore('forms');
-  return store.delete(id);
-}
+console.log('Enhanced Service Worker v3 loaded');

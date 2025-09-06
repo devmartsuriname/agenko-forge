@@ -3,6 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { optimizedQueryClient } from "@/lib/react-query-config";
+import { CacheManagementUtils } from "@/lib/cache-management";
+import { ServiceWorkerCacheManager, defaultCacheConfig } from "@/lib/service-worker-cache";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from '@/lib/auth';
@@ -86,6 +88,39 @@ const PerformanceValidator = lazy(() => import("./components/admin/PerformanceVa
 
 // Use optimized QueryClient with content-aware caching
 const queryClient = optimizedQueryClient;
+
+// Initialize Smart Cache Management System (Phase 3)
+const smartCacheManager = CacheManagementUtils.initialize(queryClient);
+const serviceWorkerCache = new ServiceWorkerCacheManager(defaultCacheConfig);
+
+// Initialize enhanced caching on app start
+if (typeof window !== 'undefined') {
+  // Initialize service worker cache
+  serviceWorkerCache.initialize().catch(console.warn);
+  
+  // Preload critical assets
+  setTimeout(() => {
+    serviceWorkerCache.preloadCriticalResources();
+    
+    // Warm critical cache paths
+    smartCacheManager.warmCache({
+      enabled: true,
+      criticalPaths: ['homepage', 'services', 'portfolio', 'about'],
+      preloadDelay: 3000,
+      maxConcurrent: 2
+    });
+  }, 1000);
+  
+  // Background cache optimization every 10 minutes
+  setInterval(() => {
+    smartCacheManager.optimizeCache();
+  }, 10 * 60 * 1000);
+  
+  // Check for deployment updates every 5 minutes
+  setInterval(() => {
+    smartCacheManager.invalidateOnDeployment();
+  }, 5 * 60 * 1000);
+}
 
 const App = () => (
   <ProductionErrorBoundary showDetails={process.env.NODE_ENV === 'development'}>
