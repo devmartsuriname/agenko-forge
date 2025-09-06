@@ -49,27 +49,32 @@ const Index = () => {
       // Successfully parsed sections: ${sections.length}
     } else if (homePage?.body?.content !== undefined) {
       // Handle case where body has 'content' instead of 'sections' - likely from wrong editor
-      console.warn('Home page has content instead of sections - needs to be re-edited with sections editor');
-      console.warn('Current body structure:', Object.keys(homePage?.body || {}));
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Home page has content instead of sections - needs to be re-edited with sections editor');
+        console.warn('Current body structure:', Object.keys(homePage?.body || {}));
+      }
       
       // Provide a basic fallback hero section if content exists but no sections
       if ((homePage as Page).body.content === "") {
-        // Creating fallback hero section since content is empty
         sections = [{
           id: 'fallback-hero',
           type: 'hero',
           data: {
             title: 'Welcome to Devmart',
             subtitle: 'Technology Solutions',
-            description: 'Please re-edit the homepage sections in the admin to restore full content.',
+            description: 'Please configure the homepage sections in the admin panel.',
             ctaText: 'Go to Admin',
             ctaLink: '/admin/pages'
           }
         }];
       }
     } else {
-      console.warn('No sections found in home page body:', homePage?.body);
-      console.warn('Expected body.sections but got:', Object.keys(homePage?.body || {}));
+      // Suppress repeated warnings for missing sections, only show once per session
+      if (process.env.NODE_ENV === 'development' && !sessionStorage.getItem('homepage-sections-warning-shown')) {
+        console.warn('No sections found in home page body:', homePage?.body);
+        console.warn('Expected body.sections but got:', Object.keys(homePage?.body || {}));
+        sessionStorage.setItem('homepage-sections-warning-shown', 'true');
+      }
     }
   } catch (error) {
     console.error('Error parsing page sections:', error);

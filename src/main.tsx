@@ -4,6 +4,7 @@ import App from './App.tsx'
 import './index.css'
 import { initializeProductionOptimizations } from './lib/production-optimizations'
 import { logAssetHealth } from './lib/asset-validation'
+import { initOptimizedPerformanceMonitoring } from './lib/performance-optimized'
 
 // Initialize React with proper error boundaries and strict mode
 const root = createRoot(document.getElementById("root")!);
@@ -22,8 +23,12 @@ try {
   setTimeout(() => {
     try {
       initializeProductionOptimizations();
-      // Perform asset health check in development
-      logAssetHealth();
+      // Initialize optimized performance monitoring
+      initOptimizedPerformanceMonitoring();
+      // Perform asset health check in development only
+      if (process.env.NODE_ENV === 'development') {
+        logAssetHealth();
+      }
     } catch (error) {
       console.error('Production optimizations failed to initialize:', error);
     }

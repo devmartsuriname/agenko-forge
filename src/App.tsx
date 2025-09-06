@@ -16,7 +16,6 @@ import { GlobalIntegrations } from '@/components/GlobalIntegrations';
 import { PWAInstallPrompt } from '@/components/ui/PWAInstallPrompt';
 import { CTAProvider } from "@/components/cta/CTAProvider";
 import { ProductionErrorBoundary } from "@/components/ui/ProductionErrorBoundary";
-import { UnifiedPerformanceMonitor } from "@/components/performance/UnifiedPerformanceMonitor";
 
 // Public pages
 import Index from "./pages/Index";
@@ -134,7 +133,6 @@ const App = () => (
             <BrowserRouter>
               <CTAProvider>
                 <PWAInstallPrompt />
-                <UnifiedPerformanceMonitor showAsWidget={true} />
                 <Routes>
               {/* Public Routes */}
               <Route path="/" element={<Index />} />
