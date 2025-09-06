@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,10 +16,66 @@ import {
   Database,
   BarChart3,
   RefreshCw,
-  Settings
+  Settings,
+  WifiOff
 } from 'lucide-react';
 import { securityAuditor, auditData } from '@/lib/security-audit';
 import { useAuth } from '@/lib/auth';
+
+interface SecurityMetrics {
+  totalEvents: number;
+  eventsByType: Record<string, number>;
+  eventsBySeverity: Record<string, number>;
+  suspiciousActivity: {
+    hasActivity: boolean;
+    patterns: string[];
+    recommendations: string[];
+  };
+  securityScore: number;
+}
+
+// Circuit breaker for preventing repeated failing calls
+class SecurityCircuitBreaker {
+  private failureCount = 0;
+  private readonly failureThreshold = 3;
+  private readonly resetTimeout = 60000; // 1 minute
+  private lastFailureTime = 0;
+  private state: 'closed' | 'open' | 'half-open' = 'closed';
+
+  canExecute(): boolean {
+    if (this.state === 'closed') return true;
+    
+    if (this.state === 'open') {
+      if (Date.now() - this.lastFailureTime >= this.resetTimeout) {
+        this.state = 'half-open';
+        return true;
+      }
+      return false;
+    }
+    
+    return true; // half-open state
+  }
+
+  recordSuccess(): void {
+    this.failureCount = 0;
+    this.state = 'closed';
+  }
+
+  recordFailure(): void {
+    this.failureCount++;
+    this.lastFailureTime = Date.now();
+    
+    if (this.failureCount >= this.failureThreshold) {
+      this.state = 'open';
+    }
+  }
+
+  isOpen(): boolean {
+    return this.state === 'open';
+  }
+}
+
+const securityCircuitBreaker = new SecurityCircuitBreaker();
 
 interface SecurityMetrics {
   totalEvents: number;
@@ -43,64 +99,164 @@ export const SecurityMonitor: React.FC = () => {
     securityScore: 100
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<string>('');
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Only show to admins
   if (!hasPermission(['admin'])) {
     return null;
   }
 
-  useEffect(() => {
-    loadSecurityMetrics();
+  // Debounced version of loadSecurityMetrics
+  const debouncedLoadMetrics = useCallback(() => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
     
-    // Refresh every 5 minutes
-    const interval = setInterval(loadSecurityMetrics, 5 * 60 * 1000);
-    return () => clearInterval(interval);
+    debounceTimeoutRef.current = setTimeout(() => {
+      loadSecurityMetricsWithTimeout();
+    }, 300); // 300ms debounce
   }, []);
 
-  const loadSecurityMetrics = () => {
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    debouncedLoadMetrics();
+    
+    // Refresh every 5 minutes, but only if not loading
+    const interval = setInterval(() => {
+      if (!isLoading && !error) {
+        debouncedLoadMetrics();
+      }
+    }, 5 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, [isLoading, error, debouncedLoadMetrics]);
+
+  const loadSecurityMetricsWithTimeout = async (): Promise<void> => {
+    // Check circuit breaker
+    if (!securityCircuitBreaker.canExecute()) {
+      setError('Security monitoring temporarily unavailable. Please try again later.');
+      setIsLoading(false);
+      return;
+    }
+
     try {
       setIsLoading(true);
-      
-      // Get security summary from auditor
-      const summary = securityAuditor.generateSecuritySummary(24);
-      
-      // Calculate security score based on events and patterns
-      let score = 100;
-      
-      // Deduct points for security events
-      const criticalCount = summary.eventsBySeverity.critical || 0;
-      const highCount = summary.eventsBySeverity.high || 0;
-      const mediumCount = summary.eventsBySeverity.medium || 0;
-      
-      score -= criticalCount * 20;
-      score -= highCount * 10;
-      score -= mediumCount * 5;
-      
-      // Deduct points for suspicious activity
-      if (summary.suspiciousActivity.hasActivity) {
-        score -= summary.suspiciousActivity.patterns.length * 15;
-      }
-      
-      score = Math.max(0, Math.min(100, score));
-      
-      setMetrics({
-        totalEvents: summary.totalEvents,
-        eventsByType: summary.eventsByType,
-        eventsBySeverity: summary.eventsBySeverity,
-        suspiciousActivity: summary.suspiciousActivity,
-        securityScore: score
+      setError(null);
+
+      // Set a timeout for the loading operation
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        loadingTimeoutRef.current = setTimeout(() => {
+          reject(new Error('Security metrics loading timeout (8 seconds)'));
+        }, 8000);
       });
+
+      const loadPromise = new Promise<SecurityMetrics>((resolve, reject) => {
+        try {
+          // Get security summary from auditor with error handling
+          const summary = securityAuditor.generateSecuritySummary(24);
+          
+          // Calculate security score based on events and patterns
+          let score = 100;
+          
+          // Deduct points for security events
+          const criticalCount = summary.eventsBySeverity.critical || 0;
+          const highCount = summary.eventsBySeverity.high || 0;
+          const mediumCount = summary.eventsBySeverity.medium || 0;
+          
+          score -= criticalCount * 20;
+          score -= highCount * 10;
+          score -= mediumCount * 5;
+          
+          // Deduct points for suspicious activity
+          if (summary.suspiciousActivity.hasActivity) {
+            score -= summary.suspiciousActivity.patterns.length * 15;
+          }
+          
+          score = Math.max(0, Math.min(100, score));
+          
+          const metrics: SecurityMetrics = {
+            totalEvents: summary.totalEvents,
+            eventsByType: summary.eventsByType,
+            eventsBySeverity: summary.eventsBySeverity,
+            suspiciousActivity: summary.suspiciousActivity,
+            securityScore: score
+          };
+          
+          resolve(metrics);
+        } catch (error) {
+          reject(error);
+        }
+      });
+
+      // Race between timeout and actual loading
+      const result = await Promise.race([loadPromise, timeoutPromise]);
       
+      // Clear timeout if we got here
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+      }
+
+      setMetrics(result);
       setLastUpdate(new Date().toLocaleTimeString());
       
       // Log the security check
       auditData.sensitiveAccess('security_monitor', 'view', undefined, 'admin_dashboard');
       
+      // Record success for circuit breaker
+      securityCircuitBreaker.recordSuccess();
+      
     } catch (error) {
       console.error('Failed to load security metrics:', error);
+      
+      // Record failure for circuit breaker
+      securityCircuitBreaker.recordFailure();
+      
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      
+      if (errorMessage.includes('timeout')) {
+        setError('Security monitoring is taking too long to respond. This may indicate a performance issue.');
+      } else {
+        setError('Failed to load security metrics. Please try refreshing.');
+      }
+      
+      // Set fallback metrics if we have an error
+      setMetrics({
+        totalEvents: 0,
+        eventsByType: { error: 1 },
+        eventsBySeverity: { medium: 1 },
+        suspiciousActivity: { 
+          hasActivity: true, 
+          patterns: ['Security monitoring system error'],
+          recommendations: ['Check system status and try refreshing']
+        },
+        securityScore: 85
+      });
+      
     } finally {
       setIsLoading(false);
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+      }
+    }
+  };
+
+  const handleRefresh = () => {
+    if (!isLoading) {
+      debouncedLoadMetrics();
     }
   };
 
@@ -118,7 +274,7 @@ export const SecurityMonitor: React.FC = () => {
     return { label: 'Critical', variant: 'destructive' };
   };
 
-  if (isLoading) {
+  if (isLoading && !error) {
     return (
       <Card>
         <CardHeader>
@@ -132,6 +288,29 @@ export const SecurityMonitor: React.FC = () => {
             <RefreshCw className="h-6 w-6 animate-spin mr-2" />
             <span>Loading security metrics...</span>
           </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Circuit breaker error state
+  if (securityCircuitBreaker.isOpen()) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <WifiOff className="h-5 w-5 text-orange-500" />
+            <span>Security Monitor - Service Unavailable</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              Security monitoring is temporarily unavailable due to repeated failures. 
+              The service will automatically retry in a few minutes.
+            </AlertDescription>
+          </Alert>
         </CardContent>
       </Card>
     );
@@ -151,7 +330,7 @@ export const SecurityMonitor: React.FC = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={loadSecurityMetrics}
+              onClick={handleRefresh}
               disabled={isLoading}
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
@@ -169,6 +348,26 @@ export const SecurityMonitor: React.FC = () => {
       </CardHeader>
       
       <CardContent>
+        {/* Error Display */}
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              {error}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleRefresh}
+                disabled={isLoading}
+                className="ml-2 h-6"
+              >
+                <RefreshCw className={`h-3 w-3 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
+                Retry
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
         <Tabs defaultValue="overview" className="space-y-4">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
