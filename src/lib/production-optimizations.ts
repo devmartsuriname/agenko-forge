@@ -240,8 +240,8 @@ function initializeMemoryMonitoring() {
           limit: Math.round(memory.jsHeapSizeLimit / 1024 / 1024) + 'MB'
         });
         
-        // Warn if memory usage is high
-        if (memoryMB > 100) {
+        // Warn if memory usage is very high (increased threshold for modern web apps)
+        if (memoryMB > 300) {
           logger.warn('High memory usage detected', { usage: memoryMB + 'MB' });
         }
       } catch (error) {
