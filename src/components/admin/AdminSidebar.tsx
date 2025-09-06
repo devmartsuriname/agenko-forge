@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
 import { cn } from '@/lib/utils';
+import { SecureLogout } from '@/components/auth/SecureLogout';
 import {
   LayoutDashboard,
   FileText,
@@ -70,31 +71,12 @@ const navItems = [
 ];
 
 export function AdminSidebar() {
-  const { signOut, isAdmin, userRole, loading } = useAuth();
+  const { isAdmin, userRole, loading } = useAuth();
   const [expandedItems, setExpandedItems] = useState<string[]>(['/admin/blog', 'Core Modules']);
   
   // Use userRole from auth context (fetched from profiles table)
   // Fix: Don't use user?.role as it's always undefined
   const isEditor = userRole === 'editor' || userRole === 'admin';
-
-  const [isSigningOut, setIsSigningOut] = useState(false);
-
-  const handleSignOut = async () => {
-    if (isSigningOut) return; // Prevent double clicks
-    
-    setIsSigningOut(true);
-    try {
-      await signOut();
-      // Redirect to login after successful logout
-      window.location.href = '/admin/login';
-    } catch (error) {
-      console.error('Logout failed:', error);
-      // Still redirect to login to ensure clean state
-      window.location.href = '/admin/login';
-    } finally {
-      setIsSigningOut(false);
-    }
-  };
 
   const toggleExpanded = (href: string) => {
     setExpandedItems(prev => 
@@ -221,20 +203,21 @@ export function AdminSidebar() {
       </nav>
       
       <div className="p-4 border-t border-border">
-        <button
-          onClick={handleSignOut}
-          disabled={isSigningOut}
-          className="flex items-center space-x-3 px-3 py-2 rounded-md transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground w-full disabled:opacity-50 disabled:cursor-not-allowed"
+        <SecureLogout
+          variant="ghost"
+          className="w-full justify-start text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+          onLogoutComplete={() => {
+            // Redirect to login after successful logout
+            window.location.href = '/admin/login';
+          }}
+          onLogoutError={(error) => {
+            console.error('Logout failed:', error);
+            // Still redirect to login to ensure clean state
+            window.location.href = '/admin/login';
+          }}
         >
-          {isSigningOut ? (
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
-          ) : (
-            <LogOut className="h-5 w-5" />
-          )}
-          <span className="font-medium">
-            {isSigningOut ? 'Signing Out...' : 'Sign Out'}
-          </span>
-        </button>
+          Sign Out
+        </SecureLogout>
       </div>
     </div>
   );

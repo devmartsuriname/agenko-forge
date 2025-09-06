@@ -127,38 +127,97 @@ export async function cleanupSessionData(): Promise<void> {
 }
 
 /**
- * Enhanced logout with comprehensive cleanup
+ * Enhanced logout with comprehensive cleanup and retry logic
  */
 export async function performSecureLogout(): Promise<{ success: boolean; error?: string }> {
+  const maxRetries = 3;
+  let lastError: any;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      // First, check if there's an active session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.warn(`Error checking session during logout (attempt ${attempt}):`, sessionError.message);
+      }
+
+      // Attempt Supabase logout with timeout
+      const logoutPromise = supabase.auth.signOut({ scope: 'global' });
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Logout timeout')), 10000)
+      );
+
+      const { error: logoutError } = await Promise.race([logoutPromise, timeoutPromise]) as any;
+      
+      if (logoutError && logoutError.message !== 'Session not found') {
+        console.warn(`Supabase logout error (attempt ${attempt}):`, logoutError.message);
+        if (attempt === maxRetries) {
+          lastError = logoutError;
+        } else {
+          continue; // Retry
+        }
+      }
+
+      // Always perform cleanup regardless of logout success
+      await cleanupSessionData();
+
+      // Verify cleanup was successful
+      const isCleanedUp = await verifySessionCleanup();
+      if (!isCleanedUp && attempt < maxRetries) {
+        continue; // Retry cleanup
+      }
+
+      return { success: true };
+    } catch (error: any) {
+      console.error(`Secure logout error (attempt ${attempt}):`, error);
+      lastError = error;
+      
+      if (attempt === maxRetries) {
+        // Still attempt cleanup even on final error
+        await cleanupSessionData();
+        
+        return { 
+          success: false, 
+          error: error?.message || 'Logout failed after multiple attempts' 
+        };
+      }
+      
+      // Wait before retry
+      await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+    }
+  }
+
+  return { 
+    success: false, 
+    error: lastError?.message || 'Logout failed after multiple attempts' 
+  };
+}
+
+/**
+ * Verify that session cleanup was successful
+ */
+async function verifySessionCleanup(): Promise<boolean> {
   try {
-    // First, check if there's an active session
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (typeof window === 'undefined') return true;
     
-    if (sessionError) {
-      console.warn('Error checking session during logout:', sessionError.message);
-    }
-
-    // Attempt Supabase logout regardless of session status
-    const { error: logoutError } = await supabase.auth.signOut({ scope: 'global' });
+    // Check for remaining session data
+    const hasLocalStorage = Object.keys(localStorage).some(key => 
+      key.startsWith('supabase.auth.token') || key.startsWith('sb-')
+    );
     
-    if (logoutError && logoutError.message !== 'Session not found') {
-      console.warn('Supabase logout error:', logoutError.message);
-    }
-
-    // Always perform cleanup regardless of logout success
-    await cleanupSessionData();
-
-    return { success: true };
-  } catch (error: any) {
-    console.error('Secure logout error:', error);
+    const hasSessionStorage = Object.keys(sessionStorage).some(key => 
+      key.startsWith('supabase.auth.token') || key.startsWith('sb-')
+    );
     
-    // Still attempt cleanup even on error
-    await cleanupSessionData();
+    const hasCookies = document.cookie.split(';').some(cookie => 
+      cookie.trim().startsWith('sb-') || cookie.includes('supabase')
+    );
     
-    return { 
-      success: false, 
-      error: error?.message || 'Logout failed unexpectedly' 
-    };
+    return !hasLocalStorage && !hasSessionStorage && !hasCookies;
+  } catch (error) {
+    console.warn('Error verifying session cleanup:', error);
+    return true; // Assume success if verification fails
   }
 }
 

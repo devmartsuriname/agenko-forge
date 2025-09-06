@@ -20,6 +20,9 @@ interface SecureLogoutProps {
   variant?: 'default' | 'outline' | 'ghost' | 'link' | 'destructive' | 'secondary';
   size?: 'default' | 'sm' | 'lg' | 'icon';
   className?: string;
+  onLogoutStart?: () => void;
+  onLogoutComplete?: () => void;
+  onLogoutError?: (error: string) => void;
 }
 
 export const SecureLogout: React.FC<SecureLogoutProps> = ({
@@ -27,17 +30,33 @@ export const SecureLogout: React.FC<SecureLogoutProps> = ({
   showIcon = true,
   variant = 'ghost',
   size = 'default',
-  className = ''
+  className = '',
+  onLogoutStart,
+  onLogoutComplete,
+  onLogoutError
 }) => {
   const { signOut, loading } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [logoutAttempts, setLogoutAttempts] = useState(0);
+  const [lastError, setLastError] = useState<string | null>(null);
 
   const handleLogout = async () => {
+    if (isLoggingOut) return; // Prevent double-clicks
+    
     setIsLoggingOut(true);
+    setLastError(null);
+    onLogoutStart?.();
+    
     try {
       await signOut();
-    } catch (error) {
+      setLogoutAttempts(0);
+      onLogoutComplete?.();
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Logout failed';
       console.error('Logout error:', error);
+      setLastError(errorMessage);
+      setLogoutAttempts(prev => prev + 1);
+      onLogoutError?.(errorMessage);
     } finally {
       setIsLoggingOut(false);
     }
@@ -68,6 +87,12 @@ export const SecureLogout: React.FC<SecureLogoutProps> = ({
           <AlertDialogTitle>Confirm Sign Out</AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to sign out? This will end your current session and you'll need to sign in again to access the admin panel.
+            {lastError && (
+              <div className="mt-2 p-2 bg-destructive/10 border border-destructive/20 rounded text-destructive text-sm">
+                Previous logout failed: {lastError}
+                {logoutAttempts > 1 && ` (${logoutAttempts} attempts)`}
+              </div>
+            )}
           </AlertDialogDescription>
         </AlertDialogHeader>
         

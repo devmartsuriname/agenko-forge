@@ -4,6 +4,7 @@ import { useAuth } from '@/lib/auth';
 import { AdminSidebar } from './AdminSidebar';
 import { AdminHeader } from './AdminHeader';
 import { AuthStateMonitor } from '@/components/auth/AuthStateMonitor';
+import { SessionHealthMonitor } from '@/components/auth/SessionHealthMonitor';
 import { SecurityMonitor } from './SecurityMonitor';
 
 interface AdminLayoutProps {
@@ -60,6 +61,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     <div className="admin-root min-h-screen bg-background" data-build="P7.2.1-PROPOSALS-FIX" data-audit="P7-RLS-AUDIT-v1">
       {/* Auth State Monitor */}
       <AuthStateMonitor />
+      <SessionHealthMonitor />
       
       {/* Debug audit banner */}
       {process.env.NODE_ENV === 'development' && (

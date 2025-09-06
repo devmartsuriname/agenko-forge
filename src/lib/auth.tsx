@@ -53,23 +53,65 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Session refresh control
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [refreshAttempts, setRefreshAttempts] = useState(0);
+  const maxRefreshAttempts = 3;
+
   const refreshSession = useCallback(async () => {
+    // Prevent concurrent refresh attempts
+    if (isRefreshing || refreshAttempts >= maxRefreshAttempts) {
+      return;
+    }
+
     try {
+      setIsRefreshing(true);
       const refreshedSession = await refreshSessionIfNeeded(session);
+      
       if (refreshedSession && refreshedSession !== session) {
         setSession(refreshedSession);
         setUser(refreshedSession.user);
+        setRefreshAttempts(0); // Reset attempts on success
         toast.success('Session refreshed successfully');
       }
     } catch (error) {
       console.error('Session refresh failed:', error);
-      toast.error('Session refresh failed. Please log in again.');
+      setRefreshAttempts(prev => prev + 1);
+      
+      if (refreshAttempts >= maxRefreshAttempts - 1) {
+        // Force logout after max attempts
+        toast.error('Session refresh failed multiple times. Please log in again.');
+        signOut();
+      } else {
+        toast.error('Session refresh failed. Please log in again.');
+      }
+    } finally {
+      setIsRefreshing(false);
     }
-  }, [session]);
+  }, [session, isRefreshing, refreshAttempts, maxRefreshAttempts]);
 
   useEffect(() => {
     let mounted = true;
+    let refreshInterval: NodeJS.Timeout;
     
+    // Cross-tab session synchronization
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key?.startsWith('sb-') && e.newValue === null) {
+        // Session was cleared in another tab, sync this tab
+        setSession(null);
+        setUser(null);
+        setUserRole(null);
+      }
+    };
+
+    // Network status handling
+    const handleOnline = () => {
+      // Refresh session when coming back online
+      if (session && !isRefreshing) {
+        setTimeout(() => refreshSession(), 1000);
+      }
+    };
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, newSession) => {
@@ -77,12 +119,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         console.log('Auth state change:', event, newSession?.user?.email);
 
+        // Reset refresh attempts on successful auth change
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          setRefreshAttempts(0);
+        }
+
         // Handle session validation
         if (newSession) {
           const validation = await validateSession(newSession);
           if (!validation.isValid) {
             console.warn('Invalid session detected:', validation.error);
-            if (validation.needsRefresh) {
+            if (validation.needsRefresh && !isRefreshing) {
               const refreshedSession = await refreshSessionIfNeeded(newSession);
               if (refreshedSession) {
                 setSession(refreshedSession);
@@ -124,7 +171,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setSession(existingSession);
           setUser(existingSession.user);
           fetchUserRole(existingSession.user.id);
-        } else if (validation.needsRefresh) {
+        } else if (validation.needsRefresh && !isRefreshing) {
           const refreshedSession = await refreshSessionIfNeeded(existingSession);
           if (refreshedSession) {
             setSession(refreshedSession);
@@ -137,19 +184,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     });
 
-    // Set up session refresh interval
-    const refreshInterval = setInterval(() => {
-      if (session) {
-        refreshSession();
-      }
-    }, 10 * 60 * 1000); // Refresh every 10 minutes
+    // Set up session refresh interval with network awareness
+    const setupRefreshInterval = () => {
+      refreshInterval = setInterval(() => {
+        if (session && navigator.onLine && !isRefreshing) {
+          refreshSession();
+        }
+      }, 10 * 60 * 1000); // Refresh every 10 minutes
+    };
+
+    setupRefreshInterval();
+
+    // Event listeners
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('online', handleOnline);
 
     return () => {
       mounted = false;
       subscription.unsubscribe();
       clearInterval(refreshInterval);
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('online', handleOnline);
     };
-  }, [fetchUserRole, refreshSession]);
+  }, [fetchUserRole, refreshSession, session, isRefreshing]);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -175,6 +232,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     try {
       setLoading(true);
+      // Reset refresh attempts and state
+      setRefreshAttempts(0);
+      setIsRefreshing(false);
+      
       const result = await performSecureLogout();
       
       if (result.success) {
@@ -220,7 +281,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         session,
-        loading,
+        loading: loading || isRefreshing,
         userRole,
         isAdmin,
         isEditor,
