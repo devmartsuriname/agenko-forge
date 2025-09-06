@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import { initializeProductionOptimizations } from './lib/production-optimizations'
+import { logAssetHealth } from './lib/asset-validation'
 
 // Initialize React with proper error boundaries and strict mode
 const root = createRoot(document.getElementById("root")!);
@@ -21,6 +22,8 @@ try {
   setTimeout(() => {
     try {
       initializeProductionOptimizations();
+      // Perform asset health check in development
+      logAssetHealth();
     } catch (error) {
       console.error('Production optimizations failed to initialize:', error);
     }

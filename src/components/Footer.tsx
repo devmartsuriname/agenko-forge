@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import logo from '@/assets/logo.png';
 import { LazyImageWithFallback } from '@/components/ui/LazyImageWithFallback';
+import { OptimizedAssetImage } from '@/components/ui/OptimizedAssetImage';
 import { useContactSettings } from '@/hooks/useContactSettings';
 
 const Footer = () => {
@@ -34,9 +35,10 @@ const Footer = () => {
           {/* Brand & Description */}
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center space-x-2 mb-4">
-              <LazyImageWithFallback 
+              <OptimizedAssetImage 
                 src={logo} 
                 fallbackSrc="/logo.png"
+                publicFallback="/placeholder.svg"
                 alt="DevMart Logo" 
                 className="h-8 w-auto"
               />

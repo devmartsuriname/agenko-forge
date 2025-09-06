@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Building, Zap, Palette, Target } from 'lucide-react';
 import heroImage from '@/assets/hero-image.jpg';
+import { OptimizedAssetImage } from '@/components/ui/OptimizedAssetImage';
 import { Link } from 'react-router-dom';
 import { TimelineShowcase } from '@/components/ui/TimelineShowcase';
 import { AutoBreadcrumb } from '@/components/ui/breadcrumb';
@@ -145,11 +146,12 @@ const About = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div className="relative">
                 <div className="bg-agenko-dark-lighter rounded-2xl p-8">
-                  <img 
+                  <OptimizedAssetImage 
                     src={heroImage} 
+                    fallbackSrc="/images/about-workspace.jpg"
+                    publicFallback="/placeholder.svg"
                     alt="About Devmart Agency" 
                     className="w-full h-96 object-cover rounded-xl"
-                    loading="eager"
                   />
                 </div>
               </div>
@@ -231,11 +233,12 @@ const About = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div className="relative">
                 <div className="bg-agenko-dark-lighter rounded-2xl p-8">
-                  <img 
+                  <OptimizedAssetImage 
                     src={heroImage} 
+                    fallbackSrc="/images/about-team-collaboration.jpg"
+                    publicFallback="/placeholder.svg"
                     alt="Our Mission" 
                     className="w-full h-96 object-cover rounded-xl"
-                    loading="lazy"
                   />
                 </div>
               </div>

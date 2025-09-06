@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import logo from '@/assets/logo.png';
 import { LazyImageWithFallback } from '@/components/ui/LazyImageWithFallback';
+import { OptimizedAssetImage } from '@/components/ui/OptimizedAssetImage';
 
 interface GlobalNavigationProps {
   /** Whether to use transparent overlay (for homepage) or solid background */
@@ -79,9 +80,10 @@ export function GlobalNavigation({ overlay = false }: GlobalNavigationProps) {
       {/* Navigation */}
       <nav className="container mx-auto flex items-center justify-between px-4 py-4 mt-6 relative z-10">
         <Link to="/" className="flex items-center">
-          <LazyImageWithFallback 
+          <OptimizedAssetImage 
             src={logo} 
             fallbackSrc="/logo.png"
+            publicFallback="/placeholder.svg"
             alt="Devmart Logo" 
             className="h-8 w-auto object-contain" 
           />
@@ -173,9 +175,10 @@ export function GlobalNavigation({ overlay = false }: GlobalNavigationProps) {
           >
             <div className="flex items-center justify-between">
               <Link to="/" className="flex items-center" onClick={() => setMobileMenuOpen(false)}>
-                <LazyImageWithFallback 
+                <OptimizedAssetImage 
                   src={logo} 
                   fallbackSrc="/logo.png"
+                  publicFallback="/placeholder.svg"
                   alt="Devmart Logo" 
                   className="h-8 w-auto object-contain" 
                 />

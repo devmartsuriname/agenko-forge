@@ -36,7 +36,7 @@ export default function ProposalView() {
         .select(`
           *,
           proposal_recipients (
-            id, email, name, role, viewed_at
+            id, proposal_id, email, name, role, token, viewed_at, created_at
           )
         `)
         .eq('id', id)
