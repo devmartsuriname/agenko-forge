@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { PerformanceMonitor } from '@/components/admin/PerformanceMonitor';
 import { CTAAnalytics } from '@/components/admin/analytics/CTAAnalytics';
 import { SystemHealthWidget } from '@/components/admin/SystemHealthWidget';
+import { ErrorBoundaryWrapper } from '@/components/admin/ErrorBoundaryWrapper';
 
 interface DashboardStats {
   services: number;
@@ -295,7 +296,9 @@ export default function AdminDashboard() {
         {/* CTA Analytics */}
         <div>
           <h2 className="text-2xl font-bold text-foreground mb-4">CTA Analytics</h2>
-          <CTAAnalytics />
+          <ErrorBoundaryWrapper>
+            <CTAAnalytics />
+          </ErrorBoundaryWrapper>
         </div>
 
         {/* Performance Monitor */}

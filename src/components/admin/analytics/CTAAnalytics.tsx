@@ -23,67 +23,34 @@ export function CTAAnalytics() {
 
   const fetchCTAMetrics = async () => {
     try {
-      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-
-      // Fetch CTA interactions
-      const { data: interactions } = await supabase
-        .from('cta_interactions')
-        .select('*')
-        .gte('created_at', sevenDaysAgo);
-
-      // Fetch email subscriptions
-      const { data: subscriptions } = await supabase
-        .from('email_subscriptions')
-        .select('*')
-        .gte('created_at', sevenDaysAgo);
-
-      if (interactions && subscriptions) {
-        // Calculate metrics
-        const totalInteractions = interactions.length;
-        const emailSignups = subscriptions.length;
-        const conversionRate = totalInteractions > 0 ? (emailSignups / totalInteractions) * 100 : 0;
-
-        // Top CTA types
-        const ctaTypeCounts = interactions.reduce((acc: Record<string, number>, interaction) => {
-          acc[interaction.cta_type] = (acc[interaction.cta_type] || 0) + 1;
-          return acc;
-        }, {});
-
-        const topCtaTypes = Object.entries(ctaTypeCounts)
-          .map(([cta_type, count]) => ({ cta_type, count }))
-          .sort((a, b) => b.count - a.count)
-          .slice(0, 5);
-
-        // Daily interactions (last 7 days)
-        const dailyData = Array.from({ length: 7 }, (_, i) => {
-          const date = new Date(Date.now() - (6 - i) * 24 * 60 * 60 * 1000);
-          const dateStr = date.toISOString().split('T')[0];
-          
-          const dayInteractions = interactions.filter(interaction => 
-            interaction.created_at.startsWith(dateStr)
-          ).length;
-          
-          const daySignups = subscriptions.filter(subscription => 
-            subscription.created_at.startsWith(dateStr)
-          ).length;
-
-          return {
-            date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-            interactions: dayInteractions,
-            signups: daySignups
-          };
-        });
-
+      // Use optimized database function
+      const { data, error } = await supabase.rpc('get_cta_analytics', { days_back: 7 });
+      
+      if (error) {
+        console.error('Database function error:', error);
+        throw error;
+      }
+      
+      if (data && typeof data === 'object') {
+        const result = data as any; // Type assertion for RPC response
         setMetrics({
-          total_interactions: totalInteractions,
-          email_signups: emailSignups,
-          conversion_rate: conversionRate,
-          top_cta_types: topCtaTypes,
-          daily_interactions: dailyData
+          total_interactions: result.total_interactions || 0,
+          email_signups: result.email_signups || 0,
+          conversion_rate: parseFloat(result.conversion_rate) || 0,
+          top_cta_types: result.top_cta_types || [],
+          daily_interactions: result.daily_interactions || []
         });
       }
     } catch (error) {
       console.error('Error fetching CTA metrics:', error);
+      // Set default empty state on error
+      setMetrics({
+        total_interactions: 0,
+        email_signups: 0,
+        conversion_rate: 0,
+        top_cta_types: [],
+        daily_interactions: []
+      });
     } finally {
       setLoading(false);
     }

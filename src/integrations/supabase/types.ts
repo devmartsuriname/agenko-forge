@@ -1335,6 +1335,10 @@ export type Database = {
           updated_at: string
         }[]
       }
+      get_cta_analytics: {
+        Args: { days_back?: number }
+        Returns: Json
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
