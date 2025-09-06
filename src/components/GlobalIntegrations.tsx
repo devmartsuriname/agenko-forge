@@ -33,7 +33,9 @@ export function GlobalIntegrations() {
         show_consent_banner: data.show_consent_banner !== false,
       });
     } catch (error) {
-      console.error('Failed to load integration settings:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Failed to load integration settings:', error);
+      }
       // Fail silently in production
     } finally {
       setLoading(false);

@@ -5,6 +5,7 @@ import './index.css'
 import { initializeProductionOptimizations } from './lib/production-optimizations'
 import { logAssetHealth } from './lib/asset-validation'
 import { initOptimizedPerformanceMonitoring } from './lib/performance-optimized'
+import { initializeProductionErrorHandler } from './lib/production-error-handler'
 
 // Initialize React with proper error boundaries and strict mode
 const root = createRoot(document.getElementById("root")!);
@@ -23,6 +24,8 @@ try {
   setTimeout(() => {
     try {
       initializeProductionOptimizations();
+      // Initialize production error handler first
+      initializeProductionErrorHandler();
       // Initialize optimized performance monitoring
       initOptimizedPerformanceMonitoring();
       // Perform asset health check in development only

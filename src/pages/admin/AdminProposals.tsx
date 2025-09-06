@@ -248,10 +248,27 @@ export default function AdminProposals() {
       const a = document.createElement('a');
       a.href = url;
       a.download = `proposal-${proposalId}.html`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      
+      // Use safer DOM manipulation
+      try {
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        
+        // Cleanup with error handling
+        setTimeout(() => {
+          try {
+            if (document.body.contains(a)) {
+              document.body.removeChild(a);
+            }
+          } catch (error) {
+            // Silently handle cleanup error
+          }
+        }, 100);
+      } catch (error) {
+        window.URL.revokeObjectURL(url);
+        throw error;
+      }
 
       adminToast.success('Proposal downloaded');
     } catch (error: any) {

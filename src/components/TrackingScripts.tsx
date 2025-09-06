@@ -176,12 +176,22 @@ export function TrackingScripts({
 
     window.addEventListener('consentChanged', handleConsentChange as EventListener);
 
-    // Cleanup function
+    // Cleanup function - safer DOM manipulation
     return () => {
       window.removeEventListener('consentChanged', handleConsentChange as EventListener);
+      
+      // Use a more React-friendly cleanup approach
       scripts.forEach(script => {
-        if (script.parentNode) {
-          script.parentNode.removeChild(script);
+        try {
+          // Check if script still exists and has a parent before removing
+          if (script && script.parentNode && document.contains(script)) {
+            script.parentNode.removeChild(script);
+          }
+        } catch (error) {
+          // Silently handle cleanup errors to prevent console noise
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('Script cleanup warning:', error);
+          }
         }
       });
     };

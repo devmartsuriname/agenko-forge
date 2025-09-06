@@ -94,10 +94,27 @@ export function FinalValidationDashboard() {
     const a = document.createElement('a');
     a.href = url;
     a.download = `performance-validation-${new Date().toISOString().split('T')[0]}.md`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    
+    // Use safer DOM manipulation
+    try {
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      // Cleanup with error handling
+      setTimeout(() => {
+        try {
+          if (document.body.contains(a)) {
+            document.body.removeChild(a);
+          }
+        } catch (error) {
+          // Silently handle cleanup error
+        }
+      }, 100);
+    } catch (error) {
+      URL.revokeObjectURL(url);
+      console.error('Download failed:', error);
+    }
   };
 
   const overallScore = results?.comprehensive.reduce((sum, result) => sum + result.overallScore, 0) / (results?.comprehensive.length || 1) || 0;

@@ -16,6 +16,7 @@ import { GlobalIntegrations } from '@/components/GlobalIntegrations';
 import { PWAInstallPrompt } from '@/components/ui/PWAInstallPrompt';
 import { CTAProvider } from "@/components/cta/CTAProvider";
 import { ProductionErrorBoundary } from "@/components/ui/ProductionErrorBoundary";
+import { EnhancedProductionErrorBoundary } from "@/components/ui/EnhancedProductionErrorBoundary";
 
 // Public pages
 import Index from "./pages/Index";
@@ -122,7 +123,7 @@ if (typeof window !== 'undefined') {
 }
 
 const App = () => (
-  <ProductionErrorBoundary showDetails={process.env.NODE_ENV === 'development'}>
+  <EnhancedProductionErrorBoundary showDetails={process.env.NODE_ENV === 'development'}>
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
@@ -379,7 +380,7 @@ const App = () => (
         </AuthProvider>
       </QueryClientProvider>
     </HelmetProvider>
-  </ProductionErrorBoundary>
+  </EnhancedProductionErrorBoundary>
 );
 
 export default App;
