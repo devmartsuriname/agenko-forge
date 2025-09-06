@@ -58,15 +58,24 @@ export const AboutSectionSchema = BaseSectionSchema.extend({
     })).optional(),
     // Enhanced About3 component fields
     mainImage: z.object({
-      src: z.string().url(),
+      src: z.string().refine(
+        (val) => val.startsWith('/') || val.startsWith('http://') || val.startsWith('https://'), 
+        { message: "Image URL must be either a relative path (starting with /) or a full URL" }
+      ),
       alt: z.string(),
     }).optional(),
     secondaryImage: z.object({
-      src: z.string().url(),
+      src: z.string().refine(
+        (val) => val.startsWith('/') || val.startsWith('http://') || val.startsWith('https://'), 
+        { message: "Image URL must be either a relative path (starting with /) or a full URL" }
+      ),
       alt: z.string(),
     }).optional(),
     breakout: z.object({
-      src: z.string().url(),
+      src: z.string().refine(
+        (val) => val.startsWith('/') || val.startsWith('http://') || val.startsWith('https://'), 
+        { message: "Image URL must be either a relative path (starting with /) or a full URL" }
+      ),
       alt: z.string(),
       title: z.string().optional(),
       description: z.string().optional(),
@@ -78,7 +87,10 @@ export const AboutSectionSchema = BaseSectionSchema.extend({
     }).optional(),
     companiesTitle: z.string().optional(),
     companies: z.array(z.object({
-      src: z.string().url(),
+      src: z.string().refine(
+        (val) => val.startsWith('/') || val.startsWith('http://') || val.startsWith('https://'), 
+        { message: "Image URL must be either a relative path (starting with /) or a full URL" }
+      ),
       alt: z.string(),
     })).optional(),
     achievementsTitle: z.string().optional(),
