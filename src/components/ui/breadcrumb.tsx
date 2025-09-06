@@ -103,7 +103,7 @@ const BreadcrumbEllipsis = ({
     <span className="sr-only">More</span>
   </span>
 )
-BreadcrumbEllipsis.displayName = "BreadcrumbElipssis"
+BreadcrumbEllipsis.displayName = "BreadcrumbEllipsis"
 
 // Auto breadcrumb component that dynamically generates breadcrumbs based on current route
 const AutoBreadcrumb = () => {
