@@ -1406,6 +1406,10 @@ export type Database = {
         Args: { p_code: string }
         Returns: boolean
       }
+      validate_page_sections: {
+        Args: { sections: Json }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
