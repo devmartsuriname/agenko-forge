@@ -181,7 +181,11 @@ const App = () => (
                     <AdminDashboard />
                   </SuspenseWithTimeout>
                 } />
-                <Route path="pages" element={<AdminPages />} />
+                <Route path="pages" element={
+                  <SuspenseWithTimeout fallback={<Spinner />}>
+                    <AdminPages />
+                  </SuspenseWithTimeout>
+                } />
                 <Route path="pages/new" element={
                   <SuspenseWithTimeout fallback={
                     <div>
@@ -197,7 +201,11 @@ const App = () => (
                     <AdminPageEditor />
                   </SuspenseWithTimeout>
                 } />
-                <Route path="services" element={<AdminServices />} />
+                <Route path="services" element={
+                  <SuspenseWithTimeout fallback={<Spinner />}>
+                    <AdminServices />
+                  </SuspenseWithTimeout>
+                } />
                 <Route path="services/new" element={
                   <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminServiceEditor />
@@ -208,7 +216,11 @@ const App = () => (
                     <AdminServiceEditor />
                   </SuspenseWithTimeout>
                 } />
-                <Route path="projects" element={<AdminProjects />} />
+                <Route path="projects" element={
+                  <SuspenseWithTimeout fallback={<Spinner />}>
+                    <AdminProjects />
+                  </SuspenseWithTimeout>
+                } />
                 <Route path="projects/new" element={
                   <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminProjectEditor />
@@ -219,7 +231,11 @@ const App = () => (
                     <AdminProjectEditor />
                   </SuspenseWithTimeout>
                 } />
-                <Route path="blog" element={<AdminBlog />} />
+                <Route path="blog" element={
+                  <SuspenseWithTimeout fallback={<Spinner />}>
+                    <AdminBlog />
+                  </SuspenseWithTimeout>
+                } />
                 <Route path="blog/new" element={
                   <SuspenseWithTimeout fallback={<Spinner />}>
                     <AdminBlogEditor />
