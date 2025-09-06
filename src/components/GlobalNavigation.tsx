@@ -19,6 +19,7 @@ export function GlobalNavigation({ overlay = false }: GlobalNavigationProps) {
 
   // Main navigation items
   const mainNavItems = [
+    { label: "Home", href: "/" },
     { label: "Services", href: "/services" },
     { label: "Portfolio", href: "/portfolio" },
     { label: "About", href: "/about" },
