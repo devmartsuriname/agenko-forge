@@ -95,7 +95,7 @@ export function About3Section({ section }: About3SectionProps) {
   const achievementsDescription = data.achievementsDescription || "Delivering exceptional results through innovative solutions and dedicated partnerships.";
 
   return (
-    <section className="relative py-32 overflow-hidden">
+    <section className="relative py-20 px-4 bg-background overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <FloatingElement variant="default" className="absolute top-20 left-10 w-96 h-96 bg-primary/3 rounded-full blur-3xl opacity-30"><div /></FloatingElement>
@@ -103,122 +103,132 @@ export function About3Section({ section }: About3SectionProps) {
         <ProgressScrubbing intensity={0.3} direction="up" className="absolute top-1/3 left-1/4 w-72 h-72 bg-muted/20 rounded-full blur-2xl opacity-20"><div /></ProgressScrubbing>
       </div>
       
-      <div className="container mx-auto relative z-10">
-        {/* Header Section */}
-        <ScrollReveal direction="up" delay={0.1}>
-          <div className="mb-14 grid gap-5 text-center md:grid-cols-2 md:text-left">
-            <h1 className="text-5xl font-semibold text-foreground">{data.title}</h1>
-            <p className="text-muted-foreground">{data.description}</p>
-          </div>
-        </ScrollReveal>
-
-        {/* Main Content Grid */}
-        <div className="grid gap-7 lg:grid-cols-3">
-          {/* Main Image */}
-          {data.mainImage && (
-            <ScrollReveal direction="left" delay={0.2}>
-              <div className="group relative overflow-hidden rounded-xl">
-                <img
-                  src={data.mainImage.src}
-                  alt={data.mainImage.alt}
-                  className="size-full max-h-[620px] rounded-xl object-cover lg:col-span-2 transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl" />
-              </div>
-            </ScrollReveal>
-          )}
-          
-          {/* Side Content */}
-          <ScrollReveal direction="right" delay={0.3} stagger>
-            <div className="flex flex-col gap-7 md:flex-row lg:flex-col">
-              {/* Breakout Section */}
-              {data.breakout && (
-                <div className="group flex flex-col justify-between gap-6 rounded-xl bg-muted p-7 md:w-1/2 lg:w-auto hover:bg-muted/80 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                  <img
-                    src={data.breakout.src}
-                    alt={data.breakout.alt}
-                    className="mr-auto h-12 transition-transform duration-300 group-hover:scale-110"
-                  />
-                  <div>
-                    <p className="mb-2 text-lg font-semibold text-foreground group-hover:text-primary transition-colors duration-300">{data.breakout.title}</p>
-                    <p className="text-muted-foreground">{data.breakout.description}</p>
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* Main Content Grid - Restored 2-Column Layout */}
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Left Column: Content */}
+          <ScrollReveal direction="left" delay={0.1}>
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+                {data.title}
+              </h2>
+              <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+                {data.description}
+              </p>
+              
+              {/* Companies Section */}
+              {data.companies && data.companies.length > 0 && (
+                <ScrollReveal direction="up" delay={0.3}>
+                  <div className="mb-8">
+                    <p className="text-sm text-muted-foreground mb-4">{companiesTitle}</p>
+                    <div className="flex flex-wrap gap-6">
+                      {data.companies.map((company, idx) => (
+                        <ScrollReveal key={company.src + idx} direction="scale" delay={0.4 + idx * 0.1}>
+                          <div className="group">
+                            <img
+                              src={company.src}
+                              alt={company.alt}
+                              className="h-6 w-auto opacity-70 hover:opacity-100 transition-all duration-300 group-hover:scale-110 filter grayscale hover:grayscale-0"
+                            />
+                          </div>
+                        </ScrollReveal>
+                      ))}
+                    </div>
                   </div>
-                  {data.breakout.buttonText && data.breakout.buttonUrl && (
-                    <Button variant="outline" className="mr-auto group-hover:border-primary group-hover:text-primary transition-colors duration-300" asChild>
-                      <a href={data.breakout.buttonUrl} target="_blank" rel="noopener noreferrer">
-                        {data.breakout.buttonText}
-                      </a>
-                    </Button>
-                  )}
+                </ScrollReveal>
+              )}
+              
+              {/* Achievements Section */}
+              {data.achievements && data.achievements.length > 0 && (
+                <ScrollReveal direction="up" delay={0.4}>
+                  <div className="mb-8">
+                    <h3 className="text-xl font-semibold text-foreground mb-2">{achievementsTitle}</h3>
+                    <p className="text-muted-foreground mb-6">{achievementsDescription}</p>
+                    <div className="grid grid-cols-2 gap-6">
+                      {data.achievements.map((item, idx) => (
+                        <ScrollReveal key={item.label + idx} direction="scale" delay={0.5 + idx * 0.1}>
+                          <div className="text-center group hover:transform hover:scale-105 transition-transform duration-300">
+                            <div className="text-2xl md:text-3xl font-bold text-primary mb-1 group-hover:text-primary/90 transition-colors duration-300">
+                              {item.value}
+                            </div>
+                            <div className="text-sm text-muted-foreground">{item.label}</div>
+                          </div>
+                        </ScrollReveal>
+                      ))}
+                    </div>
+                  </div>
+                </ScrollReveal>
+              )}
+            </div>
+          </ScrollReveal>
+          
+          {/* Right Column: Image with Breakout */}
+          <ScrollReveal direction="right" delay={0.2}>
+            <div className="order-first lg:order-last relative">
+              {/* Main Image */}
+              {data.mainImage && (
+                <div className="group relative overflow-hidden rounded-2xl">
+                  <img
+                    src={data.mainImage.src}
+                    alt={data.mainImage.alt}
+                    className="w-full h-96 lg:h-[500px] object-cover rounded-2xl shadow-2xl transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
               )}
-            
-              {/* Secondary Image */}
+              
+              {/* Breakout Card */}
+              {data.breakout && (
+                <ScrollReveal direction="up" delay={0.5}>
+                  <div className="absolute -bottom-8 -left-8 group bg-card p-6 rounded-xl shadow-xl border hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 max-w-sm">
+                    <div className="flex items-start space-x-4">
+                      <img
+                        src={data.breakout.src}
+                        alt={data.breakout.alt}
+                        className="h-12 w-12 object-contain transition-transform duration-300 group-hover:scale-110"
+                        onError={(e) => {
+                          console.error('Logo failed to load:', data.breakout.src);
+                          // Try fallback path
+                          e.currentTarget.src = '/images/logo.png';
+                        }}
+                      />
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors duration-300">
+                          {data.breakout.title}
+                        </h4>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          {data.breakout.description}
+                        </p>
+                        {data.breakout.buttonText && data.breakout.buttonUrl && (
+                          <Button variant="outline" size="sm" className="group-hover:border-primary group-hover:text-primary transition-colors duration-300" asChild>
+                            <a href={data.breakout.buttonUrl} target="_blank" rel="noopener noreferrer">
+                              {data.breakout.buttonText}
+                            </a>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </ScrollReveal>
+              )}
+              
+              {/* Secondary Image - positioned below main image if present */}
               {data.secondaryImage && (
-                <div className="group relative overflow-hidden rounded-xl">
-                  <img
-                    src={data.secondaryImage.src}
-                    alt={data.secondaryImage.alt}
-                    className="grow basis-0 rounded-xl object-cover md:w-1/2 lg:min-h-0 lg:w-auto transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl" />
-                </div>
+                <ScrollReveal direction="up" delay={0.6}>
+                  <div className="mt-6 group relative overflow-hidden rounded-xl">
+                    <img
+                      src={data.secondaryImage.src}
+                      alt={data.secondaryImage.alt}
+                      className="w-full h-48 object-cover rounded-xl transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl" />
+                  </div>
+                </ScrollReveal>
               )}
             </div>
           </ScrollReveal>
         </div>
 
-        {/* Companies Section */}
-        {data.companies && data.companies.length > 0 && (
-          <ScrollReveal direction="up" delay={0.4}>
-            <div className="py-32">
-              <p className="text-center text-muted-foreground mb-2">{companiesTitle}</p>
-              <div className="mt-8 flex flex-wrap justify-center gap-8">
-                {data.companies.map((company, idx) => (
-                  <ScrollReveal key={company.src + idx} direction="scale" delay={0.5 + idx * 0.1}>
-                    <div className="flex items-center gap-3 group">
-                      <img
-                        src={company.src}
-                        alt={company.alt}
-                        className="h-6 w-auto md:h-8 opacity-70 hover:opacity-100 transition-all duration-300 group-hover:scale-110 filter grayscale hover:grayscale-0"
-                      />
-                    </div>
-                  </ScrollReveal>
-                ))}
-              </div>
-            </div>
-          </ScrollReveal>
-        )}
-
-        {/* Achievements Section */}
-        {data.achievements && data.achievements.length > 0 && (
-          <ScrollReveal direction="up" delay={0.5}>
-            <div className="relative overflow-hidden rounded-xl bg-muted p-10 md:p-16 group hover:bg-muted/90 transition-colors duration-500">
-              <div className="flex flex-col gap-4 text-center md:text-left relative z-10">
-                <h2 className="text-4xl font-semibold text-foreground">{achievementsTitle}</h2>
-                <p className="max-w-screen-sm text-muted-foreground">
-                  {achievementsDescription}
-                </p>
-              </div>
-              <div className="mt-10 flex flex-wrap justify-between gap-10 text-center relative z-10">
-                {data.achievements.map((item, idx) => (
-                  <ScrollReveal key={item.label + idx} direction="scale" delay={0.6 + idx * 0.1}>
-                    <div className="flex flex-col gap-4 group-hover:transform group-hover:scale-105 transition-transform duration-300">
-                      <p className="text-muted-foreground">{item.label}</p>
-                      <span className="text-4xl font-semibold md:text-5xl text-primary group-hover:text-primary/90 transition-colors duration-300">
-                        {item.value}
-                      </span>
-                    </div>
-                  </ScrollReveal>
-                ))}
-              </div>
-              {/* Decorative Grid Pattern */}
-              <div className="pointer-events-none absolute -top-1 right-1 z-10 hidden h-full w-full bg-[linear-gradient(to_right,hsl(var(--muted-foreground))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--muted-foreground))_1px,transparent_1px)] bg-[size:80px_80px] opacity-15 [mask-image:linear-gradient(to_bottom_right,#000,transparent,transparent)] md:block group-hover:opacity-25 transition-opacity duration-500"></div>
-              {/* Subtle floating background element */}
-              <ProgressScrubbing intensity={0.2} direction="right" className="absolute top-10 right-10 w-32 h-32 bg-primary/5 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"><div /></ProgressScrubbing>
-            </div>
-          </ScrollReveal>
-        )}
       </div>
     </section>
   );
