@@ -1,7 +1,8 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { optimizedQueryClient } from "@/lib/react-query-config";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from '@/lib/auth';
@@ -83,7 +84,8 @@ const AdminTestHarness = lazy(() => import("./pages/admin/TestHarness"));
 const ErrorBoundaryTest = lazy(() => import("./components/admin/ErrorBoundaryTest"));
 const PerformanceValidator = lazy(() => import("./components/admin/PerformanceValidator"));
 
-const queryClient = new QueryClient();
+// Use optimized QueryClient with content-aware caching
+const queryClient = optimizedQueryClient;
 
 const App = () => (
   <ProductionErrorBoundary showDetails={process.env.NODE_ENV === 'development'}>

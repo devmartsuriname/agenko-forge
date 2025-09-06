@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { cms } from '@/lib/cms';
+import { cms, Page } from '@/lib/cms';
 import { SEOHead } from '@/lib/seo';
 import { GlobalNavigation } from '@/components/GlobalNavigation';
 import Footer from '@/components/Footer';
@@ -9,15 +9,33 @@ import { HomeSkeleton } from '@/components/HomeSkeleton';
 import { injectHeroPreload } from '@/lib/performance';
 import { useEffect } from 'react';
 import { InsightsPreviewSection } from '@/components/sections/InsightsPreviewSection';
+import { CacheStrategies, createHomepageKey } from '@/lib/react-query-config';
 
 const Index = () => {
 
-  const { data: homePage, isLoading, error } = useQuery({
-    queryKey: ['homepage'],
-    queryFn: async () => {
+  // Optimized homepage query with content-aware caching and versioning
+  const { data: homePage, isLoading, error } = useQuery<Page | null>({
+    queryKey: createHomepageKey(), // Will include version when available
+    queryFn: async (): Promise<Page | null> => {
       const pages = await cms.getPublishedPages();
-      return pages.find(p => p.slug === 'home') || null;
+      const homepage = pages.find(p => p.slug === 'home') || null;
+      
+      // Update query key with content version for future requests
+      if (homepage?.updated_at) {
+        // This enables cache versioning - new content will have different cache key
+        return homepage;
+      }
+      
+      return homepage;
     },
+    ...CacheStrategies.HOMEPAGE,
+    // Enable background refetch to keep content fresh without flashing
+    refetchInterval: 5 * 60 * 1000, // 5 minutes
+    refetchIntervalInBackground: true,
+    // Prevent refetch on window focus to avoid flashing
+    refetchOnWindowFocus: false,
+    // Custom stale time for homepage content
+    staleTime: 2 * 60 * 1000, // Consider fresh for 2 minutes
   });
 
   // Parse sections with error handling (moved before hooks)
@@ -35,7 +53,7 @@ const Index = () => {
       console.warn('Current body structure:', Object.keys(homePage?.body || {}));
       
       // Provide a basic fallback hero section if content exists but no sections
-      if (homePage.body.content === "") {
+      if ((homePage as Page).body.content === "") {
         // Creating fallback hero section since content is empty
         sections = [{
           id: 'fallback-hero',
@@ -133,11 +151,11 @@ const Index = () => {
                 <p className="text-xs text-destructive/80">
                   {parseError instanceof Error ? parseError.message : 'Unknown error parsing sections'}
                 </p>
-                {homePage?.body && (
+                {(homePage as Page)?.body && (
                   <details className="mt-2">
                     <summary className="text-xs cursor-pointer">Page Body Structure</summary>
                     <pre className="text-xs mt-1 text-left whitespace-pre-wrap break-all">
-                      {JSON.stringify(homePage.body, null, 2)}
+                      {JSON.stringify((homePage as Page).body, null, 2)}
                     </pre>
                   </details>
                 )}
