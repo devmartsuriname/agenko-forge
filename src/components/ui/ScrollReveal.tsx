@@ -28,12 +28,30 @@ export function ScrollReveal({
   const safeDuration = getSafeDuration('normal');
   const safeTransform = getSafeTransform('translateY(0)');
 
+  // Map direction to correct CSS class
+  const getDirectionClass = (dir: string) => {
+    switch (dir) {
+      case 'up':
+        return 'slide-up';
+      case 'down':
+        return 'slide-down';
+      case 'left':
+        return 'slide-left';
+      case 'right':
+        return 'slide-right';
+      case 'scale':
+        return 'scale-in';
+      default:
+        return 'slide-up';
+    }
+  };
+
   return (
     <div
       ref={elementRef}
       className={cn(
         'scroll-reveal',
-        `slide-${direction}`,
+        getDirectionClass(direction),
         {
           'revealed': isVisible,
           'stagger-children': stagger,
