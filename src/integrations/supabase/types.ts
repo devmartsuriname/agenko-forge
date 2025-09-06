@@ -1314,6 +1314,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      cleanup_old_sensitive_data: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       generate_proposal_id: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -1359,6 +1363,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      is_valid_email: {
+        Args: { email: string }
+        Returns: boolean
+      }
       log_app_event: {
         Args: {
           p_area: string
@@ -1381,6 +1389,14 @@ export type Database = {
           p_user_id?: string
         }
         Returns: undefined
+      }
+      log_sensitive_access: {
+        Args: { operation: string; record_id?: string; table_name: string }
+        Returns: undefined
+      }
+      mask_sensitive_data: {
+        Args: { data: Json }
+        Returns: Json
       }
       redact_pii: {
         Args: { input_text: string }
