@@ -4,6 +4,7 @@ import { useAuth } from '@/lib/auth';
 import { AdminSidebar } from './AdminSidebar';
 import { AdminHeader } from './AdminHeader';
 import { AuthStateMonitor } from '@/components/auth/AuthStateMonitor';
+import { SecurityMonitor } from './SecurityMonitor';
 
 interface AdminLayoutProps {
   children?: ReactNode;
@@ -70,10 +71,13 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         <AdminSidebar />
         <div className="flex-1 flex flex-col overflow-hidden">
           <AdminHeader />
-          <main className="flex-1 overflow-y-auto p-6 relative">
+          <main className="flex-1 overflow-y-auto p-6 relative space-y-6">
+            {/* Security Monitor for Admins */}
+            {hasPermission(['admin']) && <SecurityMonitor />}
+            
             {children || <Outlet />}
             <div className="fixed bottom-2 right-2 text-xs text-muted-foreground/50 pointer-events-none">
-              v:P7.2.1-PROPOSALS-FIX-AUTH-ENHANCED
+              v:P7.2.1-SECURITY-ENHANCED
             </div>
           </main>
         </div>
