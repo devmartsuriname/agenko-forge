@@ -71,7 +71,10 @@ export const AboutSectionSchema = BaseSectionSchema.extend({
       title: z.string().optional(),
       description: z.string().optional(),
       buttonText: z.string().optional(),
-      buttonUrl: z.string().url().optional(),
+      buttonUrl: z.string().refine(
+        (val) => val.startsWith('/') || val.startsWith('http://') || val.startsWith('https://'), 
+        { message: "URL must be either a relative path (starting with /) or a full URL" }
+      ).optional(),
     }).optional(),
     companiesTitle: z.string().optional(),
     companies: z.array(z.object({
