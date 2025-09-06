@@ -40,29 +40,25 @@ export function initializeProductionOptimizations() {
 }
 
 function preloadCriticalAssets() {
-  // Only preload assets that actually exist
+  // Only preload assets that actually exist and are critical
   const assets = [
-    // Use correct paths for assets
-    '/src/assets/hero-image.jpg',
-    '/src/assets/logo.png'
+    // Critical public assets
+    '/logo.png',
+    '/favicon.ico'
   ];
   
   assets.forEach(src => {
-    // Check if asset exists before preloading to avoid 404s
-    fetch(src, { method: 'HEAD' })
-      .then(response => {
-        if (response.ok) {
-          const link = document.createElement('link');
-          link.rel = 'preload';
-          link.as = 'image';
-          link.href = src;
-          document.head.appendChild(link);
-        }
-      })
-      .catch(() => {
-        // Silently fail for missing assets to avoid console spam
-        console.warn(`Asset not available for preloading: ${src}`);
-      });
+    try {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = src.endsWith('.css') ? 'style' : 'image';
+      link.href = src;
+      link.onload = () => console.log(`Production asset preloaded: ${src}`);
+      link.onerror = () => console.warn(`Failed to preload production asset: ${src}`);
+      document.head.appendChild(link);
+    } catch (error) {
+      console.warn(`Error preloading asset ${src}:`, error);
+    }
   });
 }
 

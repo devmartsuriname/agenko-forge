@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import logo from '@/assets/logo.png';
+import { LazyImageWithFallback } from '@/components/ui/LazyImageWithFallback';
 import { useContactSettings } from '@/hooks/useContactSettings';
 
 const Footer = () => {
@@ -33,8 +34,9 @@ const Footer = () => {
           {/* Brand & Description */}
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center space-x-2 mb-4">
-              <img 
+              <LazyImageWithFallback 
                 src={logo} 
+                fallbackSrc="/logo.png"
                 alt="DevMart Logo" 
                 className="h-8 w-auto"
               />

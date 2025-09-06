@@ -5,6 +5,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import logo from '@/assets/logo.png';
+import { LazyImageWithFallback } from '@/components/ui/LazyImageWithFallback';
 
 interface GlobalNavigationProps {
   /** Whether to use transparent overlay (for homepage) or solid background */
@@ -78,7 +79,12 @@ export function GlobalNavigation({ overlay = false }: GlobalNavigationProps) {
       {/* Navigation */}
       <nav className="container mx-auto flex items-center justify-between px-4 py-4 mt-6 relative z-10">
         <Link to="/" className="flex items-center">
-          <img src={logo} alt="Devmart Logo" className="h-8 w-auto object-contain" />
+          <LazyImageWithFallback 
+            src={logo} 
+            fallbackSrc="/logo.png"
+            alt="Devmart Logo" 
+            className="h-8 w-auto object-contain" 
+          />
         </Link>
 
         {/* Desktop Navigation */}
@@ -167,7 +173,12 @@ export function GlobalNavigation({ overlay = false }: GlobalNavigationProps) {
           >
             <div className="flex items-center justify-between">
               <Link to="/" className="flex items-center" onClick={() => setMobileMenuOpen(false)}>
-                <img src={logo} alt="Devmart Logo" className="h-8 w-auto object-contain" />
+                <LazyImageWithFallback 
+                  src={logo} 
+                  fallbackSrc="/logo.png"
+                  alt="Devmart Logo" 
+                  className="h-8 w-auto object-contain" 
+                />
               </Link>
               <button onClick={() => setMobileMenuOpen(false)}>
                 <X className="h-6 w-6 text-white" />

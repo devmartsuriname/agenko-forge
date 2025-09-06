@@ -37,13 +37,23 @@ export class PerformanceMonitor {
   }
 
   private preloadCriticalResources() {
-    const criticalResources = ['/logo.png'];
+    const criticalResources = [
+      '/logo.png', // Public logo for SEO
+      'favicon.ico'
+    ];
+    
     criticalResources.forEach(resource => {
-      const link = document.createElement('link');
-      link.rel = 'preload';
-      link.href = resource;
-      link.as = 'image';
-      document.head.appendChild(link);
+      try {
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = resource.endsWith('.png') || resource.endsWith('.jpg') ? 'image' : 'document';
+        link.href = resource;
+        link.onload = () => console.log(`Preloaded: ${resource}`);
+        link.onerror = () => console.warn(`Failed to preload: ${resource}`);
+        document.head.appendChild(link);
+      } catch (error) {
+        console.warn(`Error preloading ${resource}:`, error);
+      }
     });
   }
 
