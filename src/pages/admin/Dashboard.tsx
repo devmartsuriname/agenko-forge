@@ -15,6 +15,7 @@ import { FinalValidationDashboard } from '@/components/admin/FinalValidationDash
 import { CTAAnalytics } from '@/components/admin/analytics/CTAAnalytics';
 import { SystemHealthWidget } from '@/components/admin/SystemHealthWidget';
 import { ErrorBoundaryWrapper } from '@/components/admin/ErrorBoundaryWrapper';
+import { SecurityMonitor } from '@/components/admin/SecurityMonitor';
 
 interface DashboardStats {
   services: number;
@@ -259,6 +260,11 @@ export default function AdminDashboard() {
           <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
           <p className="text-muted-foreground">Welcome back! Here's what's happening.</p>
         </div>
+
+        {/* Security Monitor - Admin Only */}
+        <ErrorBoundaryWrapper>
+          <SecurityMonitor />
+        </ErrorBoundaryWrapper>
 
         {/* KPI Cards with 7-day delta */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
