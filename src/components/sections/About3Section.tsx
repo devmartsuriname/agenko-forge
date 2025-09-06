@@ -14,70 +14,75 @@ export function About3Section({ section }: About3SectionProps) {
   // Enhanced About3 layout - force simple layout for user preference
   const hasEnhancedLayout = false; // Temporarily use simple layout
 
-  // If it's the legacy layout, fall back to the original AboutSection component
+  // Simple clean layout matching original design
   if (!hasEnhancedLayout) {
     return (
       <section className="py-20 px-4 bg-background">
         <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Main Content - 2 Column Layout */}
+          <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
+            {/* Left Column: Title and Description */}
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
                 {data.title}
               </h2>
-              <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+              <p className="text-lg text-muted-foreground leading-relaxed">
                 {data.description}
               </p>
-              
-              {data.features && data.features.length > 0 && (
-                <div className="grid gap-6">
-                  {data.features.map((feature, index) => (
-                    <div key={index} className="flex items-start space-x-4">
-                      <div className="flex-shrink-0">
-                        <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                          <span className="h-6 w-6 text-primary">{feature.icon}</span>
-                        </div>
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-foreground mb-2">
-                          {feature.title}
-                        </h3>
-                        <p className="text-muted-foreground">
-                          {feature.description}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
             
-            {data.image && (
-              <div className="order-first lg:order-last">
-                <div className="relative">
-                  {typeof data.image === 'string' ? (
-                    <img 
-                      src={data.image} 
-                      alt={data.title}
-                      className="w-full h-96 lg:h-[500px] object-cover rounded-2xl shadow-2xl"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <img 
-                      src={data.image.src} 
-                      srcSet={data.image.srcset}
-                      sizes={data.image.sizes}
-                      alt={data.image.alt || data.title}
-                      width={data.image.width}
-                      height={data.image.height}
-                      className="w-full h-96 lg:h-[500px] object-cover rounded-2xl shadow-2xl"
-                      loading="lazy"
-                    />
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl" />
+            {/* Right Column: Simple Geometric Icon/Placeholder */}
+            <div className="order-first lg:order-last flex items-center justify-center">
+              <div className="w-80 h-80 bg-gradient-to-br from-primary/10 to-accent/10 rounded-full flex items-center justify-center">
+                <div className="w-32 h-32 bg-primary/20 rounded-lg rotate-12 flex items-center justify-center">
+                  <div className="w-16 h-16 bg-primary/30 rounded-md -rotate-12"></div>
                 </div>
               </div>
-            )}
+            </div>
           </div>
+
+          {/* Companies Section */}
+          {data.companies && data.companies.length > 0 && (
+            <div className="mb-16 text-center">
+              <p className="text-sm text-muted-foreground mb-8 uppercase tracking-wide">
+                {data.companiesTitle || "Valued by clients worldwide"}
+              </p>
+              <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
+                {data.companies.map((company, idx) => (
+                  <img
+                    key={company.src + idx}
+                    src={company.src}
+                    alt={company.alt}
+                    className="h-8 w-auto opacity-60 hover:opacity-100 transition-opacity duration-300 filter grayscale hover:grayscale-0"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Achievements Section - 4 Column Grid */}
+          {data.achievements && data.achievements.length > 0 && (
+            <div className="text-center">
+              <h3 className="text-2xl font-semibold text-foreground mb-4">
+                {data.achievementsTitle || "Our Impact in Numbers"}
+              </h3>
+              <p className="text-muted-foreground mb-12 max-w-2xl mx-auto">
+                {data.achievementsDescription || "Delivering exceptional results through innovative solutions and dedicated partnerships."}
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                {data.achievements.map((item, idx) => (
+                  <div key={item.label + idx} className="text-center">
+                    <div className="text-3xl md:text-4xl font-bold text-primary mb-2">
+                      {item.value}
+                    </div>
+                    <div className="text-sm text-muted-foreground uppercase tracking-wide">
+                      {item.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
     );
