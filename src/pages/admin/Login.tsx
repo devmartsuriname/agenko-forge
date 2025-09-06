@@ -26,13 +26,36 @@ export default function AdminLogin() {
     setError('');
     setIsSubmitting(true);
 
+    // Basic validation
+    if (!email.trim() || !password.trim()) {
+      setError('Please enter both email and password');
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!email.includes('@')) {
+      setError('Please enter a valid email address');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const { error } = await signIn(email, password);
       if (error) {
-        setError(error.message || 'Failed to sign in');
+        // Handle specific error types
+        if (error.message?.includes('Invalid login credentials')) {
+          setError('Invalid email or password. Please check your credentials and try again.');
+        } else if (error.message?.includes('Too many requests')) {
+          setError('Too many login attempts. Please wait a few minutes before trying again.');
+        } else if (error.message?.includes('Email not confirmed')) {
+          setError('Please check your email and click the confirmation link before signing in.');
+        } else {
+          setError(error.message || 'Failed to sign in. Please try again.');
+        }
       }
-    } catch (err) {
-      setError('An unexpected error occurred');
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError('An unexpected error occurred. Please try again later.');
     } finally {
       setIsSubmitting(false);
     }

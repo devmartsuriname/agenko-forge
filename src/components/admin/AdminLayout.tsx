@@ -3,13 +3,14 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
 import { AdminSidebar } from './AdminSidebar';
 import { AdminHeader } from './AdminHeader';
+import { AuthStateMonitor } from '@/components/auth/AuthStateMonitor';
 
 interface AdminLayoutProps {
   children?: ReactNode;
 }
 
 export function AdminLayout({ children }: AdminLayoutProps) {
-  const { user, loading, userRole } = useAuth();
+  const { user, loading, userRole, hasPermission } = useAuth();
   const location = useLocation();
 
   // Dev-only observability hooks
@@ -40,12 +41,15 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   // Check if user has admin access (admin, editor, or viewer)
-  if (!userRole || !['admin', 'editor', 'viewer'].includes(userRole)) {
+  if (!userRole || !hasPermission(['admin', 'editor', 'viewer'])) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-destructive mb-2">Access Denied</h1>
           <p className="text-muted-foreground">You don't have permission to access the admin panel.</p>
+          <p className="text-sm text-muted-foreground mt-2">
+            Current role: {userRole || 'None'} | Required: admin, editor, or viewer
+          </p>
         </div>
       </div>
     );
@@ -53,10 +57,13 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <div className="admin-root min-h-screen bg-background" data-build="P7.2.1-PROPOSALS-FIX" data-audit="P7-RLS-AUDIT-v1">
+      {/* Auth State Monitor */}
+      <AuthStateMonitor />
+      
       {/* Debug audit banner */}
       {process.env.NODE_ENV === 'development' && (
         <div className="bg-yellow-500/10 border-b border-yellow-500/20 px-4 py-1 text-xs text-yellow-700 dark:text-yellow-300">
-          🔐 Security & RLS Audit Mode - P7-RLS-AUDIT-v1
+          🔐 Security & RLS Audit Mode - P7-RLS-AUDIT-v1 | Auth: Enhanced Session Management
         </div>
       )}
       <div className="flex h-screen">
@@ -66,7 +73,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           <main className="flex-1 overflow-y-auto p-6 relative">
             {children || <Outlet />}
             <div className="fixed bottom-2 right-2 text-xs text-muted-foreground/50 pointer-events-none">
-              v:P7.2.1-PROPOSALS-FIX
+              v:P7.2.1-PROPOSALS-FIX-AUTH-ENHANCED
             </div>
           </main>
         </div>

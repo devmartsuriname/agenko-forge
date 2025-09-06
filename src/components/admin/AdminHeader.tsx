@@ -1,5 +1,6 @@
 import { useAuth } from '@/lib/auth';
 import { Badge } from '@/components/ui/badge';
+import { SecureLogout } from '@/components/auth/SecureLogout';
 
 export function AdminHeader() {
   const { user, userRole } = useAuth();
@@ -18,6 +19,8 @@ export function AdminHeader() {
               {userRole}
             </Badge>
           </div>
+          
+          <SecureLogout size="sm" />
         </div>
       </div>
     </header>
