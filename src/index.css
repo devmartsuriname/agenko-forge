@@ -348,6 +348,77 @@
     @apply scale-95;
   }
 
+  /* Floating element animations */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    25% { transform: translateY(-10px) rotate(1deg); }
+    50% { transform: translateY(-5px) rotate(0deg); }
+    75% { transform: translateY(-15px) rotate(-1deg); }
+  }
+
+  @keyframes float-delayed {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    25% { transform: translateY(-15px) rotate(-1deg); }
+    50% { transform: translateY(-8px) rotate(0deg); }
+    75% { transform: translateY(-12px) rotate(1deg); }
+  }
+
+  .floating-element {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .floating-element-delayed {
+    animation: float-delayed 8s ease-in-out infinite;
+    animation-delay: 2s;
+  }
+
+  /* Scroll reveal animations */
+  .scroll-reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all var(--transition-smooth);
+  }
+
+  .scroll-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Scroll reveal direction classes */
+  .scroll-reveal.slide-up {
+    transform: translateY(30px);
+  }
+
+  .scroll-reveal.slide-down {
+    transform: translateY(-30px);
+  }
+
+  .scroll-reveal.slide-left {
+    transform: translateX(30px);
+  }
+
+  .scroll-reveal.slide-right {
+    transform: translateX(-30px);
+  }
+
+  .scroll-reveal.scale-in {
+    transform: scale(0.9);
+  }
+
+  .scroll-reveal.revealed.slide-up,
+  .scroll-reveal.revealed.slide-down {
+    transform: translateY(0);
+  }
+
+  .scroll-reveal.revealed.slide-left,
+  .scroll-reveal.revealed.slide-right {
+    transform: translateX(0);
+  }
+
+  .scroll-reveal.revealed.scale-in {
+    transform: scale(1);
+  }
+
   /* Button enhancements */
   button, .btn {
     @apply transition-all duration-300 ease-out;
