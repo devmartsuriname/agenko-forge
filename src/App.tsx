@@ -12,6 +12,7 @@ import { TrackingScripts } from '@/components/TrackingScripts';
 import { GlobalIntegrations } from '@/components/GlobalIntegrations';
 import { PWAInstallPrompt } from '@/components/ui/PWAInstallPrompt';
 import { CTAProvider } from "@/components/cta/CTAProvider";
+import { EnhancedErrorBoundary } from "@/components/ui/EnhancedErrorBoundary";
 
 // Public pages
 import Index from "./pages/Index";
@@ -84,17 +85,18 @@ const PerformanceValidator = lazy(() => import("./components/admin/PerformanceVa
 const queryClient = new QueryClient();
 
 const App = () => (
-  <HelmetProvider>
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <GlobalIntegrations />
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <CTAProvider>
-              <PWAInstallPrompt />
-              <Routes>
+  <EnhancedErrorBoundary>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <GlobalIntegrations />
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <CTAProvider>
+                <PWAInstallPrompt />
+                <Routes>
               {/* Public Routes */}
               <Route path="/" element={<Index />} />
               <Route path="/about" element={<About />} />
@@ -333,13 +335,14 @@ const App = () => (
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
-            </Routes>
-            </CTAProvider>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </QueryClientProvider>
-  </HelmetProvider>
+                </Routes>
+              </CTAProvider>
+            </BrowserRouter>
+          </TooltipProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </HelmetProvider>
+  </EnhancedErrorBoundary>
 );
 
 export default App;
