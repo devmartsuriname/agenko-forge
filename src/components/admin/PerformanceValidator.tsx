@@ -2,25 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { PerformanceMonitor } from '@/lib/performance-optimization';
+import { performanceMonitor } from '@/lib/performance-monitor';
 import { PerformanceTester } from '@/lib/performance-tester';
-import { FinalPerformanceValidator } from '@/lib/final-performance-validation';
 import { Check, X, Clock, AlertCircle } from 'lucide-react';
+import { UnifiedPerformanceMonitor } from '@/components/performance/UnifiedPerformanceMonitor';
+import type { PerformanceMetric, TestResult } from '@/types/performance';
 
-interface PerformanceMetric {
-  name: string;
-  value: number;
-  threshold: number;
-  unit: string;
-  status: 'good' | 'warning' | 'error';
-}
+// Removed interface - now imported from types
 
 export default function PerformanceValidator() {
   const [metrics, setMetrics] = useState<PerformanceMetric[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [bundleInfo, setBundleInfo] = useState<any>(null);
-  const [comprehensiveResults, setComprehensiveResults] = useState<any[]>([]);
-  const [performanceReport, setPerformanceReport] = useState<string>('');
+  const [testResults, setTestResults] = useState<TestResult[]>([]);
 
   useEffect(() => {
     // Run initial performance check
@@ -29,28 +23,23 @@ export default function PerformanceValidator() {
 
   const runPerformanceValidation = async () => {
     setIsRunning(true);
-    PerformanceMonitor.clearMetrics();
+    performanceMonitor.clearMetrics();
 
     try {
-      // Run comprehensive performance tests
-      const testResults = await PerformanceTester.runAllTests();
-      const finalValidation = await FinalPerformanceValidator.runComprehensiveValidation();
-      
-      // Generate comprehensive report
-      const report = FinalPerformanceValidator.generatePerformanceReport(finalValidation);
-      setPerformanceReport(report);
-      setComprehensiveResults(finalValidation);
+      // Run comprehensive performance tests using unified monitor
+      const results = await performanceMonitor.runAllTests();
+      setTestResults(results);
       
       // Test React component mounting performance
-      PerformanceMonitor.startMeasure('component-mount');
+      performanceMonitor.startMeasure('component-mount');
       await new Promise(resolve => setTimeout(resolve, 50)); // Simulate component work
-      PerformanceMonitor.endMeasure('component-mount');
+      performanceMonitor.endMeasure('component-mount');
 
       // Get navigation timing
       const navigationTiming = getNavigationMetrics();
       
-      // Compile metrics from both sources
-      const performanceMetrics = PerformanceMonitor.getMetrics();
+      // Compile metrics from unified monitor
+      const performanceMetrics = performanceMonitor.getMetrics();
       const compiledMetrics: PerformanceMetric[] = [
         {
           name: 'Component Mount Time',
@@ -59,7 +48,7 @@ export default function PerformanceValidator() {
           unit: 'ms',
           status: (performanceMetrics['component-mount'] || 0) < 100 ? 'good' : 'warning'
         },
-        ...testResults.map(result => ({
+        ...results.map(result => ({
           name: result.name,
           value: result.duration,
           threshold: result.name === 'Lazy Loading' ? 500 : result.name === 'Asset Loading' ? 100 : 200,
@@ -86,12 +75,8 @@ export default function PerformanceValidator() {
 
       setMetrics(compiledMetrics);
       
-      // Check bundle information and performance data
-      setBundleInfo({
-        ...getBundleInfo(),
-        performanceReport: PerformanceTester.generateReport(),
-        testResults
-      });
+      // Check bundle information
+      setBundleInfo(getBundleInfo());
       
     } catch (error) {
       console.error('Performance validation failed:', error);
@@ -113,35 +98,23 @@ export default function PerformanceValidator() {
   };
 
   const getNavigationMetrics = () => {
-    if (typeof performance === 'undefined' || !performance.getEntriesByType) {
-      return { domContentLoaded: 0, loadComplete: 0 };
+    const metrics = performanceMonitor.getNavigationTiming();
+    if (metrics) {
+      return metrics;
     }
-
-    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-    
-    if (!navigation) {
-      return { domContentLoaded: 0, loadComplete: 0 };
-    }
-
-    return {
-      domContentLoaded: navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
-      loadComplete: navigation.loadEventEnd - navigation.loadEventStart
-    };
+    return { domContentLoaded: 0, loadComplete: 0 };
   };
 
   const getBundleInfo = () => {
     const scripts = Array.from(document.querySelectorAll('script[src]'));
     const stylesheets = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
+    const memoryUsage = performanceMonitor.getMemoryUsage();
     
     return {
       scriptCount: scripts.length,
       stylesheetCount: stylesheets.length,
       totalAssets: scripts.length + stylesheets.length,
-      memoryUsage: (performance as any).memory ? {
-        usedJSHeapSize: Math.round(((performance as any).memory.usedJSHeapSize / 1024 / 1024) * 100) / 100,
-        totalJSHeapSize: Math.round(((performance as any).memory.totalJSHeapSize / 1024 / 1024) * 100) / 100,
-        jsHeapSizeLimit: Math.round(((performance as any).memory.jsHeapSizeLimit / 1024 / 1024) * 100) / 100
-      } : null
+      memoryUsage: memoryUsage.used > 0 ? memoryUsage : null
     };
   };
 
@@ -176,6 +149,9 @@ export default function PerformanceValidator() {
 
   return (
     <div className="space-y-6">
+      {/* Unified Performance Monitor */}
+      <UnifiedPerformanceMonitor />
+      
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
@@ -244,49 +220,29 @@ export default function PerformanceValidator() {
                 </div>
               </div>
 
-              {comprehensiveResults.length > 0 && (
+              {testResults.length > 0 && (
                 <div className="p-4 border rounded-lg">
-                  <h4 className="text-sm font-medium mb-3">Comprehensive Test Results</h4>
-                  <div className="space-y-3">
-                    {comprehensiveResults.map((category, categoryIndex) => (
-                      <div key={categoryIndex} className="border rounded-lg p-3">
-                        <div className="flex items-center justify-between mb-2">
-                          <h5 className="text-sm font-medium">{category.category}</h5>
-                          <Badge variant={category.overallScore >= 80 ? 'default' : category.overallScore >= 60 ? 'secondary' : 'destructive'}>
-                            {category.overallScore}%
-                          </Badge>
-                        </div>
-                        <div className="space-y-1">
-                          {category.tests.map((test: any, testIndex: number) => (
-                            <div key={testIndex} className="flex items-center gap-2 text-xs">
-                              {test.passed ? (
-                                <Check className="h-3 w-3 text-green-500" />
-                              ) : (
-                                <X className="h-3 w-3 text-red-500" />
-                              )}
-                              <span className={test.passed ? 'text-green-700' : 'text-red-700'}>
-                                {test.name}
-                              </span>
-                              {test.duration && (
-                                <span className="text-muted-foreground">
-                                  ({test.duration.toFixed(1)}ms)
-                                </span>
-                              )}
-                            </div>
-                          ))}
-                        </div>
+                  <h4 className="text-sm font-medium mb-3">Performance Test Results</h4>
+                  <div className="space-y-2">
+                    {testResults.map((result, index) => (
+                      <div key={index} className="flex items-center gap-2 text-sm">
+                        {result.success ? (
+                          <Check className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <X className="h-4 w-4 text-red-500" />
+                        )}
+                        <span className={result.success ? 'text-green-700' : 'text-red-700'}>
+                          {result.name}
+                        </span>
+                        <span className="text-muted-foreground">
+                          ({result.duration.toFixed(1)}ms)
+                        </span>
+                        {result.error && (
+                          <span className="text-red-500 text-xs">- {result.error}</span>
+                        )}
                       </div>
                     ))}
                   </div>
-                </div>
-              )}
-
-              {performanceReport && (
-                <div className="p-4 border rounded-lg">
-                  <h4 className="text-sm font-medium mb-3">Performance Report</h4>
-                  <pre className="text-xs whitespace-pre-wrap overflow-x-auto bg-muted p-3 rounded">
-                    {performanceReport}
-                  </pre>
                 </div>
               )}
             </div>

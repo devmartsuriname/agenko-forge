@@ -10,7 +10,7 @@ import { format, subDays } from 'date-fns';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { useNavigate } from 'react-router-dom';
-import { PerformanceMonitor } from '@/components/admin/PerformanceMonitor';
+import { UnifiedPerformanceMonitor } from '@/components/performance/UnifiedPerformanceMonitor';
 import { CTAAnalytics } from '@/components/admin/analytics/CTAAnalytics';
 import { SystemHealthWidget } from '@/components/admin/SystemHealthWidget';
 import { ErrorBoundaryWrapper } from '@/components/admin/ErrorBoundaryWrapper';
@@ -302,7 +302,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Performance Monitor */}
-        <PerformanceMonitor />
+        <UnifiedPerformanceMonitor />
 
         {/* Chart and Quick Actions Row */}
         <div className="grid gap-6 lg:grid-cols-3">
