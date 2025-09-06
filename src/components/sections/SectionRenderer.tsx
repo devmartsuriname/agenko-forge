@@ -1,5 +1,6 @@
 import { HeroSectionComponent } from './HeroSection';
 import { AboutSectionComponent } from './AboutSection';
+import { About3Section } from './About3Section';
 import { ServicesPreviewSectionComponent } from './ServicesPreviewSection';
 import { PortfolioPreviewSectionComponent } from './PortfolioPreviewSection';
 import { TestimonialsSectionComponent } from './TestimonialsSection';
@@ -54,7 +55,7 @@ export function SectionRenderer({ sections, context = 'home' }: SectionRendererP
               return <HeroSectionComponent key={sectionToRender.id} section={sectionToRender} />;
             case 'about':
               console.log('ℹ️ [SectionRenderer] Rendering about section');
-              return <AboutSectionComponent key={sectionToRender.id} section={sectionToRender} />;
+              return <About3Section key={sectionToRender.id} section={sectionToRender} />;
             case 'servicesPreview':
               console.log('🛠️ [SectionRenderer] Rendering services preview section');
               return <ServicesPreviewSectionComponent key={sectionToRender.id} section={sectionToRender} />;

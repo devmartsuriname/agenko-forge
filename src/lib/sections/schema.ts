@@ -33,12 +33,13 @@ export const HeroSectionSchema = BaseSectionSchema.extend({
   }),
 });
 
-// About section schema
+// About section schema - Extended for About3 component
 export const AboutSectionSchema = BaseSectionSchema.extend({
   type: z.literal('about'),
   data: z.object({
     title: z.string().min(1, 'Title is required'),
     description: z.string().min(1, 'Description is required'),
+    // Legacy single image support
     image: z.union([
       z.string().url(),
       z.object({
@@ -54,6 +55,34 @@ export const AboutSectionSchema = BaseSectionSchema.extend({
       icon: z.string(),
       title: z.string(),
       description: z.string(),
+    })).optional(),
+    // Enhanced About3 component fields
+    mainImage: z.object({
+      src: z.string().url(),
+      alt: z.string(),
+    }).optional(),
+    secondaryImage: z.object({
+      src: z.string().url(),
+      alt: z.string(),
+    }).optional(),
+    breakout: z.object({
+      src: z.string().url(),
+      alt: z.string(),
+      title: z.string().optional(),
+      description: z.string().optional(),
+      buttonText: z.string().optional(),
+      buttonUrl: z.string().url().optional(),
+    }).optional(),
+    companiesTitle: z.string().optional(),
+    companies: z.array(z.object({
+      src: z.string().url(),
+      alt: z.string(),
+    })).optional(),
+    achievementsTitle: z.string().optional(),
+    achievementsDescription: z.string().optional(),
+    achievements: z.array(z.object({
+      label: z.string(),
+      value: z.string(),
     })).optional(),
   }),
 });
