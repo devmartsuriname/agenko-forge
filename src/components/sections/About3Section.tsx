@@ -1,4 +1,6 @@
 import { Button } from "@/components/ui/button";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import { FloatingElement } from "@/components/ui/FloatingElement";
 import type { AboutSection } from '@/lib/sections/schema';
 
 interface About3SectionProps {
@@ -95,97 +97,107 @@ export function About3Section({ section }: About3SectionProps) {
     <section className="py-32">
       <div className="container mx-auto">
         {/* Header Section */}
-        <div className="mb-14 grid gap-5 text-center md:grid-cols-2 md:text-left">
+        <ScrollReveal direction="up" className="mb-14 grid gap-5 text-center md:grid-cols-2 md:text-left" stagger>
           <h1 className="text-5xl font-semibold text-foreground">{data.title}</h1>
           <p className="text-muted-foreground">{data.description}</p>
-        </div>
+        </ScrollReveal>
 
         {/* Main Content Grid */}
-        <div className="grid gap-7 lg:grid-cols-3">
-          {/* Main Image */}
-          {data.mainImage && (
-            <img
-              src={data.mainImage.src}
-              alt={data.mainImage.alt}
-              className="size-full max-h-[620px] rounded-xl object-cover lg:col-span-2"
-            />
-          )}
-          
-          {/* Side Content */}
-          <div className="flex flex-col gap-7 md:flex-row lg:flex-col">
-            {/* Breakout Section */}
-            {data.breakout && (
-              <div className="flex flex-col justify-between gap-6 rounded-xl bg-muted p-7 md:w-1/2 lg:w-auto">
-                <img
-                  src={data.breakout.src}
-                  alt={data.breakout.alt}
-                  className="mr-auto h-12"
-                />
-                <div>
-                  <p className="mb-2 text-lg font-semibold text-foreground">{data.breakout.title}</p>
-                  <p className="text-muted-foreground">{data.breakout.description}</p>
-                </div>
-                {data.breakout.buttonText && data.breakout.buttonUrl && (
-                  <Button variant="outline" className="mr-auto" asChild>
-                    <a href={data.breakout.buttonUrl} target="_blank" rel="noopener noreferrer">
-                      {data.breakout.buttonText}
-                    </a>
-                  </Button>
-                )}
-              </div>
-            )}
-            
-            {/* Secondary Image */}
-            {data.secondaryImage && (
+        <ScrollReveal direction="left" delay={0.2}>
+          <div className="grid gap-7 lg:grid-cols-3">
+            {/* Main Image */}
+            {data.mainImage && (
               <img
-                src={data.secondaryImage.src}
-                alt={data.secondaryImage.alt}
-                className="grow basis-0 rounded-xl object-cover md:w-1/2 lg:min-h-0 lg:w-auto"
+                src={data.mainImage.src}
+                alt={data.mainImage.alt}
+                className="size-full max-h-[620px] rounded-xl object-cover lg:col-span-2"
               />
             )}
+            
+            {/* Side Content */}
+            <div className="flex flex-col gap-7 md:flex-row lg:flex-col">
+              {/* Breakout Section */}
+              {data.breakout && (
+                <FloatingElement variant="default">
+                  <div className="flex flex-col justify-between gap-6 rounded-xl bg-muted p-7 md:w-1/2 lg:w-auto">
+                    <img
+                      src={data.breakout.src}
+                      alt={data.breakout.alt}
+                      className="mr-auto h-12"
+                    />
+                    <div>
+                      <p className="mb-2 text-lg font-semibold text-foreground">{data.breakout.title}</p>
+                      <p className="text-muted-foreground">{data.breakout.description}</p>
+                    </div>
+                    {data.breakout.buttonText && data.breakout.buttonUrl && (
+                      <Button variant="outline" className="mr-auto" asChild>
+                        <a href={data.breakout.buttonUrl} target="_blank" rel="noopener noreferrer">
+                          {data.breakout.buttonText}
+                        </a>
+                      </Button>
+                    )}
+                  </div>
+                </FloatingElement>
+              )}
+              
+              {/* Secondary Image */}
+              {data.secondaryImage && (
+                <FloatingElement variant="delayed">
+                  <img
+                    src={data.secondaryImage.src}
+                    alt={data.secondaryImage.alt}
+                    className="grow basis-0 rounded-xl object-cover md:w-1/2 lg:min-h-0 lg:w-auto"
+                  />
+                </FloatingElement>
+              )}
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
 
         {/* Companies Section */}
         {data.companies && data.companies.length > 0 && (
-          <div className="py-32">
-            <p className="text-center text-muted-foreground">{companiesTitle}</p>
-            <div className="mt-8 flex flex-wrap justify-center gap-8">
-              {data.companies.map((company, idx) => (
-                <div className="flex items-center gap-3" key={company.src + idx}>
-                  <img
-                    src={company.src}
-                    alt={company.alt}
-                    className="h-6 w-auto md:h-8 opacity-70 hover:opacity-100 transition-opacity"
-                  />
-                </div>
-              ))}
+          <ScrollReveal direction="up" delay={0.4}>
+            <div className="py-32">
+              <p className="text-center text-muted-foreground">{companiesTitle}</p>
+              <div className="mt-8 flex flex-wrap justify-center gap-8">
+                {data.companies.map((company, idx) => (
+                  <div className="flex items-center gap-3" key={company.src + idx}>
+                    <img
+                      src={company.src}
+                      alt={company.alt}
+                      className="h-6 w-auto md:h-8 opacity-70 hover:opacity-100 transition-opacity"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          </ScrollReveal>
         )}
 
         {/* Achievements Section */}
         {data.achievements && data.achievements.length > 0 && (
-          <div className="relative overflow-hidden rounded-xl bg-muted p-10 md:p-16">
-            <div className="flex flex-col gap-4 text-center md:text-left">
-              <h2 className="text-4xl font-semibold text-foreground">{achievementsTitle}</h2>
-              <p className="max-w-screen-sm text-muted-foreground">
-                {achievementsDescription}
-              </p>
+          <ScrollReveal direction="scale" delay={0.6}>
+            <div className="relative overflow-hidden rounded-xl bg-muted p-10 md:p-16">
+              <div className="flex flex-col gap-4 text-center md:text-left">
+                <h2 className="text-4xl font-semibold text-foreground">{achievementsTitle}</h2>
+                <p className="max-w-screen-sm text-muted-foreground">
+                  {achievementsDescription}
+                </p>
+              </div>
+              <div className="mt-10 flex flex-wrap justify-between gap-10 text-center">
+                {data.achievements.map((item, idx) => (
+                  <div className="flex flex-col gap-4" key={item.label + idx}>
+                    <p className="text-muted-foreground">{item.label}</p>
+                    <span className="text-4xl font-semibold md:text-5xl text-primary">
+                      {item.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              {/* Decorative Grid Pattern */}
+              <div className="pointer-events-none absolute -top-1 right-1 z-10 hidden h-full w-full bg-[linear-gradient(to_right,hsl(var(--muted-foreground))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--muted-foreground))_1px,transparent_1px)] bg-[size:80px_80px] opacity-15 [mask-image:linear-gradient(to_bottom_right,#000,transparent,transparent)] md:block"></div>
             </div>
-            <div className="mt-10 flex flex-wrap justify-between gap-10 text-center">
-              {data.achievements.map((item, idx) => (
-                <div className="flex flex-col gap-4" key={item.label + idx}>
-                  <p className="text-muted-foreground">{item.label}</p>
-                  <span className="text-4xl font-semibold md:text-5xl text-primary">
-                    {item.value}
-                  </span>
-                </div>
-              ))}
-            </div>
-            {/* Decorative Grid Pattern */}
-            <div className="pointer-events-none absolute -top-1 right-1 z-10 hidden h-full w-full bg-[linear-gradient(to_right,hsl(var(--muted-foreground))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--muted-foreground))_1px,transparent_1px)] bg-[size:80px_80px] opacity-15 [mask-image:linear-gradient(to_bottom_right,#000,transparent,transparent)] md:block"></div>
-          </div>
+          </ScrollReveal>
         )}
       </div>
     </section>

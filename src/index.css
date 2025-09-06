@@ -286,6 +286,25 @@
   .stagger-children.revealed > *:nth-child(4) { transition-delay: 0.4s; }
   .stagger-children.revealed > *:nth-child(5) { transition-delay: 0.5s; }
 
+  /* Floating animations keyframes */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes float-delayed {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-15px);
+    }
+  }
+
   /* Floating elements */
   .floating-element {
     animation: float 3s ease-in-out infinite;
