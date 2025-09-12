@@ -18,6 +18,7 @@ export const LogArea = {
   CONTACT: 'contact',
   ADMIN: 'admin',
   API: 'api',
+  NETWORK: 'network',
   RATE_LIMIT: 'rate_limit',
   MAINTENANCE: 'maintenance'
 } as const;

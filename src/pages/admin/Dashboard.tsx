@@ -16,6 +16,7 @@ import { CTAAnalytics } from '@/components/admin/analytics/CTAAnalytics';
 import { SystemHealthWidget } from '@/components/admin/SystemHealthWidget';
 import { ErrorBoundaryWrapper } from '@/components/admin/ErrorBoundaryWrapper';
 import { SecurityMonitor } from '@/components/admin/SecurityMonitor';
+import { NetworkDebugWidget } from '@/components/admin/NetworkDebugWidget';
 
 interface DashboardStats {
   services: number;
@@ -404,6 +405,16 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
           )}
+        </div>
+
+        {/* System Health and Network Debug Widgets */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          <ErrorBoundaryWrapper>
+            <SystemHealthWidget />
+          </ErrorBoundaryWrapper>
+          <ErrorBoundaryWrapper>
+            <NetworkDebugWidget />
+          </ErrorBoundaryWrapper>
         </div>
 
         {/* Recent Activity */}

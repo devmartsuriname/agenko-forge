@@ -85,6 +85,7 @@ const AdminCareerEditor = lazy(() => import("./pages/admin/AdminCareerEditor"));
 const AdminTestHarness = lazy(() => import("./pages/admin/TestHarness"));
 const ErrorBoundaryTest = lazy(() => import("./components/admin/ErrorBoundaryTest"));
 const PerformanceValidator = lazy(() => import("./components/admin/PerformanceValidator"));
+const AdminNetworkDebug = lazy(() => import("./pages/admin/AdminNetworkDebug"));
 
 // Use optimized QueryClient with content-aware caching
 const queryClient = optimizedQueryClient;
@@ -349,6 +350,11 @@ const App = () => (
                 <Route path="error-boundary-test" element={
                   <SuspenseWithTimeout fallback={<Spinner />}>
                     <ErrorBoundaryTest />
+                  </SuspenseWithTimeout>
+                } />
+                <Route path="network-debug" element={
+                  <SuspenseWithTimeout fallback={<Spinner />}>
+                    <AdminNetworkDebug />
                   </SuspenseWithTimeout>
                 } />
                 <Route path="performance-validator" element={
