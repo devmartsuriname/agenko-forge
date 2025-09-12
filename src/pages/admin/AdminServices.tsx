@@ -30,6 +30,7 @@ function AdminServices() {
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
+    console.log('[AdminServices] Component mounted, initializing fetchServices...');
     fetchServices();
   }, []);
 
@@ -38,17 +39,39 @@ function AdminServices() {
   }, [services, searchTerm, statusFilter]);
 
   const fetchServices = async () => {
+    const startTime = performance.now();
+    console.log('[AdminServices] Starting fetchServices...', { timestamp: new Date().toISOString() });
+    
     try {
+      console.log('[AdminServices] Calling adminCms.getAllServices()...');
       const data = await adminCms.getAllServices();
+      const fetchTime = performance.now() - startTime;
+      console.log('[AdminServices] Services fetched successfully', { 
+        count: data.length, 
+        fetchTime: `${fetchTime.toFixed(2)}ms`,
+        timestamp: new Date().toISOString()
+      });
       setServices(data);
     } catch (error) {
-      console.error('Error fetching services:', error);
+      const errorTime = performance.now() - startTime;
+      console.error('[AdminServices] Error fetching services:', error, {
+        errorTime: `${errorTime.toFixed(2)}ms`,
+        errorType: error instanceof Error ? error.constructor.name : 'Unknown',
+        errorMessage: error instanceof Error ? error.message : String(error),
+        timestamp: new Date().toISOString()
+      });
+      
       if (error instanceof Error && error.message.includes('permission')) {
         adminToast.permissionDenied('view services');
       } else {
         adminToast.networkError();
       }
     } finally {
+      const totalTime = performance.now() - startTime;
+      console.log('[AdminServices] fetchServices completed', { 
+        totalTime: `${totalTime.toFixed(2)}ms`,
+        timestamp: new Date().toISOString()
+      });
       setLoading(false);
     }
   };

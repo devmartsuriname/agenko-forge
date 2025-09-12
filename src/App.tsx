@@ -202,7 +202,7 @@ const App = () => (
                   </SuspenseWithTimeout>
                 } />
                 <Route path="services" element={
-                  <SuspenseWithTimeout fallback={<Spinner />}>
+                  <SuspenseWithTimeout fallback={<Spinner />} timeout={50000}>
                     <AdminServices />
                   </SuspenseWithTimeout>
                 } />
