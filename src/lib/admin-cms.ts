@@ -1,17 +1,72 @@
 import { supabase } from '@/integrations/supabase/client';
 import { ProjectImage, Service, Project, BlogPost, BlogCategory, FAQ, Page, ContactSubmission } from '@/types/content';
+import { supabasePerformance } from './supabase-performance';
 
 // Admin CMS functions with full CRUD capabilities
 export const adminCms = {
-  // Services
-  async getAllServices(): Promise<Service[]> {
-    const { data, error } = await supabase
-      .from('services')
-      .select('*')
-      .order('updated_at', { ascending: false });
+  // Services - Optimized version with enhanced querying capabilities
+  async getAllServices(options: {
+    status?: 'draft' | 'published' | 'all';
+    sortBy?: 'updated_at' | 'published_at' | 'title' | 'created_at';
+    sortOrder?: 'asc' | 'desc';
+    limit?: number;
+    offset?: number;
+  } = {}): Promise<Service[]> {
+    const {
+      status = 'all',
+      sortBy = 'updated_at',
+      sortOrder = 'desc',
+      limit,
+      offset
+    } = options;
+    
+    let query = supabase.from('services').select('*');
+    
+    // Apply status filter for better index usage
+    if (status !== 'all') {
+      query = query.eq('status', status);
+    }
+    
+    // Apply sorting - this will use our new indexes
+    query = query.order(sortBy, { ascending: sortOrder === 'asc' });
+    
+    // Apply pagination if specified
+    if (limit) {
+      query = query.limit(limit);
+    }
+    if (offset) {
+      query = query.range(offset, offset + (limit || 10) - 1);
+    }
 
+    const { data, error } = await query;
+    
     if (error) throw error;
     return (data || []) as Service[];
+  },
+
+  // Optimized getAllServices method using performance manager
+  async getAllServicesOptimized(): Promise<Service[]> {
+    const result = await supabasePerformance.executeOptimizedQuery(
+      async () => {
+        const { data, error } = await supabase
+          .from('services')
+          .select('*')
+          .order('updated_at', { ascending: false });
+        return { data, error };
+      },
+      {
+        enableTiming: true,
+        enableCaching: true,
+        cacheKey: 'admin_services_all',
+        cacheTtl: 2 * 60 * 1000 // 2 minutes cache for admin data
+      }
+    );
+    
+    // Type assertion to handle status field
+    return (result || []).map(service => ({
+      ...service,
+      status: service.status as 'draft' | 'published'
+    })) as Service[];
   },
 
   async createService(service: Omit<Service, 'id' | 'created_at' | 'updated_at'>): Promise<Service> {

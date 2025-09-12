@@ -138,14 +138,15 @@ function AdminServices() {
     }, SLOW_CONNECTION_THRESHOLD);
     
     try {
-      console.log('[AdminServices] Calling adminCms.getAllServices()...');
+      console.log('[AdminServices] Calling optimized getAllServices()...');
       
       // Add timeout to the request
       const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => reject(new Error('Request timeout')), 30000); // 30s timeout
       });
       
-      const fetchPromise = adminCms.getAllServices();
+      // Use the optimized query method
+      const fetchPromise = adminCms.getAllServicesOptimized();
       const data = await Promise.race([fetchPromise, timeoutPromise]) as Service[];
       
       // Check if request was aborted
@@ -172,6 +173,9 @@ function AdminServices() {
           description: `Data loaded in ${(fetchTime / 1000).toFixed(1)}s. Consider checking your connection.`,
           duration: 3000,
         });
+      } else if (fetchTime < 500) {
+        // Log fast queries for performance monitoring
+        console.log(`[AdminServices] Fast query completed in ${fetchTime.toFixed(2)}ms`);
       }
       
     } catch (error: any) {
