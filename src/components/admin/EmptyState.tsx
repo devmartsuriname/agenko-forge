@@ -8,7 +8,8 @@ interface EmptyStateProps {
   title: string;
   description: string;
   actionLabel: string;
-  actionTo: string;
+  actionTo?: string;
+  onActionClick?: () => void;
   className?: string;
 }
 
@@ -18,6 +19,7 @@ export function EmptyState({
   description, 
   actionLabel, 
   actionTo,
+  onActionClick,
   className 
 }: EmptyStateProps) {
   return (
@@ -28,11 +30,17 @@ export function EmptyState({
         </div>
         <h3 className="text-lg font-semibold mb-2">{title}</h3>
         <p className="text-muted-foreground mb-6 max-w-sm">{description}</p>
-        <Button asChild>
-          <Link to={actionTo}>
+        {onActionClick ? (
+          <Button onClick={onActionClick}>
             {actionLabel}
-          </Link>
-        </Button>
+          </Button>
+        ) : actionTo ? (
+          <Button asChild>
+            <Link to={actionTo}>
+              {actionLabel}
+            </Link>
+          </Button>
+        ) : null}
       </CardContent>
     </Card>
   );
