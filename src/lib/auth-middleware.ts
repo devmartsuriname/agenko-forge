@@ -9,8 +9,11 @@ export interface SessionValidationResult {
 
 /**
  * Validates the current session and checks if it needs refreshing
+ * Optimized version with reduced API calls
  */
 export async function validateSession(session: Session | null): Promise<SessionValidationResult> {
+  const validationStart = performance.now();
+  
   if (!session) {
     return { 
       isValid: false, 
@@ -24,6 +27,7 @@ export async function validateSession(session: Session | null): Promise<SessionV
   const expiresAt = session.expires_at || 0;
   
   if (expiresAt <= now) {
+    console.log('[Auth] Session expired, needs refresh');
     return { 
       isValid: false, 
       needsRefresh: true, 
@@ -35,9 +39,30 @@ export async function validateSession(session: Session | null): Promise<SessionV
   const refreshThreshold = now + (5 * 60); // 5 minutes
   const needsRefresh = expiresAt <= refreshThreshold;
 
-  // Validate with Supabase
+  // Skip expensive validation for fresh sessions (more than 30 minutes left)
+  const timeUntilExpiry = expiresAt - now;
+  if (timeUntilExpiry > 30 * 60 && session.access_token) {
+    console.log('[Auth] Session is fresh, skipping API validation', {
+      timeLeft: `${Math.floor(timeUntilExpiry / 60)}min`,
+      validationTime: `${(performance.now() - validationStart).toFixed(2)}ms`
+    });
+    return { 
+      isValid: true, 
+      needsRefresh,
+      error: undefined 
+    };
+  }
+
+  // Only validate with API for sessions close to expiry
   try {
+    console.log('[Auth] Validating session with Supabase API...');
     const { data: { user }, error } = await supabase.auth.getUser(session.access_token);
+    
+    const validationTime = performance.now() - validationStart;
+    console.log('[Auth] Session validation completed', {
+      isValid: !!user && !error,
+      validationTime: `${validationTime.toFixed(2)}ms`
+    });
     
     if (error || !user) {
       return { 
@@ -53,6 +78,8 @@ export async function validateSession(session: Session | null): Promise<SessionV
       error: undefined 
     };
   } catch (error) {
+    const validationTime = performance.now() - validationStart;
+    console.error('[Auth] Session validation failed:', error, `(${validationTime.toFixed(2)}ms)`);
     return { 
       isValid: false, 
       needsRefresh: true, 
