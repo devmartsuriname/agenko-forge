@@ -19,9 +19,9 @@ class OptimizedPerformanceMonitor {
   private metrics: Map<string, number> = new Map();
   private observers: PerformanceObserver[] = [];
   private isInitialized = false;
-  private warningThreshold = 3000; // 3 seconds
+  private warningThreshold = 5000; // 5 seconds
   private lastWarningTime = 0;
-  private warningCooldown = 30000; // 30 seconds between warnings
+  private warningCooldown = 300000; // 5 minutes between warnings
 
   private constructor() {
     // Lazy initialization to avoid overhead
@@ -81,11 +81,13 @@ class OptimizedPerformanceMonitor {
     const slowResources = entries.filter(entry => entry.duration > this.warningThreshold);
     
     if (slowResources.length > 0) {
-      // Only warn in development or if truly problematic
-      if (process.env.NODE_ENV === 'development' || slowResources.some(r => r.duration > 5000)) {
-        console.warn('[WARN] Slow resources detected', {
-          count: slowResources.length,
-          slowest: Math.round(Math.max(...slowResources.map(r => r.duration)))
+      // Only warn for truly problematic resources (>8s) and limit frequency
+      const criticalResources = slowResources.filter(r => r.duration > 8000);
+      if (criticalResources.length > 0) {
+        logger.warn('Critical slow resources detected', {
+          count: criticalResources.length,
+          slowest: Math.round(Math.max(...criticalResources.map(r => r.duration))),
+          resources: criticalResources.slice(0, 3).map(r => ({ name: r.name, duration: Math.round(r.duration) }))
         });
         this.lastWarningTime = now;
       }

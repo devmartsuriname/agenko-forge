@@ -270,9 +270,11 @@ export const auditAuth = {
 
 export const auditData = {
   sensitiveAccess: (table: string, operation: string, userId?: string, recordId?: string) => {
+    // Only log admin operations as low severity for normal access patterns
+    const severity = (operation === 'SELECT' && userId) ? 'low' : 'medium';
     securityAuditor.logEvent({
       type: 'data_access',
-      severity: 'medium',
+      severity,
       source: 'database',
       userId,
       details: { table, operation, recordId }
